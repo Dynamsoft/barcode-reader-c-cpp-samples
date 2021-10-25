@@ -26,10 +26,12 @@ This repository contains multiple samples that demonstrates how to use the <a hr
 ## License
 
 The library requires a license to work, you use the API InitLicenseFromDLS to tell the program where to fetch your license.
+
 If the Organizaion ID is not specified or set as "200001", a 7-day (public) trial license will be used by default which is the case in these samples.
+
 Note that network connection is required for this license to work.
 
-When using your own license, locate the following line and specify your Organization ID.
+When using your own license, locate the following line and specify your Organization ID.  
 // organizationID = "200001";
 
 If you don't have a license yet, you can request a trial from <a href="https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp" target="_blank">Customer Portal</a>
