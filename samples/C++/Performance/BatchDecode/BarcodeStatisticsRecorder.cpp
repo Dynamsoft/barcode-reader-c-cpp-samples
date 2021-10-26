@@ -15,11 +15,7 @@ static std::string  replace_all_distinct(string str, const   string old_value, c
 	}
 	return   str;
 }
-#if defined(_WIN64) || defined(_WIN32)
-static inline std::string& rtrim(std::string& s) {
-#else
 static inline std::string rtrim(std::string s) {
-#endif
 	s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
 	return s;
 }
