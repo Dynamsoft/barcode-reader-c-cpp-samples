@@ -1,0 +1,57 @@
+cmake_minimum_required(VERSION 3.6)
+
+project(Samples)
+
+# set the platform
+option(BUILD_LINUX "Build samples for running on Linux x86_64" ON)
+option(BUILD_ARM "Build samples for running on ARM x86" OFF)
+option(BUILD_ARM64 "Build samples for running on ARM x64" OFF)
+
+option(BUILD_C_HELLOWORLD "Build the sample HelloWorld under ./samples/C/HelloWorld" ON)
+option(BUILD_C_GENERALSETTINGS "Build the sample GeneralSettings under ./samples/C/GeneralSettings" ON)
+option(BUILD_CPP_HELLOWORLD "Build the sample HelloWorld under ./samples/C++/HelloWorld" ON)
+option(BUILD_CPP_GENERALSETTINGS "Build the sample GeneralSettings under ./samples/C++/GeneralSettings" ON)
+option(BUILD_CPP_BATCHDECODE "Build the sample BatchDecode under ./samples/C++/Performance/BatchDecode" ON)
+option(BUILD_CPP_VIDEODECODING "Build the sample VideoDecoding under ./samples/C++/VideoDecoding" ON)
+
+if(BUILD_LINUX)
+    set(DBRLIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/Linux)
+elseif(BUILD_ARM)
+    set(DBRLIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/ARM32)
+    add_compile_options(-DDM_ARM -D__ARM_NEON__ -mfpu=neon)
+elseif(BUILD_ARM64)
+    set(DBRLIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/ARM64)
+    add_compile_options(-DDM_ARM -D__ARM_NEON__)
+else()
+    message(FATAL_ERROR "Please specify a supported platform")
+endif()
+
+set (CMAKE_CXX_STANDARD 11)
+add_compile_options(-O2 -fPIC)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXECUTABLE_LINKER_FLAGS} -O2 -fvisibility=hidden -fvisibility-inlines-hidden -L ${DBRLIB} -Wl,-rpath,${DBRLIB} -Wl,-rpath,'$ORIGIN' -static-libgcc -static-libstdc++ -s")
+
+#include_directories (${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+
+if(BUILD_C_HELLOWORLD)
+    add_subdirectory(samples/C/HelloWorld)
+endif()
+if(BUILD_C_GENERALSETTINGS)
+    add_subdirectory(samples/C/GeneralSettings)
+endif()
+if(BUILD_CPP_HELLOWORLD)
+    add_subdirectory(samples/C++/HelloWorld)
+endif()
+if(BUILD_CPP_GENERALSETTINGS)
+    add_subdirectory(samples/C++/GeneralSettings)
+endif()
+if(BUILD_CPP_BATCHDECODE)
+    add_subdirectory(samples/C++/Performance/BatchDecode)
+endif()
+if(BUILD_CPP_VIDEODECODING)
+    add_subdirectory(samples/C++/VideoDecoding)
+endif()
+
+if(BUILD_C_HELLOWORLD OR BUILD_C_GENERALSETTINGS OR BUILD_CPP_HELLOWORLD OR BUILD_CPP_GENERALSETTINGS)
+    File(COPY ./images/AllSupportedBarcodeTypes.png DESTINATION images)
+endif()
