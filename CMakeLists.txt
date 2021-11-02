@@ -28,7 +28,7 @@ endif()
 
 set (CMAKE_CXX_STANDARD 11)
 add_compile_options(-O2 -fPIC)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXECUTABLE_LINKER_FLAGS} -O2 -fvisibility=hidden -fvisibility-inlines-hidden -L ${DBRLIB} -Wl,-rpath,${DBRLIB} -Wl,-rpath,'$ORIGIN' -static-libgcc -static-libstdc++ -s")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O2 -fvisibility=hidden -fvisibility-inlines-hidden -L ${DBRLIB} -Wl,-rpath,${DBRLIB} -Wl,-rpath,'$ORIGIN' -static-libgcc -static-libstdc++ -s")
 
 #include_directories (${CMAKE_CURRENT_SOURCE_DIR}/include)
 
