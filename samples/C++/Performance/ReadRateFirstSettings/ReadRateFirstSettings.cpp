@@ -21,30 +21,39 @@ class ReadRateFirstSettings
 public:
 	void configReadRateFirst(CBarcodeReader *reader) 
 	{
-		
+		// Obtain current runtime settings of instance.
 		PublicRuntimeSettings settings;
 		reader->GetRuntimeSettings(&settings);
+
+		// Parameter 1. Set expected barcode formats
+		// Here the barcode scanner will try to find the maximal barcode formats.
 		settings.barcodeFormatIds = BF_ALL;
 		settings.barcodeFormatIds_2 = BF2_DOTCODE | BF2_POSTALCODE;
+
+		// Parameter 2. Set expected barcode count.
+	   // Here the barcode scanner will try to find 64 barcodes.
+	   // If the result count does not reach the expected amount, the barcode scanner will try other algorithms 
 		settings.expectedBarcodesCount = 64; 
+
+		// Parameter 3. Set more binarization modes.
 		settings.binarizationModes[0] = BM_LOCAL_BLOCK;
 		settings.binarizationModes[1] = BM_THRESHOLD;
-		settings.binarizationModes[2] = BM_SKIP;
-		settings.binarizationModes[3] = BM_SKIP;
-		settings.binarizationModes[4] = BM_SKIP;
-		settings.binarizationModes[5] = BM_SKIP;
-		settings.binarizationModes[6] = BM_SKIP;
-		settings.binarizationModes[7] = BM_SKIP;
 
+		// Parameter 4. Set more localization modes.
+		// LocalizationModes are all enabled as default. Barcode reader will automatically switch between the modes and try decoding continuously until timeout or the expected barcode count is reached.
+		// Please manually update the enabled modes list or change the expected barcode count to promote the barcode scanning speed.
+		// Read more about localization mode members: https://www.dynamsoft.com/barcode-reader/parameters/enum/parameter-mode-enums.html?ver=latest#localizationmode
 		settings.localizationModes[0] = LM_CONNECTED_BLOCKS;
 		settings.localizationModes[1] = LM_SCAN_DIRECTLY;
 		settings.localizationModes[2] = LM_STATISTICS;
 		settings.localizationModes[3] = LM_LINES;
 		settings.localizationModes[4] = LM_STATISTICS_MARKS;
 		settings.localizationModes[5] = LM_STATISTICS_POSTAL_CODE;
-		settings.localizationModes[6] = LM_SKIP;
-		settings.localizationModes[7] = LM_SKIP;
 
+		// Parameter 5. Set more deblur modes.
+		// DeblurModes are all enabled as default. Barcode reader will automatically switch between the modes and try decoding continuously until timeout or the expected barcode count is reached.
+		// Please manually update the enabled modes list or change the expected barcode count to promote the barcode scanning speed.
+		//Read more about deblur mode members: https://www.dynamsoft.com/barcode-reader/parameters/enum/parameter-mode-enums.html#deblurmode
 		settings.deblurModes[0] = DM_DIRECT_BINARIZATION;
 		settings.deblurModes[1] = DM_THRESHOLD_BINARIZATION;
 		settings.deblurModes[2] = DM_GRAY_EQUALIZATION;
@@ -52,48 +61,34 @@ public:
 		settings.deblurModes[4] = DM_MORPHING;
 		settings.deblurModes[5] = DM_DEEP_ANALYSIS;
 		settings.deblurModes[6] = DM_SHARPENING;
-		settings.deblurModes[7] = DM_SKIP;
-		settings.deblurModes[8] = DM_SKIP;
-		settings.deblurModes[9] = DM_SKIP;
 
+		// Parameter 6. Set scale up modes.
+		// It is a parameter to control the process for scaling up an image used for detecting barcodes with small module size
 		settings.scaleUpModes[0] = SUM_AUTO;
-		settings.scaleUpModes[1] = SUM_SKIP;
-		settings.scaleUpModes[2] = SUM_SKIP;
-		settings.scaleUpModes[3] = SUM_SKIP;
-		settings.scaleUpModes[4] = SUM_SKIP;
-		settings.scaleUpModes[5] = SUM_SKIP;
-		settings.scaleUpModes[6] = SUM_SKIP;
-		settings.scaleUpModes[7] = SUM_SKIP;
 
+		// Parameter 7. Set grayscale transformation modes.
+		// By default, the library can only locate the dark barcodes that stand on a light background. "GTM_INVERTED":The image will be transformed into inverted grayscale.
 		settings.furtherModes.grayscaleTransformationModes[0] = GTM_ORIGINAL;
 		settings.furtherModes.grayscaleTransformationModes[1] = GTM_INVERTED;
-		settings.furtherModes.grayscaleTransformationModes[2] = GTM_SKIP;
-		settings.furtherModes.grayscaleTransformationModes[3] = GTM_SKIP;
-		settings.furtherModes.grayscaleTransformationModes[4] = GTM_SKIP;
-		settings.furtherModes.grayscaleTransformationModes[5] = GTM_SKIP;
-		settings.furtherModes.grayscaleTransformationModes[6] = GTM_SKIP;
-		settings.furtherModes.grayscaleTransformationModes[7] = GTM_SKIP;
 
+		// Parameter 8. Enable dpm modes.
+		// It is a parameter to control how to read direct part mark (DPM) barcodes.
 		settings.furtherModes.dpmCodeReadingModes[0] = DPMCRM_GENERAL;
-		settings.furtherModes.dpmCodeReadingModes[1] = DPMCRM_SKIP;
-		settings.furtherModes.dpmCodeReadingModes[2] = DPMCRM_SKIP;
-		settings.furtherModes.dpmCodeReadingModes[3] = DPMCRM_SKIP;
-		settings.furtherModes.dpmCodeReadingModes[4] = DPMCRM_SKIP;
-		settings.furtherModes.dpmCodeReadingModes[5] = DPMCRM_SKIP;
-		settings.furtherModes.dpmCodeReadingModes[6] = DPMCRM_SKIP;
-		settings.furtherModes.dpmCodeReadingModes[7] = DPMCRM_SKIP;
 
+		// Parameter 9. Increase timeout(ms). The barcode scanner will have more chances to find the expected barcode until it times out
 		settings.timeout = 30000;
 
+		// Apply the new settings to the instance
 		reader->UpdateRuntimeSettings(&settings);
 	}
 	void configReadFirstByTemplate(CBarcodeReader *reader) 
 	{
+		// Compared with PublicRuntimeSettings, parameter templates have a richer ability to control parameter details.
+		// Please refer to the parameter explanation in "ReadRateFirstTemplate.json" to understand how to control read rate first.
 		int ret = reader->InitRuntimeSettingsWithFile("ReadRateFirstTemplate.json", CM_OVERWRITE);
 		if (ret != DBR_OK) 
 		{
 			cout << "Error" << endl;
-			exit(0);
 		}
 	}
 	void outputResults(TextResultArray* barcodeResults, CBarcodeReader& reader)
@@ -105,13 +100,13 @@ public:
 			{
 				cout << "Result " << (i + 1) << ":" << endl;
 
-				// 5.1. Get format of each barcode
+				//Get format of each barcode
 				if (barcodeResults->results[i]->barcodeFormat != BF_NULL)
 					cout << "    Barcode Format: " << barcodeResults->results[i]->barcodeFormatString << endl;
 				else
 					cout << "    Barcode Format: " << barcodeResults->results[i]->barcodeFormatString_2 << endl;
 
-				// 5.2. Get text result of each barcode
+				//Get text result of each barcode
 				cout << "    Barcode Text: " << barcodeResults->results[i]->barcodeText << endl;
 			}
 		}
@@ -120,7 +115,7 @@ public:
 			cout << "No barcode detected." << endl;
 		}
 
-		// 6. Free the memory allocated for text results
+		//Free the memory allocated for text results
 		if (barcodeResults != NULL)
 			CBarcodeReader::FreeTextResults(&barcodeResults);
 	}
@@ -131,6 +126,16 @@ int main() {
 	char szErrorMsg[256];
 	TextResultArray* barcodeResults = NULL;
 
+	// Initialize license
+	/*
+	// By setting organizaion ID as "200001", a 7-day trial license will be used for license verification.
+	// Note that network connection is required for this license to work.
+	//
+	// When using your own license, locate the following line and specify your Organization ID.
+	// organizationID = "200001";
+	//
+	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
+	*/
 	DM_DLSConnectionParameters paramters;
 	CBarcodeReader::InitDLSConnectionParameters(&paramters);
 	paramters.organizationID = const_cast<char*>("200001"); // replace it with your organization ID
@@ -140,28 +145,44 @@ int main() {
 		cout << szErrorMsg << endl;
 	}
 	
+	// Create an instance of Barcode Reader
 	CBarcodeReader reader;
 	ReadRateFirstSettings rf;
 
 	string fileName = "../../../../images/AllSupportedBarcodeTypes.png";
 
+	// There are two ways to configure runtime parameters. One is through PublicRuntimeSettings, the other is through parameters template.
 	cout << "Decode through PublicRuntimeSettings:" << endl;
 	{
+		//	config through PublicRuntimeSettings
 		rf.configReadRateFirst(&reader);
+		
+		//	Decode barcodes from an image file by current runtime settings. The second parameter value "" means to decode through the current PublicRuntimeSettings.
 		errorCode=reader.DecodeFile(fileName.c_str(), "");
+		
+		//	Get all barcode results
 		reader.GetAllTextResults(&barcodeResults);
+
+		//	Output the barcode format and barcode text.
 		rf.outputResults(barcodeResults, reader);
 	}
 	cout << endl;
 	cout << "Decode through parameters template:" << endl;
 	{
+		// config through parameters template
 		rf.configReadFirstByTemplate(&reader);
+
+		// Decode barcodes from an image file by template.
 		reader.DecodeFile(fileName.c_str(), "");
+
+		//	Get all barcode results
 		reader.GetAllTextResults(&barcodeResults);
+
+		// Output the barcode format and barcode text.
 		rf.outputResults(barcodeResults, reader);
 	}
 	cout << "Press any key to quit..." << endl;
-    	cin.ignore();
+    cin.ignore();
    	return 0;
 }
 
