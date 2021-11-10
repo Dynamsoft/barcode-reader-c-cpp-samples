@@ -164,6 +164,8 @@ int main() {
 		reader.GetAllTextResults(&barcodeResults);
 		sf.outputResults(barcodeResults, reader, ullTimeEnd - ullTimeBeg);
 	}
-	return 0;
+	cout << "Press any key to quit..." << endl;
+    	cin.ignore();
+    	return 0;
 }
 
