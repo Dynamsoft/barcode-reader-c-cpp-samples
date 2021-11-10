@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <string.h>
-#include <string>
 #include <stdlib.h>
 #include <time.h>
 #include <cstring>
-#include <iostream>
 #include "../../../../include/DynamsoftBarcodeReader.h"
 #include "../../../../include/DynamsoftCommon.h"
 using namespace std;
@@ -14,6 +12,7 @@ using namespace dynamsoft::dbr;
 #if defined(_WIN64) || defined(_WIN32)
 #include <windows.h>
 #include <conio.h>
+#include <iostream>
 #ifdef _WIN64
 #pragma comment(lib, "../../../../lib/Windows/x64/DBRx64.lib")
 #else
