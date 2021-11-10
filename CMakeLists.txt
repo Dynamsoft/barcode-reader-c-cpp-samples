@@ -60,7 +60,7 @@ endif()
 if(BUILD_CPP_ACCURACYFIRSTSETTINGS)
     add_subdirectory(samples/C++/Performance/AccuracyFirstSettings)
 endif()
-if(BUILD_CPP_READRATESETTINGS)
+if(BUILD_CPP_READRATEFIRSTSETTINGS)
     add_subdirectory(samples/C++/Performance/ReadRateFirstSettings)
 endif()
 
