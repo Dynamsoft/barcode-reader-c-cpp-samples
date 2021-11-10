@@ -1,7 +1,8 @@
-#include <string>
-#include <fstream>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <time.h>
-#include <iostream>
+#include <cstring>
 #include "../../../../include/DynamsoftBarcodeReader.h"
 #include "../../../../include/DynamsoftCommon.h"
 using namespace std;
@@ -9,12 +10,18 @@ using namespace dynamsoft::dbr;
 
 // Link libraries of DynamsoftBarcodeReader SDK for Windows.
 #if defined(_WIN64) || defined(_WIN32)
+#include <windows.h>
+#include <conio.h>
+#include <iostream>
 #ifdef _WIN64
 #pragma comment(lib, "../../../../lib/Windows/x64/DBRx64.lib")
 #else
 #pragma comment(lib, "../../../../lib/Windows/x86/DBRx86.lib")
 #endif
+#else
+#include <sys/time.h>
 #endif
+
 
 unsigned long GetTiming()
 {
@@ -133,7 +140,7 @@ int main() {
 	CBarcodeReader reader;
 	SpeedFirstSettings sf;
 
-	string fileName = "../../../../images/EAN-13.jpg";
+	string fileName = "../../../../images/AllSupportedBarcodeTypes.png";
 	unsigned long ullTimeBeg;
 	unsigned long ullTimeEnd;
 

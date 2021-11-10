@@ -21,10 +21,13 @@ class ReadRateFirstSettings
 public:
 	void configReadRateFirst(CBarcodeReader *reader) 
 	{
+		
+		char msd[256];
 		PublicRuntimeSettings settings;
+		reader->GetRuntimeSettings(&settings);
 		settings.barcodeFormatIds = BF_ALL;
 		settings.barcodeFormatIds_2 = BF2_DOTCODE | BF2_POSTALCODE;
-		settings.expectedBarcodesCount = 64;
+		settings.expectedBarcodesCount = 64; 
 		settings.binarizationModes[0] = BM_LOCAL_BLOCK;
 		settings.binarizationModes[1] = BM_THRESHOLD;
 		settings.binarizationModes[2] = BM_SKIP;
@@ -83,7 +86,7 @@ public:
 
 		settings.timeout = 30000;
 
-		reader->UpdateRuntimeSettings(&settings);
+		int r = reader->UpdateRuntimeSettings(&settings,msd,256);
 	}
 	void configReadFirstByTemplate(CBarcodeReader *reader) 
 	{
@@ -146,7 +149,7 @@ int main() {
 	cout << "Decode through PublicRuntimeSettings:" << endl;
 	{
 		rf.configReadRateFirst(&reader);
-		reader.DecodeFile(fileName.c_str(), "");
+		errorCode=reader.DecodeFile(fileName.c_str(), "");
 		reader.GetAllTextResults(&barcodeResults);
 		rf.outputResults(barcodeResults, reader);
 	}
