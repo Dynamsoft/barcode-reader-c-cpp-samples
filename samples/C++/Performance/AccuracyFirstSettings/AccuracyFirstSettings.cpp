@@ -45,13 +45,13 @@ public:
 			{
 				cout << "Result " << (i + 1) << ":" << endl;
 
-				// 5.1. Get format of each barcode
+				// Get format of each barcode
 				if (barcodeResults->results[i]->barcodeFormat != BF_NULL)
 					cout << "    Barcode Format: " << barcodeResults->results[i]->barcodeFormatString << endl;
 				else
 					cout << "    Barcode Format: " << barcodeResults->results[i]->barcodeFormatString_2 << endl;
 
-				// 5.2. Get text result of each barcode
+				// Get text result of each barcode
 				cout << "    Barcode Text: " << barcodeResults->results[i]->barcodeText << endl;
 			}
 		}
@@ -60,7 +60,7 @@ public:
 			cout << "No barcode detected." << endl;
 		}
 
-		// 6. Free the memory allocated for text results
+		// Free the memory allocated for text results
 		if (barcodeResults != NULL)
 			CBarcodeReader::FreeTextResults(&barcodeResults);
 	}
@@ -69,7 +69,16 @@ int main() {
 	int errorCode = 0;
 	char szErrorMsg[256];
 	TextResultArray* barcodeResults = NULL;
-
+	 // Initialize license
+	 /*
+	 // By setting organizaion ID as "200001", a 7-day trial license will be used for license verification.
+	 // Note that network connection is required for this license to work.
+	 //
+	 // When using your own license, locate the following line and specify your Organization ID.
+	 // organizationID = "200001";
+	 //
+	 // If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
+	 */
 	DM_DLSConnectionParameters paramters;
 	CBarcodeReader::InitDLSConnectionParameters(&paramters);
 	paramters.organizationID = const_cast<char*>("200001"); // replace it with your organization ID
@@ -78,7 +87,7 @@ int main() {
 	{
 		cout << szErrorMsg << endl;
 	}
-
+ 	// Create an instance of Barcode Reader
 	CBarcodeReader reader;
 	AccuracyFirstSettings af;
 
