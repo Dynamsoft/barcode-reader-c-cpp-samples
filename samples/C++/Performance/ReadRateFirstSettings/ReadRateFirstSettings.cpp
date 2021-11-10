@@ -160,7 +160,9 @@ int main() {
 		reader.GetAllTextResults(&barcodeResults);
 		rf.outputResults(barcodeResults, reader);
 	}
-
+	cout << "Press any key to quit..." << endl;
+    	cin.ignore();
+   	return 0;
 }
 
 
