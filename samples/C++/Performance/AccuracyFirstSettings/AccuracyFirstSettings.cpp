@@ -99,7 +99,9 @@ int main() {
 		reader.GetAllTextResults(&barcodeResults);
 		af.outputResults(barcodeResults, reader);
 	}
-	return 0;
+	cout << "Press any key to quit..." << endl;
+    	cin.ignore();
+    	return 0;
 };
 
 
