@@ -22,7 +22,6 @@ public:
 	void configReadRateFirst(CBarcodeReader *reader) 
 	{
 		
-		char msd[256];
 		PublicRuntimeSettings settings;
 		reader->GetRuntimeSettings(&settings);
 		settings.barcodeFormatIds = BF_ALL;
@@ -86,7 +85,7 @@ public:
 
 		settings.timeout = 30000;
 
-		int r = reader->UpdateRuntimeSettings(&settings,msd,256);
+		reader->UpdateRuntimeSettings(&settings);
 	}
 	void configReadFirstByTemplate(CBarcodeReader *reader) 
 	{
