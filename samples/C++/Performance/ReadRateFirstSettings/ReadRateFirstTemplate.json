@@ -15,14 +15,6 @@
             "BinarizationThreshold" : -1,
             "ImagePreprocessingModesIndex" : -1,
             "Mode" : "BM_THRESHOLD"
-         },
-         {
-            "BlockSizeX" : 0,
-            "BlockSizeY" : 0,
-            "EnableFillBinaryVacancy" : 0,
-            "ImagePreprocessingModesIndex" : -1,
-            "Mode" : "BM_LOCAL_BLOCK",
-            "ThresholdCompensation" : 15
          }
       ],
       "DPMCodeReadingModes" : [
