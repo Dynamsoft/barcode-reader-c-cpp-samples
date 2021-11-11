@@ -86,7 +86,7 @@ int main() {
 	TextResultArray* barcodeResults = NULL;
 	 // Initialize license
 	 /*
-	 // By setting organizaion ID as "200001", a 7-day trial license will be used for license verification.
+	 // By setting organization ID as "200001", a 7-day trial license will be used for license verification.
 	 // Note that network connection is required for this license to work.
 	 //
 	 // When using your own license, locate the following line and specify your Organization ID.
