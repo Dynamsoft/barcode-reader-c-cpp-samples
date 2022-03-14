@@ -80,22 +80,11 @@ int main()
 	}
 	 
 	int iRet = -1;
-
-	// Initialize license
-	/*
-	// By setting organization ID as "200001", a free public trial license will be used for license verification.
-	// Note that network connection is required for this license to work.
-	//
-	// When using your own license, locate the following line and specify your Organization ID.
-	// organizationID = "200001";
-	//
-	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
-	*/
 	char szErrorMsg[256];
-	DM_DLSConnectionParameters paramters;
-	CBarcodeReader::InitDLSConnectionParameters(&paramters);
-	paramters.organizationID = const_cast<char*>("200001"); // replace it with your organization ID
-	iRet = CBarcodeReader::InitLicenseFromDLS(&paramters, szErrorMsg, 256);
+	// Initialize license.
+  	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
+  	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp 
+   	iRet = CBarcodeReader::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
 	if (iRet != DBR_OK)
 	{
 		cout << szErrorMsg << endl;
