@@ -25,11 +25,9 @@ void main()
     TextResultArray* barcodeResults = NULL;
     int index;
 
-	// 1.Initialize license.
-	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
-	// If you want to use an offline license, please contact Dynamsoft Support: https://www.dynamsoft.com/company/contact/
-    // If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
-    */
+    // 1.Initialize license.
+    // The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
+    // If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp 
     errorCode = DLR_InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
     if (errorCode != DBR_OK)
     {
