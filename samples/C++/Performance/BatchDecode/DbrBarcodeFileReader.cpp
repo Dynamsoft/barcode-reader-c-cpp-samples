@@ -18,27 +18,6 @@
 
 CDbrBarcodeFileReader::CDbrBarcodeFileReader()
 {
-	// Initialize license
-	/*
-	// By setting organization ID as "200001", a free public trial license will be used for license verification.
-	// Note that network connection is required for this license to work.
-	//
-	// When using your own license, locate the following line and specify your Organization ID.
-	// organizationID = "200001";
-	//
-	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
-	*/
-	int errorCode = 0;
-	char szErrorMsg[256];
-	DM_DLSConnectionParameters paramters;
-	dynamsoft::dbr::CBarcodeReader::InitDLSConnectionParameters(&paramters);
-	paramters.organizationID = const_cast<char*>("200001"); // replace it with your organization ID
-	errorCode = dynamsoft::dbr::CBarcodeReader::InitLicenseFromDLS(&paramters, szErrorMsg, 256);
-	if (errorCode != DBR_OK)
-	{
-		cout << szErrorMsg << endl;
-	}
-
 	m_pBarcodeReader = new dynamsoft::dbr::CBarcodeReader();
 }
 
