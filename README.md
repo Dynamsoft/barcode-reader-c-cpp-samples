@@ -28,16 +28,11 @@ This repository contains multiple samples that demonstrates how to use the <a hr
 
 ## License
 
-The library requires a license to work, you use the API InitLicenseFromDLS to tell the program where to fetch your license.
+The library requires a license to work, you use the API InitLicense to initialize license key and activate the SDK.
 
-If the Organization ID is not specified or set as "200001", a <a href="https://www.dynamsoft.com/license-server/docs/about/terms.html?ver=latest&product=dbr&utm_source=samples&package=c_cpp#public-trial-license" target="_blank">free public trial license</a> will be used by default which is the case in these samples.
+These samples use a <a href="https://www.dynamsoft.com/license-server/docs/about/terms.html?ver=latest&product=dbr&utm_source=samples&package=c_cpp#public-trial-license" target="_blank">free public trial license</a>. Note that network connection is required for this license to work.
 
-Note that network connection is required for this license to work.
-
-When using your own license, locate the following line and specify your Organization ID.  
-// organizationID = "200001";
-
-If you don't have a license yet, you can request a trial from <a href="https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp" target="_blank">Customer Portal</a>
+You can also request a 30-day trial license from <a href="https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp" target="_blank">Customer Portal</a>
 
 For more information, please refer to https://www.dynamsoft.com/license-server/docs/about/licensefaq.html.
 
