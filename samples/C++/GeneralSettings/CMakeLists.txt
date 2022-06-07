@@ -2,8 +2,8 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_LIST_DIR)
     cmake_minimum_required(VERSION 3.6)
     # set the platform
     option(BUILD_LINUX "Build samples for running on Linux x86_64" ON)
-    option(BUILD_ARM "Build samples for running on ARM x86" OFF)
-    option(BUILD_ARM64 "Build samples for running on ARM x64" OFF)
+    option(BUILD_ARM "Build samples for running on Linux ARM32" OFF)
+    option(BUILD_ARM64 "Build samples for running on Linux ARM64" OFF)
 
     if(BUILD_LINUX)
         set(DBRLIB ../../../lib/Linux/x64)

@@ -4,8 +4,8 @@ project(Samples)
 
 # set the platform
 option(BUILD_LINUX "Build samples for running on Linux x86_64" ON)
-option(BUILD_ARM "Build samples for running on ARM x86" OFF)
-option(BUILD_ARM64 "Build samples for running on ARM x64" OFF)
+option(BUILD_ARM "Build samples for running on Linux ARM32" OFF)
+option(BUILD_ARM64 "Build samples for running on Linux ARM64" OFF)
 
 option(BUILD_C_HELLOWORLD "Build the sample HelloWorld under ./samples/C/HelloWorld" ON)
 option(BUILD_C_GENERALSETTINGS "Build the sample GeneralSettings under ./samples/C/GeneralSettings" ON)
