@@ -34,8 +34,8 @@ These samples use a <a href="https://www.dynamsoft.com/license-server/docs/about
 
 You can also request a 30-day trial license from <a href="https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp" target="_blank">Customer Portal</a>
 
-For more information, please refer to https://www.dynamsoft.com/license-server/docs/about/licensefaq.html.
+For more information, please refer to <a href="https://www.dynamsoft.com/license-server/docs/about/licensefaq.html">license FAQ</a>.
 
 ## Contact Us
 
-https://www.dynamsoft.com/company/contact/
+<a href="https://www.dynamsoft.com/company/contact/">Contact Dynamsoft</a> if you have any questions.
