@@ -1,5 +1,7 @@
+cmake_minimum_required(VERSION 3.6)
+project(SpeedFirstSettings)
+
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_LIST_DIR)
-    cmake_minimum_required(VERSION 3.6)
     # set the platform
     option(BUILD_LINUX "Build samples for running on Linux x86_64" ON)
     option(BUILD_ARM "Build samples for running on Linux ARM32" OFF)
@@ -21,8 +23,6 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_LIST_DIR)
     add_compile_options(-O2 -fPIC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O2 -fvisibility=hidden -fvisibility-inlines-hidden -L ${DBRLIB} -Wl,-rpath,${DBRLIB} -Wl,-rpath,'$ORIGIN' -static-libgcc -static-libstdc++ -s")
 endif()
-
-project(SpeedFirstSettings)
 
 file(GLOB FILE_SRCS
 SpeedFirstSettings.cpp
