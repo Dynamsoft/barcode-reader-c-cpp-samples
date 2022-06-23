@@ -24,6 +24,7 @@ This repository contains multiple samples that demonstrates how to use the <a hr
 | SpeedFirstSettings | This sample demonstrates how to configure Dynamsoft Barcode Reader to read barcodes as fast as possible. The downside is that read-rate and accuracy might be affected. |
 | ReadRateFirstSettings | This sample demonstrates how to configure Dynamsoft Barcode Reader to read as many barcodes as possible at one time. The downside is that speed and accuracy might be affected. It is recommended to apply these configurations when decoding multiple barcodes from a single image. |
 | AccuracyFirstSettings | This sample demonstrates how to configure Dynamsoft Barcode Reader to read barcodes as accurately as possible. The downside is that speed and read-rate might be affected. It is recommended to apply these configurations when misreading is unbearable. |
+| MultiThreadDecoding | This sample demonstrates how to read barcodes in multiple threads. |
 
 
 ## License
