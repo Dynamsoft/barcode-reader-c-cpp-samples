@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
-project(GeneralSettings_C)
+project(MultiThreadDecoding)
+
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_LIST_DIR)
     # set the platform
     option(BUILD_LINUX "Build samples for running on Linux x86_64" ON)
@@ -23,11 +24,10 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_LIST_DIR)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O2 -fvisibility=hidden -fvisibility-inlines-hidden -L ${DBRLIB} -Wl,-rpath,${DBRLIB} -Wl,-rpath,'$ORIGIN' -static-libgcc -static-libstdc++ -s")
 endif()
 
-
 file(GLOB FILE_SRCS
-GeneralSettings.c
+MultiThreadDecoding.cpp
 )
-add_executable(GeneralSettings_C ${FILE_SRCS})
-set_target_properties(GeneralSettings_C PROPERTIES SKIP_BUILD_RPATH TRUE)
-target_link_libraries(GeneralSettings_C DynamsoftBarcodeReader)
+add_executable(MultiThreadDecoding ${FILE_SRCS})
+set_target_properties(MultiThreadDecoding PROPERTIES SKIP_BUILD_RPATH TRUE)
+target_link_libraries(MultiThreadDecoding DynamsoftBarcodeReader -lpthread)
 

@@ -16,6 +16,7 @@ option(BUILD_CPP_VIDEODECODING "Build the sample VideoDecoding under ./samples/C
 option(BUILD_CPP_SPEEDFIRSTSETTINGS "Build the sample SpeedFirstSettings under ./sample/C++/Performance/SpeedFirstSettings" ON)
 option(BUILD_CPP_ACCURACYFIRSTSETTINGS "Build the sample AccuracyFirstSettings under ./sample/C++/Performance/AccuracyFirstSettings" ON)
 option(BUILD_CPP_READRATEFIRSTSETTINGS "Build the sample ReadRateFirstSettings under ./sample/C++/Performance/ReadRateFirstSettings" ON)
+option(BUILD_CPP_MULTITHREADDECODING "Build the sample MultiThreadDecoding under ./sample/C++/MultiThreadDecoding" ON)
 
 if(BUILD_LINUX)
     set(DBRLIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/Linux/x64)
@@ -62,6 +63,9 @@ if(BUILD_CPP_ACCURACYFIRSTSETTINGS)
 endif()
 if(BUILD_CPP_READRATEFIRSTSETTINGS)
     add_subdirectory(samples/C++/Performance/ReadRateFirstSettings)
+endif()
+if(BUILD_CPP_MULTITHREADDECODING)
+    add_subdirectory(samples/C++/MultiThreadDecoding)
 endif()
 
 if(BUILD_C_HELLOWORLD OR BUILD_C_GENERALSETTINGS OR BUILD_CPP_HELLOWORLD OR BUILD_CPP_GENERALSETTINGS OR BUILD_CPP_SPEEDFIRSTSETTINGS OR BUILD_CPP_ACCURACYFIRSTSETTINGS OR BUILD_CPP_READRATEFIRSTSETTINGS)
