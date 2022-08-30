@@ -152,14 +152,7 @@ bool CDbrBarcodeFileReader::ReadFileBarcodes(const string strFilePath, CBarcodeS
 	{
 		CBarcodeStatisticsRecorder::BCODE_VALUE bcodeValue;
 		bcodeValue.strTextMessage = (pTextResultArray)->results[i]->barcodeText;
-		if ((pTextResultArray)->results[i]->barcodeFormat != 0)
-		{
-			bcodeValue.strCodeFormat = (pTextResultArray)->results[i]->barcodeFormatString;
-		}
-		else
-		{
-			bcodeValue.strCodeFormat = (pTextResultArray)->results[i]->barcodeFormatString_2;
-		}
+		bcodeValue.strCodeFormat = (pTextResultArray)->results[i]->barcodeFormatString;
 		unsigned char* tempByte = (pTextResultArray)->results[i]->barcodeBytes;
 		int byteLength = (pTextResultArray)->results[i]->barcodeBytesLength;
 		bcodeValue.strHexMessage = ToHexString(tempByte, byteLength);
