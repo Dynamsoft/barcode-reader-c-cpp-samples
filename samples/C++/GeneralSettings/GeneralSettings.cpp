@@ -82,10 +82,8 @@ int main()
             cout << "Result " << (i + 1) << ":" << endl;
 
             // 5.1. Get format of each barcode
-            if (barcodeResults->results[i]->barcodeFormat != BF_NULL)
-                cout << "    Barcode Format: " << barcodeResults->results[i]->barcodeFormatString << endl;
-            else
-                cout << "    Barcode Format: " << barcodeResults->results[i]->barcodeFormatString_2 << endl;
+            cout << "    Barcode Format: " << barcodeResults->results[i]->barcodeFormatString << endl;
+
 
             // 5.2. Get text result of each barcode
             cout << "    Barcode Text: " << barcodeResults->results[i]->barcodeText << endl;

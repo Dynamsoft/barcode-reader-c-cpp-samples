@@ -82,10 +82,7 @@ void main()
             printf("Result %d:\r\n", (index + 1));
 
             // 5.1. Get format of each barcode
-            if (barcodeResults->results[index]->barcodeFormat != BF_NULL)
-                printf("    Barcode Format: %s\r\n", barcodeResults->results[index]->barcodeFormatString);
-            else
-                printf("    Barcode Format: %s\r\n", barcodeResults->results[index]->barcodeFormatString_2);
+            printf("    Barcode Format: %s\r\n", barcodeResults->results[index]->barcodeFormatString);
 
             // 5.2. Get text result of each barcode
             printf("    Barcode Text: %s\r\n", barcodeResults->results[index]->barcodeText);
