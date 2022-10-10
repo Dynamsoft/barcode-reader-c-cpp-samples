@@ -1,0 +1,18 @@
+{
+    "Version":"3.0",
+    "ImageParameterContentArray":[
+      {
+        "Name": "Test",
+        "MaxAlgorithmthreadCount": 4,
+        "TimeOut": 10000,
+        "ScaleDownThreshold": 700,
+        "ExpectedBarcodesCount": 1,
+        "BarcodeFormatIds": [ "BF_QR_CODE" ],
+        "GrayscaleTransformationModes": [
+          {
+            "Mode": "GTM_INVERTED"
+          }
+        ]
+      }
+    ]
+}

@@ -17,6 +17,7 @@ option(BUILD_CPP_SPEEDFIRSTSETTINGS "Build the sample SpeedFirstSettings under .
 option(BUILD_CPP_ACCURACYFIRSTSETTINGS "Build the sample AccuracyFirstSettings under ./sample/C++/Performance/AccuracyFirstSettings" ON)
 option(BUILD_CPP_READRATEFIRSTSETTINGS "Build the sample ReadRateFirstSettings under ./sample/C++/Performance/ReadRateFirstSettings" ON)
 option(BUILD_CPP_MULTITHREADDECODING "Build the sample MultiThreadDecoding under ./sample/C++/MultiThreadDecoding" ON)
+option(BUILD_CPP_READLOWQUALITYBARCODES "Build the sample ReadLowQualityBarcodes under ./sample/C++/UseCases/ReadLowQualityBarcodes" ON)
 
 if(BUILD_LINUX)
     set(DBRLIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/Linux/x64)
@@ -66,6 +67,12 @@ if(BUILD_CPP_READRATEFIRSTSETTINGS)
 endif()
 if(BUILD_CPP_MULTITHREADDECODING)
     add_subdirectory(samples/C++/MultiThreadDecoding)
+endif()
+
+if(BUILD_CPP_READLOWQUALITYBARCODES)
+    add_subdirectory(samples/C++/UseCases/ReadLowQualityBarcodes)
+    File(COPY samples/C++/UseCases/ReadLowQualityBarcodes/images DESTINATION samples/C++/UseCases/ReadLowQualityBarcodes)
+    File(COPY samples/C++/UseCases/ReadLowQualityBarcodes/templates DESTINATION samples/C++/UseCases/ReadLowQualityBarcodes)
 endif()
 
 if(BUILD_C_HELLOWORLD OR BUILD_C_GENERALSETTINGS OR BUILD_CPP_HELLOWORLD OR BUILD_CPP_GENERALSETTINGS OR BUILD_CPP_SPEEDFIRSTSETTINGS OR BUILD_CPP_ACCURACYFIRSTSETTINGS OR BUILD_CPP_READRATEFIRSTSETTINGS)
