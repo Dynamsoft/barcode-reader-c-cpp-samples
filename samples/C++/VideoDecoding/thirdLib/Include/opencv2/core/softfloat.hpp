@@ -137,7 +137,7 @@ public:
     > The IEEE Standard remainder operation computes the value
     > a - n * b, where n is the integer closest to a / b.
     > If a / b is exactly halfway between two integers, n is the even integer
-    > closest to a / b. The IEEE Standard’s remainder operation is always exact and so requires no rounding.
+    > closest to a / b. The IEEE Standard's remainder operation is always exact and so requires no rounding.
     > Depending on the relative magnitudes of the operands, the remainder functions
     > can take considerably longer to execute than the other SoftFloat functions.
     > This is an inherent characteristic of the remainder operation itself and is not a flaw
@@ -274,7 +274,7 @@ public:
     > The IEEE Standard remainder operation computes the value
     > a - n * b, where n is the integer closest to a / b.
     > If a / b is exactly halfway between two integers, n is the even integer
-    > closest to a / b. The IEEE Standard’s remainder operation is always exact and so requires no rounding.
+    > closest to a / b. The IEEE Standard's remainder operation is always exact and so requires no rounding.
     > Depending on the relative magnitudes of the operands, the remainder functions
     > can take considerably longer to execute than the other SoftFloat functions.
     > This is an inherent characteristic of the remainder operation itself and is not a flaw
