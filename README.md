@@ -15,27 +15,27 @@ This repository contains multiple samples that demonstrates how to use the <a hr
 
 ## Samples
 
-| Sample | Description |
+| C++ Sample | Description |
 |---|---|
-| HelloWorld | This sample demonstrates the simplest way to read barcodes from an image file and output barcode format and text. |
-| GeneralSettings | This sample demonstrates how to configure general used settings and read barcodes from an image file. |
-| BatchDecode | This sample demonstrates how to read barcodes from files in the specified directory and return results plus performance metrics. |
-| VideoDecoding | This sample demonstrates how to read barcodes from video frames. |
-| SpeedFirstSettings | This sample demonstrates how to configure Dynamsoft Barcode Reader to read barcodes as fast as possible. The downside is that read-rate and accuracy might be affected. |
-| ReadRateFirstSettings | This sample demonstrates how to configure Dynamsoft Barcode Reader to read as many barcodes as possible at one time. The downside is that speed and accuracy might be affected. It is recommended to apply these configurations when decoding multiple barcodes from a single image. |
-| AccuracyFirstSettings | This sample demonstrates how to configure Dynamsoft Barcode Reader to read barcodes as accurately as possible. The downside is that speed and read-rate might be affected. It is recommended to apply these configurations when misreading is unbearable. |
-| MultiThreadDecoding | This sample demonstrates how to read barcodes in multiple threads. |
-| ReadLowQualityBarcodes | This sample demonstrates how to use intermediate result to decode low quality barcodes. |
+| [`HelloWorld`](samples/C++/HelloWorld) | This sample demonstrates the simplest way to read barcodes from an image file and output barcode format and text. |
+| [`GeneralSettings`](samples/C++/GeneralSettings) | This sample demonstrates how to configure general used settings and read barcodes from an image file. |
+| [`BatchDecode`](samples/C++/Performance/BatchDecode) | This sample demonstrates how to read barcodes from files in the specified directory and return results plus performance metrics. |
+| [`VideoDecoding`](samples/C++/VideoDecoding/) | This sample demonstrates how to read barcodes from video frames. |
+| [`SpeedFirstSettings`](samples/C++/Performance/SpeedFirstSettings) | This sample demonstrates how to configure Dynamsoft Barcode Reader to read barcodes as fast as possible. The downside is that read-rate and accuracy might be affected. |
+| [`ReadRateFirstSettings`](samples/C++/Performance/ReadRateFirstSettings) | This sample demonstrates how to configure Dynamsoft Barcode Reader to read as many barcodes as possible at one time. The downside is that speed and accuracy might be affected. It is recommended to apply these configurations when decoding multiple barcodes from a single image. |
+| [`AccuracyFirstSettings`](samples/C++/Performance/AccuracyFirstSettings) | This sample demonstrates how to configure Dynamsoft Barcode Reader to read barcodes as accurately as possible. The downside is that speed and read-rate might be affected. It is recommended to apply these configurations when misreading is unbearable. |
+| [`MultiThreadDecoding`](samples/C++/MultiThreadDecoding) | This sample demonstrates how to read barcodes in multiple threads. |
+| [`ReadLowQualityBarcodes`](samples/C++/UseCases/ReadLowQualityBarcodes) | This sample demonstrates how to use intermediate result to decode low quality barcodes. |
 
+| C Sample | Description |
+|---|---|
+| [`HelloWorld`](samples/C/HelloWorld) | This sample demonstrates the simplest way to read barcodes from an image file and output barcode format and text. |
+| [`GeneralSettings`](samples/C/GeneralSettings) | This sample demonstrates how to configure general used settings and read barcodes from an image file. |
 ## License
 
 The library requires a license to work, you use the API InitLicense to initialize license key and activate the SDK.
 
-These samples use a <a href="https://www.dynamsoft.com/license-server/docs/about/terms.html?ver=latest&product=dbr&utm_source=samples&package=c_cpp#public-trial-license" target="_blank">free public trial license</a>. Note that network connection is required for this license to work.
-
-You can also request a 30-day trial license from <a href="https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp" target="_blank">Customer Portal</a>
-
-For more information, please refer to <a href="https://www.dynamsoft.com/license-server/docs/about/licensefaq.html">license FAQ</a>.
+These samples use a free public trial license which require network connection to function. You can request a 30-day free trial license key from <a href="https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp" target="_blank">Customer Portal</a> which works offline.
 
 ## Contact Us
 
