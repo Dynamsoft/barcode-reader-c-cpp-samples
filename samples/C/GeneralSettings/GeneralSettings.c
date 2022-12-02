@@ -21,7 +21,7 @@ void main()
 {
     void* dbr = NULL;
     int errorCode = 0;
-    char szErrorMsg[256];
+    char szErrorMsg[512];
     PublicRuntimeSettings settings;
     TextResultArray* barcodeResults = NULL;
     int index;
@@ -29,7 +29,7 @@ void main()
     // 1.Initialize license.
     // The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
     // If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp 
-    errorCode = DBR_InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
+    errorCode = DBR_InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 512);
     if (errorCode != DBR_OK)
     {
         printf("%s\r\n", szErrorMsg);
@@ -48,6 +48,8 @@ void main()
     // 3.1.2 Configure one or more specific settings
     // In this sample, we configure three settings: 
     // try to finnd PDF 417 and DotCode
+        // The barcode format our library will search for is composed of BarcodeFormat group 1 and BarcodeFormat group 2.
+        // So you need to specify the barcode format in group 1 and group 2 individually.
     settings.barcodeFormatIds = BF_PDF417;
     settings.barcodeFormatIds_2 = BF2_DOTCODE;
     // try to find 2 barcodes
@@ -60,10 +62,10 @@ void main()
     settings.region.regionMeasuredByPercentage = 1;
 
     // 3.1.3 Call DBR_UpdateRuntimeSettings to apply above settings
-    DBR_UpdateRuntimeSettings(dbr, &settings, szErrorMsg, 256);
+    DBR_UpdateRuntimeSettings(dbr, &settings, szErrorMsg, 512);
 
     // 3.2 Through JSON template
-    //DBR_InitRuntimeSettingsWithString(dbr, "{\"ImageParameter\":{\"Name\":\"S1\",\"RegionDefinitionNameArray\":[\"R1\"]},\"RegionDefinition\":{\"Name\":\"R1\",\"BarcodeFormatIds\":[\"BF_PDF417\"],\"BarcodeFormatIds_2\":[\"BF2_POSTALCODE\"],\"ExpectedBarcodesCount\":2,\"Left\":0,\"Right\":100,\"Top\":50,\"Bottom\":100,\"MeasuredByPercentage\":1}}", CM_IGNORE, szErrorMsg, 256);
+    //DBR_InitRuntimeSettingsWithString(dbr, "{\"ImageParameter\":{\"Name\":\"S1\",\"RegionDefinitionNameArray\":[\"R1\"]},\"RegionDefinition\":{\"Name\":\"R1\",\"BarcodeFormatIds\":[\"BF_PDF417\"],\"BarcodeFormatIds_2\":[\"BF2_POSTALCODE\"],\"ExpectedBarcodesCount\":2,\"Left\":0,\"Right\":100,\"Top\":50,\"Bottom\":100,\"MeasuredByPercentage\":1}}", CM_IGNORE, szErrorMsg, 512);
 
     // 4. Read barcode from an image file
     errorCode = DBR_DecodeFile(dbr, "../../../images/AllSupportedBarcodeTypes.png", "");
