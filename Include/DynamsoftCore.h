@@ -1,6 +1,6 @@
 #pragma once
 
-#define DYNAMSOFT_CORE_VERSION "3.0.0.629"
+#define DYNAMSOFT_CORE_VERSION "3.0.10.807"
 
 /**Enumeration section*/
 
@@ -155,7 +155,7 @@ typedef enum ErrorCode {
 	/**DynamsoftLabelRecognizer*/
 	/**DynamsoftDocumentNormalizer*/
 	EC_MODULE_NOT_FOUND = -10065,
-	
+
 	/**The api does not support multi-page files. Please use FileFetcher instead.*/
 	EC_MULTI_PAGES_NOT_SUPPORTED = -10066,
 
@@ -443,18 +443,18 @@ typedef enum PDFReadingMode
 } PDFReadingMode;
 
 /**
-* @enum TargetType
+* @enum RasterDataSource
 *
-* Describes the target types.
+* Describes the raster data sources.
 */
-typedef enum TargetType 
+typedef enum RasterDataSource
 {
 	/**The target type of the PDF file is "page". Only available for PDFReadingMode PDFRM_RASTER.*/
-	TT_PAGE,
+	RDS_RASTERIZED_PAGES,
 
 	/**The target type of the PDF file is "image".*/
-	TT_IMAGE
-} TargetType;
+	RDS_EXTRACTED_IMAGES
+} RasterDataSource;
 
 /**
 * @enum CapturedResultItemType
@@ -463,8 +463,8 @@ typedef enum TargetType
 */
 typedef enum CapturedResultItemType
 {
-	/** The type of the CapturedResultItem is "raw image". */
-	CRIT_RAW_IMAGE = 1,
+	/** The type of the CapturedResultItem is "original image". */
+	CRIT_ORIGINAL_IMAGE = 1,
 
 	/** The type of the CapturedResultItem is "barcode". */
 	CRIT_BARCODE = 2,
@@ -487,13 +487,13 @@ typedef enum CapturedResultItemType
 *
 * Describes the protection modes when the buffer of ImageSourceAdapter is overflow.
 */
-typedef enum BufferOverflowProtectionMode 
+typedef enum BufferOverflowProtectionMode
 {
 	/** New images are blocked when the buffer is full. */
 	BOPM_BLOCK = 0x00,
 
 	/** New images are appended at the end, and the oldest images are pushed out from the beginning if the buffer is full. */
-	BOPM_APPEND = 0x01,
+	BOPM_UPDATE = 0x01,
 
 } BufferOverflowProtectionMode;
 
@@ -502,7 +502,7 @@ typedef enum BufferOverflowProtectionMode
 *
 * Describes the type of the image tag, which is used to distinguish video frame and file images.
 */
-typedef enum ImageTagType 
+typedef enum ImageTagType
 {
 	/**The image is a file image.*/
 	ITT_FILE_IMAGE,
@@ -516,7 +516,7 @@ typedef enum ImageTagType
 *
 * Describes the quality of video frames.
 */
-typedef enum VideoFrameQuality 
+typedef enum VideoFrameQuality
 {
 	/**The frame quality is measured to be high.*/
 	VFQ_HIGH,
@@ -533,7 +533,7 @@ typedef enum VideoFrameQuality
 *
 * Describes how the corner is formed by its sides.
 */
-typedef enum CornerType 
+typedef enum CornerType
 {
 	/**The sides of the corner is normally intersected.*/
 	CT_NORMAL_INTERSECTED = 0,
@@ -551,7 +551,7 @@ typedef enum CornerType
 /**
 * @enum SectionType
 *
-* Describes the section of the algorithm. 
+* Describes the section of the algorithm.
 * In the IntermediateResultReceiver, the SectionType indicate the algorithm section that produced the IntermediateResult.
 */
 typedef enum SectionType
@@ -583,7 +583,7 @@ typedef enum SectionType
 /**
 * @enum IntermediateResultUnitType
 *
-* IntermediateResultUnitType is used in each subclass of IntermediateResult to indicate the type of the result. 
+* IntermediateResultUnitType is used in each subclass of IntermediateResult to indicate the type of the result.
 * It is also used to declare which kinds IntermediateResult should be output by the library.
 */
 enum IntermediateResultUnitType : unsigned long long
@@ -752,6 +752,27 @@ typedef enum ColourChannelUsageType
 
 }ColourChannelUsageType;
 
+/**
+* @enum TransformMatrixType
+*
+* Describes the type of the transformation matrix.
+*/
+typedef enum TransformMatrixType
+{
+	/**Represents a transformation matrix that converts coordinates from the local image to the original image.*/
+	TMT_LOCAL_TO_ORIGINAL_IMAGE,
+
+	/**Represents a transformation matrix that converts coordinates from the original image to the local image.*/
+	TMT_ORIGINAL_TO_LOCAL_IMAGE,
+
+	/**Represents a transformation matrix that converts coordinates from the rotated image to the original image.*/
+	TMT_ROTATED_TO_ORIGINAL_IMAGE,
+
+	/**Represents a transformation matrix that converts coordinates from the original image to the rotated image.*/
+	TMT_ORIGINAL_TO_ROTATED_IMAGE
+
+}TransformMatrixType;
+
 /**Structures section*/
 #pragma pack(push)
 #pragma pack(1)
@@ -811,6 +832,16 @@ extern "C" {
 	 *
 	 */
 	DS_API  const char* DC_GetErrorString(int errorCode);
+
+	/**
+	 * Calculates the square root of a number.
+	 *
+	 * @param [in] x A non-negative number whose square root is to be computed.
+	 *
+	 * @return Returns the square root of the given argument.
+	 *
+	 */
+	DS_API  double DC_Sqrt(double x);
 #ifdef __cplusplus
 }
 #endif
@@ -875,21 +906,142 @@ namespace dynamsoft
 		};
 
 		/**
-		* The CPoint class represents a point in 2D space. It contains an array of two integers, which represent the coordinates of the point.
-		*/
-		class DS_API CPoint
+		 * The DMPoint_ class template represents a point in 2D space.
+		 */
+		template<typename _Tp>
+		class DMPoint_
 		{
 		public:
 			/**
-			* The coordinate array of the point.
+			* Constructor
 			*/
-			int coordinate[2];
+			DMPoint_(void) {};
+
+			/**
+			* Constructor
+			*
+			* @param [in] x The x coordinate of a point.
+			* @param [in] y The y coordinate of a point.
+			*
+			*/
+			DMPoint_(_Tp _x, _Tp _y)
+			{
+				this->coordinate[0] = _x;
+				this->coordinate[1] = _y;
+			}
+
+			/**
+			* Constructor
+			*
+			* @param [in] pt The given point.
+			*
+			*/
+			DMPoint_(const DMPoint_ &pt)
+			{
+				this->coordinate[0] = pt.coordinate[0];
+				this->coordinate[1] = pt.coordinate[1];
+			}
+
+			/**
+			* Destructor.
+			*/
+			~DMPoint_(void) {};
+
+		public:
+			/**
+			* Sets the coordinates of a point.
+			*
+			* @param [in] x The x coordinate of a point.
+			* @param [in] y The y coordinate of a point.
+			*
+			*/
+			void Set(_Tp _x, _Tp _y)
+			{
+				this->coordinate[0] = _x;
+				this->coordinate[1] = _y;
+			}
+
+			DMPoint_& operator=(const DMPoint_&pt)
+			{
+				this->coordinate[0] = pt.coordinate[0];
+				this->coordinate[1] = pt.coordinate[1];
+				return *this;
+			}
+
+			/**
+			* Gets the element at the specified index in the DMPoint_.
+			*
+			* @param [in] i An integer index used to access the element of the DMPoint_.
+			*
+			* @return Returns a reference to the element at the specified index in the DMPoint_.
+			*
+			*/
+			const _Tp& operator[](int i) const
+			{
+				return this->coordinate[i];
+			}
+
+			/**
+			* Gets the element at the specified index in the DMPoint_.
+			*
+			* @param [in] i An integer index used to access the element of the DMPoint_.
+			*
+			* @return Returns a reference to the element at the specified index in the DMPoint_.
+			*
+			*/
+			_Tp& operator[](int i)
+			{
+				return this->coordinate[i];
+			}
+
+			template<typename _Tp2> operator DMPoint_<_Tp2>() const
+			{
+				return DMPoint_<_Tp2>((_Tp2)(this->coordinate[0]), (_Tp2)(this->coordinate[1]));
+			}
+
+			/**
+			* Calculates the distance between the current point and the specified target point.
+			*
+			* @param [in] pt The target point to which the distance is calculated.
+			*
+			* @return Returns a floating-point value representing the distance between the current point and the specified target point.
+			*
+			*/
+			double DistanceTo(const DMPoint_&pt) const
+			{
+				return DC_Sqrt(double((pt[0] - this->coordinate[0])*(pt[0] - this->coordinate[0]) + (pt[1] - this->coordinate[1])*(pt[1] - this->coordinate[1])));
+			}
 
 			/**
 			* Transforms the coordinates of a point using a given transformation matrix.
+			*
+			* @param [in] originalPoint The original point to transform.
+			* @param [in] transformationMatrix The transformation matrix to apply to the coordinates.
+			*
+			* @return Returns a new point with the transformed coordinates.
+			*
 			*/
-			static CPoint TransformCoordinates(CPoint originalPoint, double transformationMatrix[9]);
+			static DMPoint_ TransformCoordinates(const DMPoint_& originalPoint, double transformationMatrix[9])
+			{
+				DMPoint_<_Tp> dst;
+				double w = originalPoint.coordinate[0] * transformationMatrix[6] + originalPoint.coordinate[1] * transformationMatrix[7] + transformationMatrix[8];
+				w = 1. / w;
+				dst.coordinate[0] = (originalPoint.coordinate[0] * transformationMatrix[0] + originalPoint.coordinate[1] * transformationMatrix[1] + transformationMatrix[2])*w;
+				dst.coordinate[1] = (originalPoint.coordinate[0] * transformationMatrix[3] + originalPoint.coordinate[1] * transformationMatrix[4] + transformationMatrix[5])*w;
+				return dst;
+			}
+
+		private:
+			/**
+			* The coordinate array of the point.
+			*/
+			_Tp coordinate[2];
 		};
+
+		/**
+		 * The CPoint class represents a point in 2D space. It contains an array of two integers, which represent the coordinates of the point.
+		 */
+		typedef DMPoint_<int> CPoint;
 
 		/**
 		* The CContour class represents a contour in 2D space. It contains an array of CPoint objects, which represent the vertices of the contour.
@@ -919,11 +1071,82 @@ namespace dynamsoft
 		};
 
 		/**
+		* The CVector4 class represents a four-dimensional vector.
+		*/
+		class DS_API CVector4
+		{
+		public:
+			int value[4];
+
+			/**
+			* Constructor
+			*/
+			CVector4(void);
+
+			/**
+			* Constructor
+			*
+			* @param [in] v1 The first component value of the four-dimensional vector.
+			* @param [in] v2 The second component value of the four-dimensional vector.
+			* @param [in] v3 The third component value of the four-dimensional vector.
+			* @param [in] v4 The fourth component value of the four-dimensional vector.
+			*
+			*/
+			CVector4(int v1, int v2, int v3, int v4);
+
+			/**
+			* Constructor
+			*
+			* @param [in] v The given CVector4 object.
+			*
+			*/
+			CVector4(const CVector4& v);
+
+			/**
+			* Destructor.
+			*/
+			~CVector4(void);
+
+			/**
+			* Sets the components value of a four-dimensional vector.
+			*
+			* @param [in] v1 The first component value of the four-dimensional vector.
+			* @param [in] v2 The second component value of the four-dimensional vector.
+			* @param [in] v3 The third component value of the four-dimensional vector.
+			* @param [in] v4 The fourth component value of the four-dimensional vector.
+			*
+			*/
+			void Set(int v1, int v2, int v3, int v4);
+
+			CVector4& operator=(const CVector4& v);
+
+			/**
+			* Gets the component value at the specified index in the CVector4.
+			*
+			* @param [in] i An integer index used to access the component value of the CVector4.
+			*
+			* @return Returns the component value at the specified index in the CVector4.
+			*
+			*/
+			int operator[](int i) const;
+
+			/**
+			* Gets the component value at the specified index in the CVector4.
+			*
+			* @param [in] i An integer index used to access the component value of the CVector4.
+			*
+			* @return Returns a reference to the component value at the specified index in the CVector4.
+			*
+			*/
+			int& operator[](int i);
+		};
+
+		/**
 		* The CLineSegment class represents a line segment in 2D space. It contains two CPoint objects, which represent the start point and end point of the line segment.
 		*/
 		class DS_API CLineSegment
 		{
-		public:
+		protected:
 			/**
 			* The start point of the line segment.
 			*/
@@ -933,6 +1156,62 @@ namespace dynamsoft
 			* The end point of the line segment.
 			*/
 			CPoint endPoint;
+
+			virtual void Init();
+
+		public:
+			/**
+			* Constructor
+			*/
+			CLineSegment();
+
+			/**
+			* Constructor
+			*
+			* @param [in] p1 The start point of the line segment.
+			* @param [in] p2 The end point of the line segment.
+			*
+			*/
+			CLineSegment(const CPoint& p1, const CPoint& p2);
+
+			/**
+			* Destructor.
+			*/
+			virtual ~CLineSegment();
+
+			CLineSegment& operator = (const CLineSegment& line);
+
+			/**
+			* Gets the start point of the line segment.
+			*
+			* @return Returns the start point of the line segment.
+			*
+			*/
+			const CPoint& GetStartPoint() const { return startPoint; }
+
+			/**
+			* Gets the end point of the line segment.
+			*
+			* @return Returns the end point of the line segment.
+			*
+			*/
+			const CPoint& GetEndPoint() const { return endPoint; }
+
+			/**
+			* Sets the start point of the line segment.
+			*
+			* @param [in] pt The start point of the line segment.
+			*
+			*/
+			void SetStartPoint(const CPoint& pt);
+
+			/**
+			* Sets the end point of the line segment.
+			*
+			* @param [in] pt The end point of the line segment.
+			*
+			*/
+			void SetEndPoint(const CPoint& pt);
 		};
 
 		/**
@@ -963,7 +1242,7 @@ namespace dynamsoft
 		};
 
 		/**
-		* CEdge is a structure composed of two Corner points in an image. 
+		* CEdge is a structure composed of two Corner points in an image.
 		* A Corner represents a point at which the image's brightness or color sharply changes. Therefore, a CEdge is a line segment connecting two such points that have been identified as Corners.
 		*/
 		class DS_API CEdge
@@ -1040,7 +1319,7 @@ namespace dynamsoft
 		/**
 		* The CImageTag class represents an image tag that can be attached to an image in a system. It contains information about the image, such as the image ID and the image capture distance mode.
 		*/
-		class DS_API CImageTag 
+		class DS_API CImageTag
 		{
 		private:
 			int imageId;
@@ -1104,7 +1383,7 @@ namespace dynamsoft
 		/**
 		* The CFileImageTag class represents an image tag that is associated with a file. It inherits from the CImageTag class and adds two attributes, a file path and a page number.
 		*/
-		class DS_API CFileImageTag : public CImageTag 
+		class DS_API CFileImageTag : public CImageTag
 		{
 		public:
 			/**
@@ -1306,7 +1585,7 @@ namespace dynamsoft
 			* @return Returns a pointer to the image byte array.
 			*
 			*/
-			const unsigned char* const GetBytes() const;
+			const unsigned char* GetBytes() const;
 
 			/**
 			* Gets the length of the image byte array.
@@ -1371,14 +1650,14 @@ namespace dynamsoft
 			*
 			*/
 			void SetImageTag(const CImageTag* _tag);
-			
+
 		private:
 			CImageData(const CImageData&);
 			CImageData& operator=(const CImageData&);
 		};
 
 		/**
-		* The CCapturedResultItem class represents an item in a captured result. It is an abstract base class with multiple subclasses, each representing a different type of captured item such as barcode, text line, detected quad, normalized image, raw image, parsed item, etc.
+		* The CCapturedResultItem class represents an item in a captured result. It is an abstract base class with multiple subclasses, each representing a different type of captured item such as barcode, text line, detected quad, normalized image, original image, parsed item, etc.
 		*/
 		class DS_API CCapturedResultItem
 		{
@@ -1406,7 +1685,7 @@ namespace dynamsoft
 		};
 
 		/**
-		* The CCapturedResult class represents the result of a capture operation on an image. Internally, CaptureResult stores an array that contains multiple items, each of which may be a barcode, text line, detected quad, normalized image, raw image, parsed item, etc.
+		* The CCapturedResult class represents the result of a capture operation on an image. Internally, CaptureResult stores an array that contains multiple items, each of which may be a barcode, text line, detected quad, normalized image, original image, parsed item, etc.
 		*/
 		class DS_API CCapturedResult
 		{
@@ -1417,20 +1696,20 @@ namespace dynamsoft
 			virtual ~CCapturedResult() {};
 
 			/**
-			* Gets the hash ID of the source image.
+			* Gets the hash ID of the original image.
 			*
-			* @return Returns the hash ID of the source image as a null-terminated string. You are not required to release the memory pointed to by the returned pointer.
+			* @return Returns the hash ID of the original image as a null-terminated string. You are not required to release the memory pointed to by the returned pointer.
 			*
 			*/
-			virtual const char* GetSourceImageHashId() const = 0;
+			virtual const char* GetOriginalImageHashId() const = 0;
 
 			/**
-			 * Gets a pointer to the CImageTag object containing the tag of the source image.
+			 * Gets a pointer to the CImageTag object containing the tag of the original image.
 			 *
-			 * @return Returns a pointer to the CImageTag object containing the tag of the source image. You are not required to release the memory pointed to by the returned pointer.
+			 * @return Returns a pointer to the CImageTag object containing the tag of the original image. You are not required to release the memory pointed to by the returned pointer.
 			 *
 			 */
-			virtual const CImageTag* GetSourceImageTag() const = 0;
+			virtual const CImageTag* GetOriginalImageTag() const = 0;
 
 			/**
 			 * Get the rotation transformation matrix of the original image relative to the rotated image.
@@ -1446,7 +1725,7 @@ namespace dynamsoft
 			 * @return Returns the number of items in the captured result.
 			 *
 			 */
-			virtual int GetCount() const = 0;
+			virtual int GetItemsCount() const = 0;
 
 			/**
 			 * Gets a pointer to the CCapturedResultItem object at the specified index.
@@ -1496,27 +1775,27 @@ namespace dynamsoft
 		};
 
 		/**
-		* The `CRawImageResultItem` class represents a captured raw image result item. It is a derived class of `CCapturedResultItem` and provides an interface to get the image data.
+		* The `COriginalImageResultItem` class represents a captured original image result item. It is a derived class of `CCapturedResultItem` and provides an interface to get the image data.
 		*/
-		class DS_API CRawImageResultItem : public CCapturedResultItem
+		class DS_API COriginalImageResultItem : public CCapturedResultItem
 		{
 		public:
 			/**
 			* Destructor
 			*/
-			virtual ~CRawImageResultItem() {};
+			virtual ~COriginalImageResultItem() {};
 
 			/**
-			* Gets the image data for the CRawImageResultItem.
+			* Gets the image data for the COriginalImageResultItem.
 			*
-			* @return Returns a const pointer to the CImageData object that contains the image data for the CRawImageResultItem.
+			* @return Returns a const pointer to the CImageData object that contains the image data for the COriginalImageResultItem.
 			*
 			*/
 			virtual const CImageData* GetImageData() const = 0;
 		};
 
 		/**
-		* The `CCapturedResultReceiver` class is responsible for receiving captured results. It contains several callback functions for different types of results, including raw image, decoded barcodes, recognized text lines, detected quads, normalized images, and parsed results.
+		* The `CCapturedResultReceiver` class is responsible for receiving captured results. It contains several callback functions for different types of results, including original image, decoded barcodes, recognized text lines, detected quads, normalized images, and parsed results.
 		*/
 		class DS_API CCapturedResultReceiver
 		{
@@ -1568,12 +1847,12 @@ namespace dynamsoft
 			virtual void OnCapturedResultReceived(const CCapturedResult* pResult);
 
 			/**
-			* Callback function for raw image results. It will be called once for each raw image result.
+			* Callback function for original image results. It will be called once for each original image result.
 			*
-			* @param [in] pResult The raw image result.
+			* @param [in] pResult The original image result.
 			*
 			*/
-			virtual void OnRawImageResultReceived(const CRawImageResultItem* pResult);
+			virtual void OnOriginalImageResultReceived(const COriginalImageResultItem* pResult);
 
 			/**
 			* Callback function for decoded barcodes results. It will be called once for each decoded barcodes result.
@@ -1618,7 +1897,7 @@ namespace dynamsoft
 		};
 
 		/**
-		* The `CCapturedResultFilter` class is responsible for filtering captured results. It contains several callback functions for different types of results, including raw image, decoded barcodes, recognized text lines, detected quads, normalized images, and parsed results.
+		* The `CCapturedResultFilter` class is responsible for filtering captured results. It contains several callback functions for different types of results, including original image, decoded barcodes, recognized text lines, detected quads, normalized images, and parsed results.
 		*/
 		class DS_API CCapturedResultFilter
 		{
@@ -1662,12 +1941,12 @@ namespace dynamsoft
 			void SetName(const char* name);
 
 			/**
-			* Callback function for raw image results. It will be called once for each raw image result.
+			* Callback function for original image results. It will be called once for each original image result.
 			*
-			* @param [in] pResult The raw image result.
+			* @param [in] pResult The original image result.
 			*
 			*/
-			virtual void OnRawImageResultReceived(CRawImageResultItem* pResult);
+			virtual void OnOriginalImageResultReceived(COriginalImageResultItem* pResult);
 
 			/**
 			* Callback function for decoded barcodes results. It will be called once for each decoded barcodes result.
@@ -1715,7 +1994,7 @@ namespace dynamsoft
 		/**
 		* The CImageSourceAdapter class provides an interface for fetching and buffering images. It is an abstract class that needs to be implemented by a concrete class to provide actual functionality.
 		*/
-		class DS_API CImageSourceAdapter 
+		class DS_API CImageSourceAdapter
 		{
 		private:
 			class CImageSourceAdapterInner;
@@ -1723,7 +2002,7 @@ namespace dynamsoft
 			CImageSourceAdapter& operator=(const CImageSourceAdapter&);
 			CImageSourceAdapterInner* m_inner;
 		protected:
-			
+
 			/**
 			* Adds an image to the buffer of the adapter.
 			*
@@ -1743,7 +2022,7 @@ namespace dynamsoft
 			* Destructor
 			*/
 			virtual ~CImageSourceAdapter();
-			
+
 			/**
 			* Determines whether there are more images left to fetch.
 			*
@@ -1751,7 +2030,7 @@ namespace dynamsoft
 			*
 			*/
 			virtual bool HasNextImageToFetch()const = 0;
-			
+
 			/**
 			* Starts fetching images.
 			*/
@@ -1761,17 +2040,15 @@ namespace dynamsoft
 			* Stops fetching images.
 			*/
 			virtual void StopFetching();
-			
+
 			/**
 			* Returns a buffered image.
-			*
-			* @param [in] removeFromBuffer Whether the image should be removed from the buffer after it is returned.
 			*
 			* @return Returns a pointer to the image if it exists in the buffer, NULL otherwise.
 			*
 			*/
 			virtual CImageData* GetImage();
-			
+
 			/**
 			* Sets how many images are allowed to be buffered.
 			*
@@ -1813,7 +2090,7 @@ namespace dynamsoft
 			*
 			*/
 			bool HasImage(int imageId)const;
-			
+
 			/**
 			* Sets the next image to return.
 			*
@@ -1841,11 +2118,11 @@ namespace dynamsoft
 			*/
 			bool IsBufferEmpty() const;
 
-			/** 
+			/**
 			 * Clears the buffer.
 			 */
 			void ClearBuffer();
-			
+
 			/**
 			 * Sets the usage type of a color channel in images.
 			 */
@@ -1876,18 +2153,18 @@ namespace dynamsoft
 			int dpi;
 
 			/**
-			* The tarGetstype.
+			* The raster data source.
 			*/
-			TargetType type;
-			
+			RasterDataSource rasterDataSource;
+
 			CPDFReadingParameter() {
 				mode = PDFRM_RASTER;
 				dpi = 300;
-				type = TT_PAGE;
+				rasterDataSource = RDS_RASTERIZED_PAGES;
 			}
 		};
 
-		
+
 #pragma pack(pop)
 	}
 
@@ -1960,10 +2237,10 @@ namespace dynamsoft
 		{
 		protected:
 			const char* hashId;
-			const char* sourceImageHashId;
-			CImageTag* sourceImageTag;
-			double transformMatrix[9];
-			double rotationMatrix[9];
+			const char* originalImageHashId;
+			CImageTag* originalImageTag;
+			double localToOriginalMatrix[9];
+			double rotatedToOriginalMatrix[9];
 
 		public:
 			/**
@@ -1985,36 +2262,38 @@ namespace dynamsoft
 			const char* GetHashId() const;
 
 			/**
-			* Gets the hash ID of the source image.
+			* Gets the hash ID of the original image.
 			*
-			* @return Returns the hash ID of the source image.
+			* @return Returns the hash ID of the original image.
 			*
 			*/
-			const char* GetSourceImageHashId() const;
+			const char* GetOriginalImageHashId() const;
 
 			/**
-			* Gets the image tag of the source image.
+			* Gets the image tag of the original image.
 			*
-			* @return Returns the image tag of the source image.
+			* @return Returns the image tag of the original image.
 			*
 			*/
-			const CImageTag* GetSourceImageTag() const;
+			const CImageTag* GetOriginalImageTag() const;
 
 			/**
-			* Gets the rotation transformation matrix of the original image relative to the rotated image.
+			* Gets the transformation matrix via TransformMatrixType.
 			*
-			* @param [out] matrix A double array which represents the rotation transform matrix.
+			* @param [in] matrixType The transform matrix type.
+			* @param [out] matrix A double array which represents the transform matrix. The corresponding transformation matrices are as follows: local image to original image, original image to local image, rotated image to original image, original image to rotated image.
 			*
 			*/
-			void GetRotationTransformMatrix(double matrix[9]) const;
+			void GetTransformMatrix(TransformMatrixType matrixType, double matrix[9]) const;
 
 			/**
-			* Gets the transformation matrix from local to source image coordinates.
+			* Sets the transformation matrix via TransformMatrixType.
 			*
-			* @param [out] matrix The transformation matrix.
+			* @param [in] matrixType The transform matrix type.
+			* @param [in] matrix A double array which represents the transform matrix. The corresponding transformation matrices are as follows: local image to original image, original image to local image, rotated image to original image, original image to rotated image.
 			*
 			*/
-			void GetLocalToSourceImageTransformMatrix(double matrix[9]) const;
+			void SetTransformMatrix(TransformMatrixType matrixType, double matrix[9]);
 
 			/**
 			* Gets the type of the intermediate result unit.
@@ -2041,36 +2320,20 @@ namespace dynamsoft
 			void SetHashId(const char* _hashId);
 
 			/**
-			* Sets the hash ID of the source image.
+			* Sets the hash ID of the original image.
 			*
-			* @param [in] _sourceImageHashId The hash ID to set.
+			* @param [in] _originalImageHashId The hash ID to set.
 			*
 			*/
-			void SetSourceImageHashId(const char* _sourceImageHashId);
+			void SetOriginalImageHashId(const char* _originalImageHashId);
 
 			/**
-			* Sets the image tag of the source image.
+			* Sets the image tag of the original image.
 			*
 			* @param [in] _tag The image tag to set.
 			*
 			*/
-			void SetSourceImageTag(const CImageTag* _tag);
-
-			/**
-			* Sets the rotation transformation matrix of the original image relative to the rotated image.
-			*
-			* @param [in] _matrix A double array which represents the rotation transform matrix.
-			*
-			*/
-			void SetRotationTransformMatrix(double _matrix[9]);
-
-			/**
-			* Sets the transformation matrix from local to source image coordinates.
-			*
-			* @param [out] _matrix The transformation matrix.
-			*
-			*/
-			void SetLocalToSourceImageTransformMatrix(double _matrix[9]);
+			void SetOriginalImageTag(const CImageTag* _tag);
 
 			/**
 			* Increases the reference count of the intermediate result unit.
@@ -2225,7 +2488,7 @@ namespace dynamsoft
 			* @return Returns a const pointer to the specified pre-detected region in the collection. You don't need to release the memory pointed to by the returned pointer.
 			*
 			*/
-			virtual const CPredetectedRegionElement* GetPredectedRegion(int index) const = 0;
+			virtual const CPredetectedRegionElement* GetPredetectedRegion(int index) const = 0;
 		};
 
 		/**
@@ -2403,25 +2666,7 @@ namespace dynamsoft
 			*/
 			virtual ~CContoursUnit() {};
 
-			/**
-			* Gets the number of contours in the unit.
-			*
-			* @return Returns the number of contours in the unit.
-			*
-			*/
-			virtual int GetCount() const = 0;
-
-			/**
-			* Gets the contour at the specified index.
-			*
-			* @param [in] index The index of the contour to get.
-			* @param [in, out] contour A pointer to a CContour object that will be filled with the contour data.
-			*
-			* @return Returns 0 if successful, or an error code if the contour could not be retrieved.
-			*
-			* Note: The caller of this method is responsible for allocating memory for the `contour` pointer.
-			*/
-			virtual int GetContour(int index, CContour* contour) const = 0;
+			virtual int GetContours(int* count, const CContour** contours, const CVector4** hierarchies) const = 0;
 		};
 
 		/**
@@ -2444,17 +2689,7 @@ namespace dynamsoft
 			*/
 			virtual int GetCount() const = 0;
 
-			/**
-			* Gets the specified line segment from the collection.
-			*
-			* @param [in] index The index of the line segment to retrieve.
-			*
-			* @param [in, out] line The CLineSegment object to store the retrieved line segment.
-			*
-			* @return Returns 0 if the operation succeeds, or a negative value if an error occurs.
-			*
-			*/
-			virtual int GetLineSegment(int index, CLineSegment* line) const = 0;
+			virtual const CLineSegment* GetLineSegment(int index) const = 0;
 		};
 
 		/**
@@ -2518,7 +2753,7 @@ namespace dynamsoft
 		};
 
 		/**
-		* The `CIntermediateResultReceiver` class is responsible for receiving intermediate results of different types. 
+		* The `CIntermediateResultReceiver` class is responsible for receiving intermediate results of different types.
 		* It provides virtual functions for each type of result, which are called when the corresponding result is received.
 		*/
 		class DS_API CIntermediateResultReceiver
@@ -2723,7 +2958,7 @@ namespace dynamsoft
 			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
 			*
 			*/
-			virtual void OnTextZonesUnitReceived(CTextZonesUnit *pResult, const IntermediateResultExtraInfo* extraInfo);
+			virtual void OnTextZonesUnitReceived(CTextZonesUnit *pResult, const IntermediateResultExtraInfo* info);
 
 			/**
 			* Called when text-removed binary image units have been received.
@@ -2830,14 +3065,14 @@ namespace dynamsoft
 			virtual int RemoveResultReceiver(CIntermediateResultReceiver* receiver) = 0;
 
 			/**
-			* Gets the raw image data using an image hash id.
+			* Gets the original image data using an image hash id.
 			*
 			* @param [in] imageHashId The hash id of the image to retrieve.
 			*
-			* @return Returns a pointer to the CImageData object containing the raw image data. You don't need to release the memory pointed to by the returned pointer.
+			* @return Returns a pointer to the CImageData object containing the original image data. You don't need to release the memory pointed to by the returned pointer.
 			*
 			*/
-			virtual CImageData* GetRawImage(const char* imageHashId) = 0;
+			virtual CImageData* GetOriginalImage(const char* imageHashId) = 0;
 		};
 	}
 }

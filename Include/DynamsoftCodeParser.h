@@ -11,7 +11,7 @@
 #endif
 #include "DynamsoftCore.h"
 
-#define DCP_VERSION "2.0.0.629"
+#define DCP_VERSION "2.0.10.807"
 /**
  * @enum MappingStatus 
  *
@@ -124,41 +124,41 @@ namespace dynamsoft
 			virtual ~CParsedResult() {};
 
 			/**
-			 * Gets the hash ID of the source image.
+			 * Gets the hash ID of the original image.
 			 * 
-			 * @return Returns a pointer to a null-terminated string containing the hash ID of the source image.
-			 * 
-			 */
-			virtual const char* GetSourceImageHashId()const = 0;
-
-			/**
-			 * Gets the tag of the source image.
-			 * 
-			 * @return Returns a pointer to a CImageTag object representing the tag of the source image.
+			 * @return Returns a pointer to a null-terminated string containing the hash ID of the original image.
 			 * 
 			 */
-			virtual const CImageTag* GetSourceImageTag()const = 0;
+			virtual const char* GetOriginalImageHashId()const = 0;
 
 			/**
-			 * Gets the number of decoded barcode items in the barcode reading result.
+			 * Gets the tag of the original image.
 			 * 
-			 * @return Returns the number of decoded barcode items in the barcode reading result.
+			 * @return Returns a pointer to a CImageTag object representing the tag of the original image.
 			 * 
 			 */
-			virtual int GetCount()const = 0;
+			virtual const CImageTag* GetOriginalImageTag()const = 0;
 
 			/**
-			 * Gets the decoded barcode result item at the specified index.
+			 * Gets the number of parsed result items in the parsed result.
 			 * 
-			 * @param [in] index The zero-based index of the barcode result item to retrieve.
+			 * @return Returns the number of parsed result items in the parsed result.
 			 * 
-			 * @return Returns a pointer to the CDecodedBarcodesResult object at the specified index.
+			 */
+			virtual int GetItemsCount()const = 0;
+			 
+			/**
+			 * Gets the parsed result item at the specified index.
+			 * 
+			 * @param [in] index The zero-based index of the parsed result item to retrieve.
+			 * 
+			 * @return Returns a pointer to the CParsedResultItem object at the specified index.
 			 * 
 			 */
 			virtual const CParsedResultItem* GetItem(int index)const = 0;
 
 			/**
-			 * Remove a specific item from the array in the normalized images.
+			 * Remove a specific item from the array in the parsed results.
 			 * 
 			 * @param [in] item The specific item to remove.
 			 * 
@@ -178,9 +178,9 @@ namespace dynamsoft
 			virtual bool HasItem(const CParsedResultItem* item) const = 0;
 
 			/**
-			 * Gets the error code of the barcode reading result, if an error occurred.
+			 * Gets the error code of the parsed result, if an error occurred.
 			 * 
-			 * @return Returns the error code of the barcode reading result, or 0 if no error occurred.
+			 * @return Returns the error code of the parsed result, or 0 if no error occurred.
 			 * 
 			 */
 			virtual int GetErrorCode()const = 0;

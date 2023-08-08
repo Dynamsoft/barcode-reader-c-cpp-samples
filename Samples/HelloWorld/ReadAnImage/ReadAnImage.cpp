@@ -7,7 +7,7 @@ using namespace std;
 using namespace dynamsoft::license;
 using namespace dynamsoft::cvr;
 using namespace dynamsoft::dbr;
-
+using namespace dynamsoft::basic_structures;
 #if defined(_WIN64) || defined(_WIN32)
 #ifdef _WIN64
 #pragma comment(lib, "../../../Lib/Windows/x64/DynamsoftLicensex64.lib")
@@ -42,7 +42,7 @@ int main()
 		cout << "Error: " << result->GetErrorCode() << "," << result->GetErrorString() << endl;
 	}
 
-	int capturedResultItemCount = result->GetCount();
+	int capturedResultItemCount = result->GetItemsCount();
 	cout << "Decoded " << capturedResultItemCount << " barcodes" << endl;
 
 	for (int j = 0; j < capturedResultItemCount; j++) 

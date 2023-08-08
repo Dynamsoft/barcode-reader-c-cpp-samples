@@ -26,7 +26,7 @@ using namespace dynamsoft::utility;
 class MyCapturedResultReceiver : public CCapturedResultReceiver {
     virtual void OnDecodedBarcodesReceived(const CDecodedBarcodesResult* pResult) 
 	{
-		const CFileImageTag *tag = dynamic_cast<const CFileImageTag*>(pResult->GetSourceImageTag());
+		const CFileImageTag *tag = dynamic_cast<const CFileImageTag*>(pResult->GetOriginalImageTag());
 
 		cout << "File: " << tag->GetFilePath() << endl;
 
@@ -36,7 +36,7 @@ class MyCapturedResultReceiver : public CCapturedResultReceiver {
 		}
 		else
 		{
-			int count = pResult->GetCount();
+			int count = pResult->GetItemsCount();
 			cout << "Decoded " << count << " barcodes" << endl;
 			for (int i = 0; i < count; i++) {
 			    const CBarcodeResultItem* barcodeResultItem = pResult->GetItem(i);

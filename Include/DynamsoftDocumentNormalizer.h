@@ -19,7 +19,7 @@
 #endif
 #include "DynamsoftCore.h"
 
-#define DDN_VERSION                  "2.0.0.629"
+#define DDN_VERSION                  "2.0.10.807"
 
 
 #ifdef __cplusplus
@@ -98,14 +98,11 @@ namespace dynamsoft
 				 *
 				 * @param [in] index The index of the LongLine object.
 				 *
-				 * @param [out] line The LongLine object got by the specific index.
-				 *
-				 * @return Returns the error code.
+				 * @return Returns the LongLine object got by the specific index.
 				 *
 				 * @see [CLineSegment]()
-				 * @see [ErrorCode]()
 				 */
-				virtual int GetLongLine(int index, CLineSegment* line) const = 0;
+				virtual const CLineSegment* GetLongLine(int index) const = 0;
 			};
 
 			/**
@@ -308,22 +305,22 @@ namespace dynamsoft
 			virtual ~CDetectedQuadsResult() {}
 
 			/**
-			 * Gets the hash ID of the source image.
+			 * Gets the hash ID of the original image.
 			 *
-			 * @return Returns a pointer to a null-terminated string that represents the hash ID of the source image.
+			 * @return Returns a pointer to a null-terminated string that represents the hash ID of the original image.
 			 *
 			 */
-			virtual const char* GetSourceImageHashId()const = 0;
+			virtual const char* GetOriginalImageHashId()const = 0;
 
 			/**
-			 * Gets the tag of the source image.
+			 * Gets the tag of the original image.
 			 *
-			 * @return Returns a pointer to a CImageTag object that represents the tag of the source image.
+			 * @return Returns a pointer to a CImageTag object that represents the tag of the original image.
 			 *
 			 * @see CImageTag
 			 *
 			 */
-			virtual const CImageTag* GetSourceImageTag()const = 0;
+			virtual const CImageTag* GetOriginalImageTag()const = 0;
 
 			/**
 			 * Get the rotation transformation matrix of the original image relative to the rotated image.
@@ -339,7 +336,7 @@ namespace dynamsoft
 			 * @return Returns the number of detected quadrilaterals.
 			 *
 			 */
-			virtual int GetCount()const = 0;
+			virtual int GetItemsCount()const = 0;
 
 			/**
 			 * Gets the detected quadrilateral item at a specified index.
@@ -405,22 +402,22 @@ namespace dynamsoft
 			virtual ~CNormalizedImagesResult() {};
 
 			/**
-			 * Gets the hash ID of the source image that was normalized.
+			 * Gets the hash ID of the original image that was normalized.
 			 *
-			 * @return Returns the hash ID of the source image that was normalized.
+			 * @return Returns the hash ID of the original image that was normalized.
 			 *
 			 */
-			virtual const char* GetSourceImageHashId()const = 0;
+			virtual const char* GetOriginalImageHashId()const = 0;
 
 			/**
-			 * Gets the tag of the source image that was normalized.
+			 * Gets the tag of the original image that was normalized.
 			 *
-			 * @return Returns a pointer to the tag of the source image that was normalized.
+			 * @return Returns a pointer to the tag of the original image that was normalized.
 			 *
 			 * @see CImageTag
 			 *
 			 */
-			virtual const CImageTag* GetSourceImageTag()const = 0;
+			virtual const CImageTag* GetOriginalImageTag()const = 0;
 
 			/**
 			 * Get the rotation transformation matrix of the original image relative to the rotated image.
@@ -436,7 +433,7 @@ namespace dynamsoft
 			 * @return Returns the number of normalized images in the result.
 			 *
 			 */
-			virtual int GetCount()const = 0;
+			virtual int GetItemsCount()const = 0;
 
 			/**
 			 * Gets a specific normalized image from the result.

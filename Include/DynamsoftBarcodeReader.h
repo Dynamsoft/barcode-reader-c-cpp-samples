@@ -24,7 +24,7 @@ typedef void* HANDLE;
 #endif
 #include "DynamsoftCore.h"
 
-#define DBR_VERSION "10.0.0.629"
+#define DBR_VERSION "10.0.10.807"
 
 /**Enumeration section*/
 
@@ -1067,20 +1067,20 @@ namespace dynamsoft
 			virtual ~CDecodedBarcodesResult() {};
 
 			/**
-			 * Gets the hash ID of the source image.
+			 * Gets the hash ID of the original image.
 			 *
-			 * @return Returns a pointer to a null-terminated string containing the hash ID of the source image.
+			 * @return Returns a pointer to a null-terminated string containing the hash ID of the original image.
 			 *
 			 */
-			virtual const char* GetSourceImageHashId()const = 0;
+			virtual const char* GetOriginalImageHashId()const = 0;
 
 			/**
-			 * Gets the tag of the source image.
+			 * Gets the tag of the original image.
 			 *
-			 * @return Returns a pointer to a CImageTag object representing the tag of the source image.
+			 * @return Returns a pointer to a CImageTag object representing the tag of the original image.
 			 *
 			 */
-			virtual const CImageTag* GetSourceImageTag()const = 0;
+			virtual const CImageTag* GetOriginalImageTag()const = 0;
 
 			/**
 			 * Get the rotation transformation matrix of the original image relative to the rotated image.
@@ -1096,7 +1096,7 @@ namespace dynamsoft
 			 * @return Returns the number of decoded barcode items in the barcode reading result.
 			 *
 			 */
-			virtual int GetCount()const = 0;
+			virtual int GetItemsCount()const = 0;
 
 			/**
 			 * Gets the decoded barcode result item at the specified index.

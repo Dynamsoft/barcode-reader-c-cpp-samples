@@ -13,7 +13,7 @@
 
 
 #include"DynamsoftCore.h"
-#define DISA_VERSION "1.0.0.629"
+#define DISA_VERSION "1.0.10.807"
 
 #ifdef __cplusplus
 
@@ -51,7 +51,7 @@ namespace dynamsoft {
 			* @param [in] enable Set whether to enable result verification.
 			*
 			*/
-			void EnableResultVerification(int resultItemTypes, bool enable);
+			void EnableResultCrossVerification(int resultItemTypes, bool enable);
 
 			/**
 			* Determines whether the result verification feature is enabled for
@@ -61,7 +61,7 @@ namespace dynamsoft {
 			* @return Returns a bool value indicating whether result verification is 
 			* enabled for the specific captured result item type.
 			*/
-			bool IsResultVerificationEnabled(CapturedResultItemType type) const;
+			bool IsResultCrossVerificationEnabled(CapturedResultItemType type) const;
 
 			/**
 			* Enable duplicate filter feature to filter out the duplicate results in 
@@ -77,7 +77,7 @@ namespace dynamsoft {
 			* @param [in] enable Set whether to enable result duplicate filter.
 			*
 			*/
-			void EnableDuplicateFilter(int resultItemTypes, bool enable);
+			void EnableResultDeduplication(int resultItemTypes, bool enable);
 
 			/**
 			* Determines whether the duplicate filter feature is enabled for the specific result item type.
@@ -87,7 +87,7 @@ namespace dynamsoft {
 			* result item type.
 			*
 			*/
-			bool IsDuplicateFilterEnabled(CapturedResultItemType type) const;
+			bool IsResultDeduplicationEnabled(CapturedResultItemType type) const;
 
 			/**
 			* Sets the duplicate forget time for the specific captured result item types.The same captured result 
@@ -113,7 +113,7 @@ namespace dynamsoft {
 			*/
 			int GetDuplicateForgetTime(CapturedResultItemType type) const;
 
-			virtual void OnRawImageResultReceived(CRawImageResultItem* pResult);
+			virtual void OnOriginalImageResultReceived(COriginalImageResultItem* pResult);
 
 			virtual void OnDecodedBarcodesReceived(dbr::CDecodedBarcodesResult* pResult);
 

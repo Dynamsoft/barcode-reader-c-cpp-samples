@@ -20,7 +20,7 @@
 #include "DynamsoftLicense.h"
 #include "DynamsoftUtility.h"
 
-#define DCV_VERSION                  "2.0.0.629"
+#define DCV_VERSION                  "2.0.10.807"
 
 /**Enumeration section*/
 
@@ -64,8 +64,8 @@ typedef struct tagSimplifiedCaptureVisionSettings
 	/**
 	 * Specifies the type(s) of CapturedItem(s) that will be captured.
 	 *
-	 * @values The value should be a bitwise OR combination of one or more of the following constants:\n
-	 *         `DCV_CAPTURED_ITEM_TYPE_BARCODE`\n
+	 * @values The value should be a bitwise OR combination of one or more of the following constants:
+	 *         `DCV_CAPTURED_ITEM_TYPE_BARCODE`
 	 *         `DCV_CAPTURED_ITEM_TYPE_LABEL`
 	 */
 	int capturedResultItemTypes;
@@ -78,7 +78,7 @@ typedef struct tagSimplifiedCaptureVisionSettings
 	/**
 	 * Specifies whether the ROI is measured in pixels or as a percentage of the image size.
 	 *
-	 * @values 0 if the ROI is measured in pixels.\n
+	 * @values 0 if the ROI is measured in pixels.
 	 *         1 if the ROI is measured as a percentage of the image size.
 	 */
 	int roiMeasuredInPercentage;
