@@ -18,17 +18,25 @@
 
 CDbrBarcodeFileReader::CDbrBarcodeFileReader()
 {
-	m_pBarcodeReader = new dynamsoft::dbr::CBarcodeReader();
+	m_pBarcodeReader = dynamsoft::dbr::CBarcodeReader::GetInstance();
 }
 
 CDbrBarcodeFileReader::~CDbrBarcodeFileReader()
 {
-
-	SAFE_DELETE(m_pBarcodeReader);
+	if (m_pBarcodeReader)
+	{
+		m_pBarcodeReader->Recycle();
+		m_pBarcodeReader = nullptr;
+	}
 }
 
 void CDbrBarcodeFileReader::Run()
 {
+	if (!m_pBarcodeReader)
+	{
+		cout << "Get instance failed." << endl;
+		return;
+	}
 	LoadRuntimeSettings("templates");
 	if (m_listSettingsFile.size() > 0)
 	{

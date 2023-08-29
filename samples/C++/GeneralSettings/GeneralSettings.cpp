@@ -28,7 +28,7 @@ int main()
 
     // 1.Initialize license.
     // The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
-    // If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp 
+    // If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?architecture=dcv&product=dbr&utm_source=samples&package=c_cpp 
     errorCode = CBarcodeReader::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 512);
     if (errorCode != DBR_OK)
     {
@@ -36,14 +36,18 @@ int main()
     }
 
     // 2. Create an instance of Barcode Reader
-    CBarcodeReader dbr;
-
+    CBarcodeReader* dbr = CBarcodeReader::GetInstance();
+    if (dbr == NULL)
+    {
+        cout << "Get instance failed." << endl;
+        return -1;
+    }
     // 3. Configure settings
 
     // 3.1 Through PublicRuntimeSetting
 
     // 3.1.1 Call GetRuntimeSettings to get current runtime settings. 
-    dbr.GetRuntimeSettings(&settings);
+    dbr->GetRuntimeSettings(&settings);
 
     // 3.1.2 Configure one or more specific settings
     // In this sample, we configure three settings: 
@@ -62,18 +66,18 @@ int main()
     settings.region.regionMeasuredByPercentage = 1;
 
     // 3.1.3 Call UpdateRuntimeSettings to apply above settings
-    dbr.UpdateRuntimeSettings(&settings, szErrorMsg, 512);
+    dbr->UpdateRuntimeSettings(&settings, szErrorMsg, 512);
 
     // 3.2 Through JSON template
     //dbr.InitRuntimeSettingsWithString("{\"ImageParameter\":{\"Name\":\"S1\",\"RegionDefinitionNameArray\":[\"R1\"]},\"RegionDefinition\":{\"Name\":\"R1\",\"BarcodeFormatIds\":[\"BF_PDF417\"],\"BarcodeFormatIds_2\":[\"BF2_POSTALCODE\"],\"ExpectedBarcodesCount\":2,\"Left\":0,\"Right\":100,\"Top\":50,\"Bottom\":100,\"MeasuredByPercentage\":1}}", CM_IGNORE, szErrorMsg, 512);
 
     // 4. Read barcode from an image file
-    errorCode = dbr.DecodeFile("../../../images/AllSupportedBarcodeTypes.png", "");
+    errorCode = dbr->DecodeFile("../../../images/AllSupportedBarcodeTypes.png", "");
     if (errorCode != DBR_OK)
         cout << CBarcodeReader::GetErrorString(errorCode) << endl;
 
     // 5. Get all barcode results
-    dbr.GetAllTextResults(&barcodeResults);
+    dbr->GetAllTextResults(&barcodeResults);
 
 
     if (barcodeResults != NULL && barcodeResults->resultsCount > 0)
@@ -99,6 +103,9 @@ int main()
     // 6. Free the memory allocated for text results
     if (barcodeResults != NULL)
         CBarcodeReader::FreeTextResults(&barcodeResults);
+
+    dbr->Recycle();
+    dbr = NULL;
 
     cout << "Press any key to quit..." << endl;
     cin.ignore();

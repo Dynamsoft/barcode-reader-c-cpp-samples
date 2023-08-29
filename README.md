@@ -35,7 +35,7 @@ This repository contains multiple samples that demonstrates how to use the <a hr
 
 The library requires a license to work, you use the API InitLicense to initialize license key and activate the SDK.
 
-These samples use a free public trial license which require network connection to function. You can request a 30-day free trial license key from <a href="https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp" target="_blank">Customer Portal</a> which works offline.
+These samples use a free public trial license which require network connection to function. You can request a 30-day free trial license key from <a href="https://www.dynamsoft.com/customer/license/trialLicense?architecture=dcv&product=dbr&utm_source=samples&package=c_cpp" target="_blank">Customer Portal</a> which works offline.
 
 ## Contact Us
 

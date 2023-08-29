@@ -91,7 +91,7 @@ public:
 			cout << "Error" << endl;
 		}
 	}
-	void outputResults(TextResultArray* barcodeResults, CBarcodeReader& reader)
+	void outputResults(TextResultArray* barcodeResults)
 	{
 		if (barcodeResults != NULL && barcodeResults->resultsCount > 0)
 		{
@@ -125,7 +125,7 @@ int main() {
 
 	// 1.Initialize license.
   	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
-  	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp 
+  	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?architecture=dcv&product=dbr&utm_source=samples&package=c_cpp 
    	errorCode = CBarcodeReader::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
 	if (errorCode != DBR_OK)
 	{
@@ -133,7 +133,13 @@ int main() {
 	}
 	
 	// Create an instance of Barcode Reader
-	CBarcodeReader reader;
+	CBarcodeReader* reader = CBarcodeReader::GetInstance();
+	if (reader == NULL)
+	{
+		cout << "Get instance failed." << endl;
+		return -1;
+	}
+
 	ReadRateFirstSettings rf;
 
 	string fileName = "../../../../images/AllSupportedBarcodeTypes.png";
@@ -142,32 +148,36 @@ int main() {
 	cout << "Decode through PublicRuntimeSettings:" << endl;
 	{
 		//	config through PublicRuntimeSettings
-		rf.configReadRateFirst(&reader);
+		rf.configReadRateFirst(reader);
 		
 		//	Decode barcodes from an image file by current runtime settings. The second parameter value "" means to decode through the current PublicRuntimeSettings.
-		errorCode=reader.DecodeFile(fileName.c_str(), "");
+		errorCode = reader->DecodeFile(fileName.c_str(), "");
 		
 		//	Get all barcode results
-		reader.GetAllTextResults(&barcodeResults);
+		reader->GetAllTextResults(&barcodeResults);
 
 		//	Output the barcode format and barcode text.
-		rf.outputResults(barcodeResults, reader);
+		rf.outputResults(barcodeResults);
 	}
 	cout << endl;
 	cout << "Decode through parameters template:" << endl;
 	{
 		// config through parameters template
-		rf.configReadFirstByTemplate(&reader);
+		rf.configReadFirstByTemplate(reader);
 
 		// Decode barcodes from an image file by template.
-		reader.DecodeFile(fileName.c_str(), "");
+		reader->DecodeFile(fileName.c_str(), "");
 
 		//	Get all barcode results
-		reader.GetAllTextResults(&barcodeResults);
+		reader->GetAllTextResults(&barcodeResults);
 
 		// Output the barcode format and barcode text.
-		rf.outputResults(barcodeResults, reader);
+		rf.outputResults(barcodeResults);
 	}
+
+	reader->Recycle();
+	reader = NULL;
+
 	cout << "Press any key to quit..." << endl;
     cin.ignore();
    	return 0;

@@ -55,17 +55,22 @@ void ThreadDecodeFile(void* pInfo)
 		pMultiThreadDecodeFileInfo->mutexInfo->unlock();
 
 
-		CBarcodeReader reader;
-		
+		CBarcodeReader* reader = CBarcodeReader::GetInstance();
+		if (reader == NULL)
+		{
+			cout << "Get instance failed." << endl;
+			continue;
+		}
+
 		char errorMessage[256];
 		//Best coverage settings
-		reader.InitRuntimeSettingsWithString("{\"ImageParameter\":{\"Name\":\"BestCoverage\",\"DeblurLevel\":9,\"ExpectedBarcodesCount\":512,\"ScaleDownThreshold\":100000,\"LocalizationModes\":[{\"Mode\":\"LM_CONNECTED_BLOCKS\"},{\"Mode\":\"LM_SCAN_DIRECTLY\"},{\"Mode\":\"LM_STATISTICS\"},{\"Mode\":\"LM_LINES\"},{\"Mode\":\"LM_STATISTICS_MARKS\"}],\"GrayscaleTransformationModes\":[{\"Mode\":\"GTM_ORIGINAL\"},{\"Mode\":\"GTM_INVERTED\"}]}}", CM_OVERWRITE, errorMessage, 256);		
+		reader->InitRuntimeSettingsWithString("{\"ImageParameter\":{\"Name\":\"BestCoverage\",\"DeblurLevel\":9,\"ExpectedBarcodesCount\":512,\"ScaleDownThreshold\":100000,\"LocalizationModes\":[{\"Mode\":\"LM_CONNECTED_BLOCKS\"},{\"Mode\":\"LM_SCAN_DIRECTLY\"},{\"Mode\":\"LM_STATISTICS\"},{\"Mode\":\"LM_LINES\"},{\"Mode\":\"LM_STATISTICS_MARKS\"}],\"GrayscaleTransformationModes\":[{\"Mode\":\"GTM_ORIGINAL\"},{\"Mode\":\"GTM_INVERTED\"}]}}", CM_OVERWRITE, errorMessage, 256);		
 		//Best speend settings
 		//reader.InitRuntimeSettingsWithString(temphBarcode, "{\"ImageParameter\":{\"Name\":\"BestSpeed\",\"DeblurLevel\":3,\"ExpectedBarcodesCount\":512,\"LocalizationModes\":[{\"Mode\":\"LM_SCAN_DIRECTLY\"}],\"TextFilterModes\":[{\"MinImageDimension\":262144,\"Mode\":\"TFM_GENERAL_CONTOUR\"}]}}", CM_OVERWRITE, errorMessage, 256);
 		//Balance settings
 		//reader.InitRuntimeSettingsWithString(temphBarcode, "{\"ImageParameter\":{\"Name\":\"Balance\",\"DeblurLevel\":5,\"ExpectedBarcodesCount\":512,\"LocalizationModes\":[{\"Mode\":\"LM_CONNECTED_BLOCKS\"},{\"Mode\":\"LM_STATISTICS\"}]}}", CM_OVERWRITE, errorMessage, 256);
 		
-		int iRet = reader.DecodeFile(strImageFile.c_str());
+		int iRet = reader->DecodeFile(strImageFile.c_str());
 
 		cout << "Thread: " << this_thread::get_id() << " File Name:" << strImageFile << endl;
 
@@ -78,7 +83,7 @@ void ThreadDecodeFile(void* pInfo)
 		else
 		{
 			TextResultArray *paryResult = NULL;
-			reader.GetAllTextResults(&paryResult);
+			reader->GetAllTextResults(&paryResult);
 			
 			if (paryResult->resultsCount == 0)
 			{
@@ -93,6 +98,9 @@ void ThreadDecodeFile(void* pInfo)
 		}
 
 		cout << endl;
+
+		reader->Recycle();
+		reader = NULL;
 	}
 }
 
@@ -184,7 +192,7 @@ int main(int argc, const char* argv[])
 
 	// 1.Initialize license.
 	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
-	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp 
+	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?architecture=dcv&product=dbr&utm_source=samples&package=c_cpp 
 	errorCode = CBarcodeReader::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
 	if (errorCode == DBR_OK)
 	{

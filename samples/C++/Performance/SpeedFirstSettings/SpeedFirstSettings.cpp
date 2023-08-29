@@ -103,7 +103,7 @@ public:
 		}
 	}
 
-	void outputResults(TextResultArray* barcodeResults, CBarcodeReader& reader, long costTime) {
+	void outputResults(TextResultArray* barcodeResults, long costTime) {
 		cout << "Cost time:" << costTime << "ms" << endl;
 		if (barcodeResults != NULL && barcodeResults->resultsCount > 0)
 		{
@@ -139,14 +139,19 @@ int main() {
 
 	// 1.Initialize license.
   	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
-  	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp 
+  	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?architecture=dcv&product=dbr&utm_source=samples&package=c_cpp 
    	errorCode = CBarcodeReader::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
 	{
 		cout << szErrorMsg << endl;
 	}
 
 	//Create an instance of Barcode Reader
-	CBarcodeReader reader;
+	CBarcodeReader* reader = CBarcodeReader::GetInstance();
+	if (reader == NULL)
+	{
+		cout << "Get instance failed." << endl;
+		return -1;
+	}
 	SpeedFirstSettings sf;
 
 	string fileName = "../../../../images/AllSupportedBarcodeTypes.png";
@@ -157,41 +162,45 @@ int main() {
 	cout << "Decode through PublicRuntimeSettings:" << endl;
 	{
 		// config through PublicRuntimeSettings
-		sf.configSpeedFirst(&reader);
+		sf.configSpeedFirst(reader);
 
 		ullTimeBeg = GetTiming();
 		
 		// Decode barcodes from an image file by current runtime settings. The second parameter value "" means to decode through the current PublicRuntimeSettings.
-		reader.DecodeFile(fileName.c_str(), "");
+		reader->DecodeFile(fileName.c_str(), "");
 
 		ullTimeEnd = GetTiming();
 		
 		//Get all barcode results
-		reader.GetAllTextResults(&barcodeResults);
+		reader->GetAllTextResults(&barcodeResults);
 
 		// Output the barcode format and barcode text.
-		sf.outputResults(barcodeResults, reader, ullTimeEnd - ullTimeBeg);
+		sf.outputResults(barcodeResults, ullTimeEnd - ullTimeBeg);
 
 	}
 	cout << endl;
 	cout << "Decode through parameters template:" << endl;
 	{
 		// config through parameters template
-		sf.configSpeedFirstByTemplate(&reader);
+		sf.configSpeedFirstByTemplate(reader);
 
 		ullTimeBeg = GetTiming();
 		
 		// Decode barcodes from an image file by template.
-		reader.DecodeFile(fileName.c_str(), "");
+		reader->DecodeFile(fileName.c_str(), "");
 		
 		ullTimeEnd = GetTiming();
 
 		//Get all barcode results
-		reader.GetAllTextResults(&barcodeResults);
+		reader->GetAllTextResults(&barcodeResults);
 
 		// Output the barcode format and barcode text.
-		sf.outputResults(barcodeResults, reader, ullTimeEnd - ullTimeBeg);
+		sf.outputResults(barcodeResults, ullTimeEnd - ullTimeBeg);
 	}
+
+	reader->Recycle();
+	reader = NULL;
+
 	cout << "Press any key to quit..." << endl;
     cin.ignore();
     return 0;

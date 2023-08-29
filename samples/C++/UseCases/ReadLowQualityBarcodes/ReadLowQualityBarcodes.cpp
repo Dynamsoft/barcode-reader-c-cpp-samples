@@ -169,17 +169,37 @@ int main(int argc, const char* argv[])
 	{
 		cout << szErrorMsg << endl;
 	}
+	//CBarcodeReader reader1, reader21, reader22, reader23, reader3;
+	CBarcodeReader* reader1 = CBarcodeReader::GetInstance();
+	CBarcodeReader* reader21 = CBarcodeReader::GetInstance();
+	CBarcodeReader* reader22 = CBarcodeReader::GetInstance();
+	CBarcodeReader* reader23 = CBarcodeReader::GetInstance();
+	CBarcodeReader* reader3 = CBarcodeReader::GetInstance();
+	if (reader1 == NULL || reader21 == NULL || reader22 == NULL || reader23 == NULL || reader3 == NULL)
+	{
+		cout << "Get instance failed." << endl;
+		if (reader1 != NULL) { reader1->Recycle(), reader1 = NULL; }
+		if (reader21 != NULL) { reader21->Recycle(), reader21 = NULL; }
+		if (reader22 != NULL) { reader22->Recycle(), reader22 = NULL; }
+		if (reader23 != NULL) { reader23->Recycle(), reader23 = NULL; }
+		if (reader3 != NULL) { reader3->Recycle(), reader3 = NULL; }
+		return -1;
+	}
 
-	CBarcodeReader reader1, reader21, reader22, reader23, reader3;
 	printf("*************************************************\r\n");
 	printf("Welcome to Dynamsoft Barcode Reader Demo\r\n");
-	printf("DBR version: %s\r\n", reader1.GetVersion());
+	printf("DBR version: %s\r\n", reader1->GetVersion());
 	printf("*************************************************\r\n\r\n");
 
 	PathInfo pathInfo(folder);
 	if (!OpenDirectory(pathInfo))
 	{
 		printf("The directory %s does not exist.\r\n", folder.c_str());
+		reader1->Recycle(), reader1 = NULL;
+		reader21->Recycle(), reader21 = NULL;
+		reader22->Recycle(), reader22 = NULL;
+		reader23->Recycle(), reader23 = NULL;
+		reader3->Recycle(), reader3 = NULL;
 		return -1;
 	}
 		
@@ -226,22 +246,27 @@ int main(int argc, const char* argv[])
 			//============== Step 1: check if can be decoded with general settings ===============
 
 			// As an example, we set parameters based on the sample image in the template file defined by tpDecoding
-			iRet = reader1.InitRuntimeSettingsWithFile(tpDecoding.c_str(), CM_OVERWRITE, szErrorMsg, 256);
+			iRet = reader1->InitRuntimeSettingsWithFile(tpDecoding.c_str(), CM_OVERWRITE, szErrorMsg, 256);
 			if (iRet != 0)
 			{
 				printf("Load %s error: %s\r\n", tpDecoding.c_str(), szErrorMsg);
+				reader1->Recycle(), reader1 = NULL;
+				reader21->Recycle(), reader21 = NULL;
+				reader22->Recycle(), reader22 = NULL;
+				reader23->Recycle(), reader23 = NULL;
+				reader3->Recycle(), reader3 = NULL;
 				return -1;
 			}
 
 			ullTimeBegin = GetTiming();
-			iRet = reader1.DecodeFile(filePath, "");
+			iRet = reader1->DecodeFile(filePath, "");
 			ullTimeEnd = GetTiming();
 
 			unsigned long curImgTime = ullTimeEnd - ullTimeBegin;
 			totalTime_Step1 += curImgTime;
 
 			TextResultArray* paryResult = NULL;
-			reader1.GetAllTextResults(&paryResult);
+			reader1->GetAllTextResults(&paryResult);
 			if (paryResult->resultsCount > 0)
 			{
 				printf("Result count: %d\r\n", paryResult->resultsCount);
@@ -272,7 +297,7 @@ int main(int argc, const char* argv[])
 						string settingsT2 = settingsT + ipModes[ipmi];
 						string settingsGetGrayImg = settingsT2 + terminatePhases[0] + intermediateResultTypes[0] + tpFoot;
 
-						iRet = reader21.InitRuntimeSettingsWithString(settingsGetGrayImg.c_str(), CM_OVERWRITE, szErrorMsg, 256);
+						iRet = reader21->InitRuntimeSettingsWithString(settingsGetGrayImg.c_str(), CM_OVERWRITE, szErrorMsg, 256);
 						if (iRet != 0)
 						{
 							printf("ImagePreprocessingMode %d error: %s\r\n", ipmi, szErrorMsg);
@@ -280,14 +305,14 @@ int main(int argc, const char* argv[])
 						}
 
 						ullTimeBegin = GetTiming();
-						iRet = reader21.DecodeFile(filePath, "");
+						iRet = reader21->DecodeFile(filePath, "");
 						ullTimeEnd = GetTiming();
 						curImgTime += ullTimeEnd - ullTimeBegin;
 						totalTime_Step2 += ullTimeEnd - ullTimeBegin;
 
 						// binarizationModes loop
 						IntermediateResultArray* pIMRA21 = NULL;
-						reader21.GetIntermediateResults(&pIMRA21);
+						reader21->GetIntermediateResults(&pIMRA21);
 						if (pIMRA21 != NULL)
 						{
 							for (int bini = 0; bini < binModesCount; bini++)
@@ -296,7 +321,7 @@ int main(int argc, const char* argv[])
 								string settingsT3 = settingsT2 + binModes[bini];
 								string settingsGetBinImg = settingsT3 + terminatePhases[1] + intermediateResultTypes[1] + tpFoot;
 
-								iRet = reader22.InitRuntimeSettingsWithString(settingsGetBinImg.c_str(), CM_OVERWRITE, szErrorMsg, 256);
+								iRet = reader22->InitRuntimeSettingsWithString(settingsGetBinImg.c_str(), CM_OVERWRITE, szErrorMsg, 256);
 								if (iRet != 0)
 								{
 									printf("BinarizationMode %d error: %s\r\n", bini, szErrorMsg);
@@ -304,14 +329,14 @@ int main(int argc, const char* argv[])
 								}
 
 								ullTimeBegin = GetTiming();
-								iRet = reader22.DecodeIntermediateResults(pIMRA21, "");
+								iRet = reader22->DecodeIntermediateResults(pIMRA21, "");
 								ullTimeEnd = GetTiming();
 								curImgTime += ullTimeEnd - ullTimeBegin;
 								totalTime_Step2 += ullTimeEnd - ullTimeBegin;
 
 								// localizationModes loop
 								IntermediateResultArray* pIMRA22 = NULL;
-								reader22.GetIntermediateResults(&pIMRA22);
+								reader22->GetIntermediateResults(&pIMRA22);
 								if (pIMRA22 != NULL)
 								{
 									string noIpmSettings = settingsT + ipModes[ipModesCount-1] + binModes[bini];
@@ -321,7 +346,7 @@ int main(int argc, const char* argv[])
 										string settingsT4 = noIpmSettings + locModes[loci];
 										string settingsGetZone = settingsT4 + terminatePhases[2] + intermediateResultTypes[2] + tpFoot;
 
-										iRet = reader23.InitRuntimeSettingsWithString(settingsGetZone.c_str(), CM_OVERWRITE, szErrorMsg, 256);
+										iRet = reader23->InitRuntimeSettingsWithString(settingsGetZone.c_str(), CM_OVERWRITE, szErrorMsg, 256);
 										if (iRet != 0)
 										{
 											printf("LocalizationMode %d error: %s\r\n", loci, szErrorMsg);
@@ -329,14 +354,14 @@ int main(int argc, const char* argv[])
 										}
 
 										ullTimeBegin = GetTiming();
-										iRet = reader23.DecodeIntermediateResults(pIMRA22, "");
+										iRet = reader23->DecodeIntermediateResults(pIMRA22, "");
 										ullTimeEnd = GetTiming();
 										curImgTime += ullTimeEnd - ullTimeBegin;
 										totalTime_Step2 += ullTimeEnd - ullTimeBegin;
 
 										// decode intermediate results
 										IntermediateResultArray* pIMRA23 = NULL;
-										reader23.GetIntermediateResults(&pIMRA23);
+										reader23->GetIntermediateResults(&pIMRA23);
 										if (pIMRA23 != NULL)
 										{
 											PIntermediateResult& pIMR = pIMRA22->results[0];
@@ -352,13 +377,13 @@ int main(int argc, const char* argv[])
 											//}
 
 											ullTimeBegin = GetTiming();
-											reader3.DecodeBuffer(img->bytes, img->width, img->height, img->stride, img->format, "");
+											reader3->DecodeBuffer(img->bytes, img->width, img->height, img->stride, img->format, "");
 											ullTimeEnd = GetTiming();
 											curImgTime += ullTimeEnd - ullTimeBegin;
 											totalTime_Step2 += ullTimeEnd - ullTimeBegin;
 
 											TextResultArray* paryResult = NULL;
-											reader3.GetAllTextResults(&paryResult);
+											reader3->GetAllTextResults(&paryResult);
 											if (paryResult->resultsCount > 0)
 											{
 												printf("Result count: %d\r\n", paryResult->resultsCount);
@@ -414,7 +439,11 @@ int main(int argc, const char* argv[])
 		std::cout << "step 1 Avg Time: " << totalTime_Step1 / totalImageCount << " ms" << endl;
 		std::cout << "step 2 Avg Time: " << totalTime_Step2 / totalImageCount << " ms" << endl;
 	}
-
+	reader1->Recycle(), reader1 = NULL;
+	reader21->Recycle(), reader21 = NULL;
+	reader22->Recycle(), reader22 = NULL;
+	reader23->Recycle(), reader23 = NULL;
+	reader3->Recycle(), reader3 = NULL;
 	std::cin.ignore();
 	return 0;
 }

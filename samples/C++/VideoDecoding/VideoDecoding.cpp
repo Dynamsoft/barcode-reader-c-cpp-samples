@@ -83,7 +83,7 @@ int main()
 	char szErrorMsg[256];
 	// Initialize license.
   	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
-  	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp 
+  	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?architecture=dcv&product=dbr&utm_source=samples&package=c_cpp 
    	iRet = CBarcodeReader::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
 	if (iRet != DBR_OK)
 	{
@@ -91,15 +91,19 @@ int main()
 	}
 
 	// Create an instance of Barcode Reader
-	CBarcodeReader dbr;
-
+	CBarcodeReader* dbr = CBarcodeReader::GetInstance();
+	if (dbr == NULL)
+	{
+		cout << "Get instance failed." << endl;
+		return -1;
+	}
 	// Set the callback functions to process the barcode result and error returned by Dynamsoft Barcode Reader SDK
-	dbr.SetTextResultCallback(textResultCallback, NULL);
-	dbr.SetErrorCallback(errorCallback, NULL);
+	dbr->SetTextResultCallback(textResultCallback, NULL);
+	dbr->SetErrorCallback(errorCallback, NULL);
 
 	// Initialize a group of parameters for video decoding
 	FrameDecodingParameters parameters;
-	dbr.InitFrameDecodingParameters(&parameters);
+	dbr->InitFrameDecodingParameters(&parameters);
 	capture >> frame;
 	parameters.width = capture.get(CAP_PROP_FRAME_WIDTH);
 	parameters.height = capture.get(CAP_PROP_FRAME_HEIGHT);
@@ -116,7 +120,7 @@ int main()
 	//parameters.fps = 0;
 
 	// Start a new thread to decode barcodes from the inner frame queue
-	iRet = dbr.StartFrameDecodingEx(parameters, "");
+	iRet = dbr->StartFrameDecodingEx(parameters, "");
 	
 	for(;;)
 	{
@@ -129,7 +133,7 @@ int main()
 		}
 
 		// Append a frame image buffer to the inner frame queue
-		dbr.AppendFrame(frame.data);
+		dbr->AppendFrame(frame.data);
 
 		imshow("Frame", frame);
 
@@ -140,7 +144,9 @@ int main()
 	}
 
 	// Stop the frame decoding thread created by StartFrameDecodingEx
-	dbr.StopFrameDecoding();
-	
+	dbr->StopFrameDecoding();
+
+	dbr->Recycle();
+	dbr = NULL;
 	return 0;
 }

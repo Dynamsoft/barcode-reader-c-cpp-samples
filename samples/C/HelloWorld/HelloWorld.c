@@ -19,58 +19,64 @@
 
 void main()
 {
-    void* dbr = NULL;
-    int errorCode = 0;
-    char szErrorMsg[256];
-    TextResultArray* barcodeResults = NULL;
-    int index;
+	void* dbr = NULL;
+	int errorCode = 0;
+	char szErrorMsg[256];
+	TextResultArray* barcodeResults = NULL;
+	int index;
 
-    // 1.Initialize license.
-    // The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
-    // If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp 
-    errorCode = DBR_InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
-    if (errorCode != DBR_OK)
-    {
-        printf("%s\r\n", szErrorMsg);
-    }
+	// 1.Initialize license.
+	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
+	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?architecture=dcv&product=dbr&utm_source=samples&package=c_cpp 
+	errorCode = DBR_InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
+	if (errorCode != DBR_OK)
+	{
+		printf("%s\r\n", szErrorMsg);
+	}
 
-    // 2. Create an instance of Barcode Reader
-    dbr = DBR_CreateInstance();
+	// 2. Create an instance of Barcode Reader
+	dbr = DBR_GetInstance();
+	if (dbr == NULL)
+	{
+		printf("Get instance failed.\n");
+		printf("Press any key to quit...");
+		getchar();
+		return;
+	}
+	// 3. Read barcode from an image file
+	errorCode = DBR_DecodeFile(dbr, "../../../images/AllSupportedBarcodeTypes.png", "");
+	if (errorCode != DBR_OK)
+		printf("%s\r\n", DBR_GetErrorString(errorCode));
 
-    // 3. Read barcode from an image file
-    errorCode = DBR_DecodeFile(dbr, "../../../images/AllSupportedBarcodeTypes.png", "");
-    if (errorCode != DBR_OK)
-        printf("%s\r\n", DBR_GetErrorString(errorCode));
-
-    // 4. Get all barcode results
-    DBR_GetAllTextResults(dbr, &barcodeResults);
+	// 4. Get all barcode results
+	DBR_GetAllTextResults(dbr, &barcodeResults);
 
 
-    if (barcodeResults != NULL && barcodeResults->resultsCount > 0)
-    {
-        // Process each result in a loop
-        for (index = 0; index < barcodeResults->resultsCount; ++index)
-        {
-            printf("Result %d:\r\n", (index + 1));
+	if (barcodeResults != NULL && barcodeResults->resultsCount > 0)
+	{
+		// Process each result in a loop
+		for (index = 0; index < barcodeResults->resultsCount; ++index)
+		{
+			printf("Result %d:\r\n", (index + 1));
 
-            // 4.1. Get format of each barcode
-            printf("    Barcode Format: %s\r\n", barcodeResults->results[index]->barcodeFormatString);
+			// 4.1. Get format of each barcode
+			printf("    Barcode Format: %s\r\n", barcodeResults->results[index]->barcodeFormatString);
 
-            // 4.2. Get text result of each barcode
-            printf("    Barcode Text: %s\r\n", barcodeResults->results[index]->barcodeText);
-        }
-    }
-    else
-    {
-        printf("No barcode detected.");
-    }
+			// 4.2. Get text result of each barcode
+			printf("    Barcode Text: %s\r\n", barcodeResults->results[index]->barcodeText);
+		}
+	}
+	else
+	{
+		printf("No barcode detected.");
+	}
 
-    // 5. Free the memory allocated for text results
-    if (barcodeResults != NULL)
-        DBR_FreeTextResults(&barcodeResults);
-    DBR_DestroyInstance(dbr);
+	// 5. Free the memory allocated for text results
+	if (barcodeResults != NULL)
+		DBR_FreeTextResults(&barcodeResults);
+	DBR_RecycleInstance(dbr);
 
-    printf("Press any key to quit...");
-    getchar();
+	printf("Press any key to quit...");
+	getchar();
 }
 

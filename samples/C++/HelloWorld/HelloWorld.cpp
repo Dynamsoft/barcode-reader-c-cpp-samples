@@ -27,7 +27,7 @@ int main()
 
      // 1.Initialize license.
     // The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
-    // If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp 
+    // If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?architecture=dcv&product=dbr&utm_source=samples&package=c_cpp 
     errorCode = CBarcodeReader::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
     if (errorCode != DBR_OK)
     {
@@ -35,15 +35,20 @@ int main()
     }
 
     // 2. Create an instance of Barcode Reader
-    CBarcodeReader dbr;
+    CBarcodeReader* dbr = CBarcodeReader::GetInstance();
+    if (dbr == NULL)
+    {
+        cout << "Get instance failed." << endl;
+        return -1;
+    }
 
     // 3. Read barcode from an image file
-    errorCode = dbr.DecodeFile("../../../images/AllSupportedBarcodeTypes.png", "");
+    errorCode = dbr->DecodeFile("../../../images/AllSupportedBarcodeTypes.png", "");
     if (errorCode != DBR_OK)
         cout << CBarcodeReader::GetErrorString(errorCode) << endl;
 
     // 4. Get all barcode results
-    dbr.GetAllTextResults(&barcodeResults);
+    dbr->GetAllTextResults(&barcodeResults);
 
     if (barcodeResults != NULL && barcodeResults->resultsCount > 0)
     {
@@ -67,6 +72,10 @@ int main()
     // 5. Free the memory allocated for text results
     if (barcodeResults != NULL)
         CBarcodeReader::FreeTextResults(&barcodeResults);
+
+    // 6. Free the memory allocated for instance of Barcode Reader
+    dbr->Recycle();
+    dbr = NULL;
 
     cout << "Press any key to quit..." << endl;
     cin.ignore();
