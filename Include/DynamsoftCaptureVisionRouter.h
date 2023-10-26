@@ -20,7 +20,7 @@
 #include "DynamsoftLicense.h"
 #include "DynamsoftUtility.h"
 
-#define DCV_VERSION                  "2.0.10.807"
+#define DCV_VERSION                  "2.0.20.0925"
 
 /**Enumeration section*/
 
@@ -102,11 +102,27 @@ typedef struct tagSimplifiedCaptureVisionSettings
 	 * Specifies the settings for label recognition.
 	 */
 	SimplifiedLabelRecognizerSettings labelSettings;
+	/**
+	 * @brief Minimum time interval (in milliseconds) allowed between consecutive image captures.
+	 *
+	 * This property represents the minimum time interval (in milliseconds) that must
+	 * elapse before the next image capture operation can be initiated.
+	 * Setting a larger value for this property will introduce a delay between image
+	 * captures, while setting a smaller value allows for more frequent captures. It
+	 * can be used to reduce the computational frequency, which can effectively lower
+	 * energy consumption.
+	 *
+	 * @note The actual time interval between captures may be longer than the specified
+	 *       minimum interval due to various factors, such as image processing time and
+	 *       hardware limitations.
+	 *
+	 */
+	int minImageCaptureInterval;
 
 	/**
 	 * Reserved for future use.
 	 */
-	char reserved[2048];
+	char reserved[2044];
 
 } SimplifiedCaptureVisionSettings;
 
@@ -165,12 +181,66 @@ namespace dynamsoft
 		class CPresetTemplate 
 		{
 		public:
-			CVR_API static const char*  PT_DEFAULT;							//"default": DBR + DLR + DDN-Normalize
-			CVR_API static const char*	PT_READ_BARCODES;					//"read-barcodes"
-			CVR_API static const char*	PT_RECOGNIZE_TEXT_LINES;			//"recognize-textlines"
-			CVR_API static const char*	PT_DETECT_DOCUMENT_BOUNDARIES;		//"detect-document-boundaries"
-			CVR_API static const char*	PT_DETECT_AND_NORMALIZE_DOCUMENT;   //"detect-and-normalize-document"
-			CVR_API static const char*	PT_NORMALIZE_DOCUMENT;				//"normalize-document"
+			CVR_API static const char*  PT_DEFAULT;							//"Default", compatible with "default": DBR + DLR + DDN-Normalize
+			CVR_API static const char*	PT_READ_BARCODES;					//"ReadBarcodes_Default", compatible with "read-barcodes"
+			CVR_API static const char*	PT_RECOGNIZE_TEXT_LINES;			//"RecognizeTextLines_Default", compatible with "recognize-textlines"
+			CVR_API static const char*	PT_DETECT_DOCUMENT_BOUNDARIES;		//"DetectDocumentBoundaries_Default", compatible with "detect-document-boundaries"
+			CVR_API static const char*	PT_DETECT_AND_NORMALIZE_DOCUMENT;   //"DetectAndNormalizeDocument_Default", compatible with "detect-and-normalize-document"
+			CVR_API static const char*	PT_NORMALIZE_DOCUMENT;				//"NormalizeDocument_Default", compatible with "normalize-document"
+
+			/**
+			 * @brief Represents a barcode reading mode where speed is prioritized.
+			 *
+			 * In this mode, the barcode reader will optimize for faster barcode detection
+			 * and decoding, sacrificing some level of accuracy and read rate. It is suitable
+			 * for situations where a quick response time is more important than perfect
+			 * barcode recognition.
+			 */
+			CVR_API static const char* PT_READ_BARCODES_SPEED_FIRST; //"ReadBarcodes_SpeedFirst";
+
+			/**
+			 * @brief Represents a barcode reading mode where barcode read rate is prioritized.
+			 *
+			 * In this mode, the barcode reader will optimize for higher barcode read rates,
+			 * even if it may sometimes result in reduced accuracy and speed. It is suitable for
+			 * scenarios where maximizing the number of successfully read barcodes is critical.
+			 */
+			CVR_API static const char* PT_READ_BARCODES_READ_RATE_FIRST; //"ReadBarcodes_ReadRateFirst";
+
+			/**
+			* @brief Represents a barcode reading mode for single barcode code detection.
+			*
+			* In this mode, the barcode reader will focus on detecting and decoding a single
+			* barcode code, ignoring any additional codes in the same image. It is efficient
+			* when the target image has only one barcode.
+			*/
+			CVR_API static const char* PT_READ_SINGLE_BARCODE; //"ReadSingleBarcode";
+
+			/**
+			* @brief Represents a text recognition mode focused on recognizing numbers.
+			*/
+			CVR_API static const char* PT_RECOGNIZE_NUMBERS; //"RecognizeNumbers";
+
+			/**
+			 * @brief Represents a text recognition mode focused on recognizing alphabetic characters (letters).
+			 *
+			 */
+			CVR_API static const char* PT_RECOGNIZE_LETTERS; //"RecognizeLetters";
+
+			/**
+			 * @brief Represents a text recognition mode that combines numbers and alphabetic characters (letters) recognition.
+			 */
+			CVR_API static const char* PT_RECOGNIZE_NUMBERS_AND_LETTERS; //"RecognizeNumbersAndLetters";
+
+			/**
+			 * @brief Represents a text recognition mode that combines numbers and uppercase letters recognition.
+			 */
+			CVR_API static const char* PT_RECOGNIZE_NUMBERS_AND_UPPERCASE_LETTERS; //"RecognizeNumbersAndUppercaseLetters";
+
+			/**
+			 * @brief Represents a text recognition mode focused on recognizing uppercase letters.
+			 */
+			CVR_API static const char* PT_RECOGNIZE_UPPERCASE_LETTERS; //"RecognizeUppercaseLetters";
 		};
 
 		/**

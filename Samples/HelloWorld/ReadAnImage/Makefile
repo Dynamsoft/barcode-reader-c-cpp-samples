@@ -1,7 +1,8 @@
 CC=gcc
 CCFLAGS=-c -std=c++11
 
-DS_LIB_PATH="../../../Lib/Linux/x64"
+DS_LIB_PATH="../../../Distributables/Lib/Linux/x64"
+DS_JSON_PATH=../../../Distributables/DBR-PresetTemplates.json
 LDFLAGS=-L $(DS_LIB_PATH) -Wl,-rpath=$(DS_LIB_PATH) -Wl,-rpath=./
 DS_LIB=-lDynamsoftCaptureVisionRouter -lDynamsoftLicense
 
@@ -14,6 +15,7 @@ SOURCE=ReadAnImage.cpp
 # build rule for target.
 $(TARGET): $(OBJECT)
 	$(CC) -o $(TARGET) $(OBJECT) $(STDLIB) $(DS_LIB) $(LDFLAGS)
+	cp  $(DS_JSON_PATH) $(DS_LIB_PATH)
 
 # target to build an object file
 $(OBJECT): $(SOURCE)

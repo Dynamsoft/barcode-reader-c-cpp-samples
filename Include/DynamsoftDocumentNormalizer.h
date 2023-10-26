@@ -19,7 +19,7 @@
 #endif
 #include "DynamsoftCore.h"
 
-#define DDN_VERSION                  "2.0.10.807"
+#define DDN_VERSION                  "2.0.20.0925"
 
 
 #ifdef __cplusplus

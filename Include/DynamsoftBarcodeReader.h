@@ -24,7 +24,7 @@ typedef void* HANDLE;
 #endif
 #include "DynamsoftCore.h"
 
-#define DBR_VERSION "10.0.10.807"
+#define DBR_VERSION "10.0.20.0925"
 
 /**Enumeration section*/
 
@@ -42,7 +42,7 @@ enum BarcodeFormat : unsigned long long
 	BF_ALL = 0xFFFFFFFFFFFFFFFF,
 
 	/**Use the default barcode format settings*/
-	BF_DEFAULT = 0xFE3FFFFF,
+	BF_DEFAULT = 0xFE3BFFFF,
 
 	/**Combined value of BF_CODABAR, BF_CODE_128, BF_CODE_39, BF_CODE_39_Extended, BF_CODE_93, BF_EAN_13, BF_EAN_8, INDUSTRIAL_25, BF_ITF, BF_UPC_A, BF_UPC_E, BF_MSI_CODE;  */
 	BF_ONED = 0x003007FF,
@@ -362,8 +362,13 @@ typedef struct tagSimplifiedBarcodeReaderSettings
 	/**Set the maximum available threads count in one barcode decoding task.*/
 	int maxThreadsInOneTask;
 
+	/**Set the threshold for image shrinking. If the shorter edge size exceeds the specified threshold value,
+	* the library will calculate the resized height and width of the image and and perform shrinking.
+	*/
+	int scaleDownThreshold;
+
 	/**Reserved for future use.*/
-	char reserved[512];
+	char reserved[508];
 }SimplifiedBarcodeReaderSettings;
 
 #pragma pack(pop)

@@ -13,7 +13,7 @@
 
 
 #include"DynamsoftCore.h"
-#define DISA_VERSION "1.0.10.807"
+#define DISA_VERSION "1.0.20.0925"
 
 #ifdef __cplusplus
 
@@ -125,6 +125,8 @@ namespace dynamsoft {
 
 			virtual void OnParsedResultsReceived(dcp::CParsedResult* pResult);
 
+			virtual void ClearStatus();
+
 		};
 
 		/**
@@ -144,7 +146,8 @@ namespace dynamsoft {
 			void FetchImageToBuffer();
 
 		protected:
-			
+			CProactiveImageSourceAdapter();
+
 			/**
 			* This method needs to be implemented in the derived class. It is called in a loop in the Fetching thread to obtain images.
 			*
@@ -154,7 +157,6 @@ namespace dynamsoft {
 			virtual CImageData* FetchImage() = 0;
 
 		public:
-			CProactiveImageSourceAdapter();
 			~CProactiveImageSourceAdapter();
 			
 			bool HasNextImageToFetch()const override;
@@ -221,6 +223,7 @@ namespace dynamsoft {
 
 			bool HasNextImageToFetch()const override;
 
+			int SetPages(const int pages[], int pagesCount);
 		};
 
 		/**
@@ -258,6 +261,7 @@ namespace dynamsoft {
 			int SetPDFReadingParameter(const CPDFReadingParameter& para);
 			bool HasNextImageToFetch()const override;
 			CImageData* GetImage()override;
+			int SetPages(const int pages[], int pagesCount);
 		private:
 			void* m_pFetcher;
 		};

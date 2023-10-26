@@ -1,6 +1,6 @@
 #pragma once
 
-#define DYNAMSOFT_CORE_VERSION "3.0.10.807"
+#define DYNAMSOFT_CORE_VERSION "3.0.20.0925"
 
 /**Enumeration section*/
 
@@ -158,6 +158,16 @@ typedef enum ErrorCode {
 
 	/**The api does not support multi-page files. Please use FileFetcher instead.*/
 	EC_MULTI_PAGES_NOT_SUPPORTED = -10066,
+
+	/**The file already exists but overwriting is disabled.*/
+	EC_FILE_ALREADY_EXISTS = -10067,
+
+	/**The file path does not exist but cannot be created, or the file
+	cannot be created for any other reason.*/
+	EC_CREATE_FILE_FAILED = -10068,
+
+	/**The input ImageData object contains invalid parameter(s).*/
+	EC_IMAGE_DATA_INVALID = -10069,
 
 	/** -20000~-29999: DLS license error code. */
 	/**No license.*/
@@ -615,10 +625,10 @@ enum IntermediateResultUnitType : unsigned long long
 	/**The type of the IntermediateResult is "texture detection result".*/
 	IRUT_TEXTURE_DETECTION_RESULT = 1 << 7,
 
-	/**The type of the IntermediateResult is "texture removed grayscale image".*/
+	/**The type of the IntermediateResult is "texture-removed grayscale image".*/
 	IRUT_TEXTURE_REMOVED_GRAYSCALE_IMAGE = 1 << 8,
 
-	/**The type of the IntermediateResult is "texture removed binary image".*/
+	/**The type of the IntermediateResult is "texture-removed binary image".*/
 	IRUT_TEXTURE_REMOVED_BINARY_IMAGE = 1 << 9,
 
 	/**The type of the IntermediateResult is "contours".*/
@@ -903,6 +913,7 @@ namespace dynamsoft
 			 * @return Returns a const char pointer representing the version of the core module.
 			 */
 			static const char* GetVersion();
+
 		};
 
 		/**
@@ -920,8 +931,8 @@ namespace dynamsoft
 			/**
 			* Constructor
 			*
-			* @param [in] x The x coordinate of a point.
-			* @param [in] y The y coordinate of a point.
+			* @param [in] _x The x coordinate of a point.
+			* @param [in] _y The y coordinate of a point.
 			*
 			*/
 			DMPoint_(_Tp _x, _Tp _y)
@@ -951,8 +962,8 @@ namespace dynamsoft
 			/**
 			* Sets the coordinates of a point.
 			*
-			* @param [in] x The x coordinate of a point.
-			* @param [in] y The y coordinate of a point.
+			* @param [in] _x The x coordinate of a point.
+			* @param [in] _y The y coordinate of a point.
 			*
 			*/
 			void Set(_Tp _x, _Tp _y)
@@ -1324,8 +1335,10 @@ namespace dynamsoft
 		private:
 			int imageId;
 			ImageCaptureDistanceMode mode;
-		public:
+		protected:
 			CImageTag();
+		public:
+
 			/**
 			* Destructor
 			*/
@@ -1802,13 +1815,12 @@ namespace dynamsoft
 		protected:
 			unsigned int observedResultItemTypes;
 			const char* name;
-
-		public:
+			
 			/**
 			* Constructor.
 			*/
 			CCapturedResultReceiver();
-
+		public:
 			/**
 			* Destructor.
 			*/
@@ -1844,7 +1856,7 @@ namespace dynamsoft
 			* @param [in] pResult The captured result.
 			*
 			*/
-			virtual void OnCapturedResultReceived(const CCapturedResult* pResult);
+			virtual void OnCapturedResultReceived(CCapturedResult* pResult);
 
 			/**
 			* Callback function for original image results. It will be called once for each original image result.
@@ -1852,7 +1864,7 @@ namespace dynamsoft
 			* @param [in] pResult The original image result.
 			*
 			*/
-			virtual void OnOriginalImageResultReceived(const COriginalImageResultItem* pResult);
+			virtual void OnOriginalImageResultReceived(COriginalImageResultItem* pResult);
 
 			/**
 			* Callback function for decoded barcodes results. It will be called once for each decoded barcodes result.
@@ -1860,7 +1872,7 @@ namespace dynamsoft
 			* @param [in] pResult The decoded barcodes result.
 			*
 			*/
-			virtual void OnDecodedBarcodesReceived(const dbr::CDecodedBarcodesResult* pResult);
+			virtual void OnDecodedBarcodesReceived(dbr::CDecodedBarcodesResult* pResult);
 
 			/**
 			* Callback function for recognized text lines results. It will be called once for each recognized text lines result.
@@ -1868,7 +1880,7 @@ namespace dynamsoft
 			* @param [in] pResult The recognized text lines result.
 			*
 			*/
-			virtual void OnRecognizedTextLinesReceived(const dlr::CRecognizedTextLinesResult* pResult);
+			virtual void OnRecognizedTextLinesReceived(dlr::CRecognizedTextLinesResult* pResult);
 
 			/**
 			* Callback function for detected quads results. It will be called once for each detected quads result.
@@ -1876,7 +1888,7 @@ namespace dynamsoft
 			* @param [in] pResult The detected quads result.
 			*
 			*/
-			virtual void OnDetectedQuadsReceived(const ddn::CDetectedQuadsResult* pResult);
+			virtual void OnDetectedQuadsReceived(ddn::CDetectedQuadsResult* pResult);
 
 			/**
 			* Callback function for normalized images results. It will be called once for each normalized images result.
@@ -1884,7 +1896,7 @@ namespace dynamsoft
 			* @param [in] pResult The normalized images result.
 			*
 			*/
-			virtual void OnNormalizedImagesReceived(const ddn::CNormalizedImagesResult* pResult);
+			virtual void OnNormalizedImagesReceived(ddn::CNormalizedImagesResult* pResult);
 
 			/**
 			* Callback function for parsed results. It will be called once for each parsed result.
@@ -1892,7 +1904,7 @@ namespace dynamsoft
 			* @param [in] pResult The parsed result.
 			*
 			*/
-			virtual void OnParsedResultsReceived(const dcp::CParsedResult* pResult);
+			virtual void OnParsedResultsReceived(dcp::CParsedResult* pResult);
 
 		};
 
@@ -1905,12 +1917,11 @@ namespace dynamsoft
 			unsigned int filteredResultItemTypes;
 			const char* name;
 
-		public:
 			/**
 			* Constructor.
 			*/
 			CCapturedResultFilter();
-
+		public:
 			/**
 			* Destructor.
 			*/
@@ -1988,8 +1999,28 @@ namespace dynamsoft
 			*/
 			virtual void OnParsedResultsReceived(dcp::CParsedResult* pResult);
 
+			virtual void ClearStatus();
+
 		};
 
+		/**
+		* The CImageSourceErrorListener class is an abstract base class for receiving error notifications from an image source.
+		*
+		* Subclasses of this class can be implemented to handle specific error conditions that may occur during image source operations.
+		* Error information, such as error code and error maessage, is passed to the "OnErrorReceived" method when an error occurs.
+		*/
+		class DS_API CImageSourceErrorListener {
+		public:
+
+			/**
+			* Called when an error is received from the image source.
+			*
+			* @param [in] errorCode The integer error code indicating the type of error.
+			* @param [in] errorMessage A C-style string containing the error message providing additional information about the error.
+			*
+			*/
+			virtual void OnErrorReceived(int errorCode, const char* errorMessage) = 0;
+		};
 
 		/**
 		* The CImageSourceAdapter class provides an interface for fetching and buffering images. It is an abstract class that needs to be implemented by a concrete class to provide actual functionality.
@@ -2002,6 +2033,11 @@ namespace dynamsoft
 			CImageSourceAdapter& operator=(const CImageSourceAdapter&);
 			CImageSourceAdapterInner* m_inner;
 		protected:
+			CImageSourceErrorListener* m_listener;
+			/**
+			* Constructor
+			*/
+			CImageSourceAdapter();
 
 			/**
 			* Adds an image to the buffer of the adapter.
@@ -2013,11 +2049,6 @@ namespace dynamsoft
 			void AddImageToBuffer(const CImageData* img, bool bClone = true);
 
 		public:
-			/**
-			* Constructor
-			*/
-			CImageSourceAdapter();
-
 			/**
 			* Destructor
 			*/
@@ -2135,6 +2166,15 @@ namespace dynamsoft
 			*
 			*/
 			ColourChannelUsageType GetColourChannelUsageType()const;
+
+			/**
+			* Sets the error listener for the image source. This function allows you to set an error listener object that will receive notifications when errors occur during image source operations.
+			* If an error occurs, the error infomation will be passed to the listener's OnErrorReceived method.
+			*
+			* @param [in] listener A pointer to an instance of CImageSourceErrorListener or its derived class, which will handle error notifications.
+			*
+			*/
+			void SetErrorListener(CImageSourceErrorListener* listener);
 		};
 
 		/**
@@ -2242,12 +2282,11 @@ namespace dynamsoft
 			double localToOriginalMatrix[9];
 			double rotatedToOriginalMatrix[9];
 
-		public:
 			/**
 			* Constructor
 			*/
 			CIntermediateResultUnit();
-
+		public:
 			/**
 			* Destructor
 			*/
@@ -2761,12 +2800,11 @@ namespace dynamsoft
 		protected:
 			CObservationParameters* parameters;
 
-		public:
 			/**
 			* Constructor
 			*/
 			CIntermediateResultReceiver();
-
+		public:
 			/**
 			* Destructor
 			*/

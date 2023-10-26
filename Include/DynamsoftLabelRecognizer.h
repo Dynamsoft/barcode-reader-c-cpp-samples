@@ -20,7 +20,7 @@
 
 #include "DynamsoftCore.h"
 
-#define DLR_VERSION                  "3.0.10.807"
+#define DLR_VERSION                  "3.0.20.0925"
 
 /**Structures section*/
 
@@ -47,8 +47,13 @@ typedef struct tagSimplifiedLabelRecognizerSettings
 	/**Set the maximum available threads count in one label recognition task.*/
 	int maxThreadsInOneTask;
 
+	/**Set the threshold for image shrinking. If the shorter edge size exceeds the specified threshold value,
+	* the library will calculate the resized height and width of the image and and perform shrinking.
+	*/
+	int scaleDownThreshold;
+
 	/**Reserved for future use.*/
-	char reserved[512];
+	char reserved[508];
 
 }SimplifiedLabelRecognizerSettings;
 

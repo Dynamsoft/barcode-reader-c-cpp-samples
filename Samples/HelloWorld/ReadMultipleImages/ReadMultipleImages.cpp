@@ -11,20 +11,20 @@ using namespace dynamsoft::utility;
 
 #if defined(_WIN64) || defined(_WIN32)
 #ifdef _WIN64
-#pragma comment(lib, "../../../Lib/Windows/x64/DynamsoftCorex64.lib")
-#pragma comment(lib, "../../../Lib/Windows/x64/DynamsoftLicensex64.lib")
-#pragma comment(lib, "../../../Lib/Windows/x64/DynamsoftCaptureVisionRouterx64.lib")
-#pragma comment(lib, "../../../Lib/Windows/x64/DynamsoftUtilityx64.lib")
+#pragma comment(lib, "../../../Distributables/Lib/Windows/x64/DynamsoftCorex64.lib")
+#pragma comment(lib, "../../../Distributables/Lib/Windows/x64/DynamsoftLicensex64.lib")
+#pragma comment(lib, "../../../Distributables/Lib/Windows/x64/DynamsoftCaptureVisionRouterx64.lib")
+#pragma comment(lib, "../../../Distributables/Lib/Windows/x64/DynamsoftUtilityx64.lib")
 #else
-#pragma comment(lib, "../../../Lib/Windows/x86/DynamsoftCorex86.lib")
-#pragma comment(lib, "../../../Lib/Windows/x86/DynamsoftLicensex86.lib")
-#pragma comment(lib, "../../../Lib/Windows/x86/DynamsoftCaptureVisionRouterx86.lib")
-#pragma comment(lib, "../../../Lib/Windows/x86/DynamsoftUtilityx86.lib")
+#pragma comment(lib, "../../../Distributables/Lib/Windows/x86/DynamsoftCorex86.lib")
+#pragma comment(lib, "../../../Distributables/Lib/Windows/x86/DynamsoftLicensex86.lib")
+#pragma comment(lib, "../../../Distributables/Lib/Windows/x86/DynamsoftCaptureVisionRouterx86.lib")
+#pragma comment(lib, "../../../Distributables/Lib/Windows/x86/DynamsoftUtilityx86.lib")
 #endif
 #endif
 
 class MyCapturedResultReceiver : public CCapturedResultReceiver {
-    virtual void OnDecodedBarcodesReceived(const CDecodedBarcodesResult* pResult) 
+    virtual void OnDecodedBarcodesReceived(CDecodedBarcodesResult* pResult) 
 	{
 		const CFileImageTag *tag = dynamic_cast<const CFileImageTag*>(pResult->GetOriginalImageTag());
 
