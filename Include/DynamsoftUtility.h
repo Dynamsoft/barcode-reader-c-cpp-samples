@@ -12,19 +12,29 @@
 #endif
 
 
-#include"DynamsoftCore.h"
-#define DISA_VERSION "1.0.20.0925"
+#include"DynamsoftCaptureVisionRouter.h"
+#define DISA_VERSION "1.2.0.1227"
 
 #ifdef __cplusplus
 
 using namespace dynamsoft::basic_structures;
+using namespace dynamsoft::cvr;
 
 namespace dynamsoft {
 	namespace utility {
 
+		/**
+		 * The CUtilityModule class defines general functions in the utility module.
+		 */
 		class UTIL_API CUtilityModule
 		{
 		public:
+			/**
+			 * Get version information of utility module.
+			 *
+			 * @return Returns the version information string.
+			 *
+			 */
 			static const char* GetVersion();
 		};
 		/**
@@ -177,8 +187,14 @@ namespace dynamsoft {
 			*/
 			int GetImageFetchInterval()const;
 
+			/**
+			* Starts fetching images.
+			*/
 			void StartFetching()override;
 
+			/**
+			* Stops fetching images.
+			*/
 			void StopFetching()override;
 		};
 
@@ -186,7 +202,21 @@ namespace dynamsoft {
 		* The CDirectoryFetcher class is a utility class that retrieves a list of files from a specified directory based on certain criteria. It inherits from the CProactiveImageSourceAdapter class.
 		*/
 		class UTIL_API CDirectoryFetcher : public CProactiveImageSourceAdapter 
-		{			
+		{		
+			/** Maximum Image Count is set to say 10 or 20;
+			* Buffer ProtectionMode is set to Block;
+			* FetchMode is set to Proactive;
+			* FetchInterval is set to 0;
+			* FetchIntervalAutoCalculatin is disabled;
+			* FetchTimeout is set to 0;
+			*
+			* It works like this:
+			* 1. Specify files with SetFilePath or SetDirectory
+			* 2. The paths of the files are stored in filePaths
+			* 3. Each time FetchImage is called, it processes the file specified by
+			* indexOfNextFileToFetch and gets one image only
+			* called, it tries to get the next image into Buffer.
+			*/
 		private:
 			class DirectoryFetcherInner;
 			DirectoryFetcherInner* m_directoryFetcherInner;
@@ -221,8 +251,23 @@ namespace dynamsoft {
 			*/
 			int SetPDFReadingParameter(const CPDFReadingParameter& para);
 
+			/**
+			* Determines whether there are more images left to fetch.
+			*
+			* @return Returns true if there are more images left to fetch, false otherwise. This function must be implemented in the subclass.
+			*
+			*/
 			bool HasNextImageToFetch()const override;
 
+			/**
+			* Sets the pages to be fetched. It only takes effect when the file is a multi-page image.
+			*
+			* @param [in] pages The pages to be fetched.
+			* @param [in] pagesCount The number of pages to be fetched.
+			*
+			* @return Returns an integer value that represents the success or failure of the operation.
+			*
+			*/
 			int SetPages(const int pages[], int pagesCount);
 		};
 
@@ -234,12 +279,14 @@ namespace dynamsoft {
 		public:
 			CFileFetcher(const CPDFReadingParameter& pdfReadingParameter = CPDFReadingParameter());
 			~CFileFetcher();
+
 			/**
 			  * Sets the file by path.
 			  * @param [in] path The file path.
 			  * @return Returns an integer value that represents the success or failure of the operation.
 			*/
 			int SetFile(const char* path);
+
 			/**
 			  * Sets the file using a file bytes.
 			  * @param [in] pFileBytes The file bytes.
@@ -247,20 +294,46 @@ namespace dynamsoft {
 			  * @return Returns an integer value that represents the success or failure of the operation.
 			*/
 			int SetFile(const unsigned char* pFileBytes, int fileSize);
+
 			/**
 			  * Sets the file using a CImageData object.
 			  * @param [in] imageData The image data.
 			  * @return Returns an integer value that represents the success or failure of the operation.
 			*/
 			int SetFile(const CImageData* imageData);
+
 			/**
 			  * Sets the parameters for reading PDF files.
 			  * @param [in] para The parameter object for reading PDF files.
 			  * @return Returns an integer value that represents the success or failure of the operation.
 			*/
 			int SetPDFReadingParameter(const CPDFReadingParameter& para);
+
+			/**
+			* Determines whether there are more images left to fetch.
+			*
+			* @return Returns true if there are more images left to fetch, false otherwise. This function must be implemented in the subclass.
+			*
+			*/
 			bool HasNextImageToFetch()const override;
+
+			/**
+			* Returns a buffered image.
+			*
+			* @return Returns a pointer to the image if it exists in the buffer, NULL otherwise.
+			*
+			*/
 			CImageData* GetImage()override;
+
+			/**
+			* Sets the pages to be fetched. It only takes effect when the file is a multi-page image.
+			*
+			* @param [in] pages The pages to be fetched.
+			* @param [in] pagesCount The number of pages to be fetched.
+			*
+			* @return Returns an integer value that represents the success or failure of the operation.
+			*
+			*/
 			int SetPages(const int pages[], int pagesCount);
 		private:
 			void* m_pFetcher;

@@ -1,7 +1,11 @@
 #pragma once
 
 #if !defined(_WIN32) && !defined(_WIN64)
+#ifdef __EMSCRIPTEN__
+#define DCP_API __attribute__((used))
+#else
 #define DCP_API __attribute__((visibility("default")))
+#endif
 #else
 #ifdef DCP_EXPORTS
 #define DCP_API __declspec(dllexport)
@@ -11,7 +15,7 @@
 #endif
 #include "DynamsoftCore.h"
 
-#define DCP_VERSION "2.0.20.0925"
+#define DCP_VERSION "2.2.0.1227"
 /**
  * @enum MappingStatus 
  *
@@ -58,15 +62,20 @@ namespace dynamsoft
 {
 	namespace dcp
 	{
+		/**
+		 * The `CParsedResultItem` class represents a item parsed by code parser sdk. It is derived from `CCapturedResultItem`.
+		 *
+		 */
 		class DCP_API CParsedResultItem : public CCapturedResultItem
 		{
-		public:
+		protected:
 			/**
 			 * Destructor.
 			 * 
 			 */
 			virtual ~CParsedResultItem() {};
 
+		public:
 			/**
 			 * Gets the parsed result as a JSON formatted string.
 			 * 
@@ -114,15 +123,20 @@ namespace dynamsoft
 			virtual ValidationStatus GetFieldValidationStatus(const char* fieldName) const = 0;
 		};
 
+		/**
+		 * The `CParsedResult` class represents the result of code parsing process. It provides access to information about the parsed items, the source image, and any errors that occurred during the process.
+		 *
+		 */
 		class DCP_API CParsedResult
 		{
-		public:
+		protected:
 			/**
 			 * Destructor.
 			 * 
 			 */
 			virtual ~CParsedResult() {};
 
+		public:
 			/**
 			 * Gets the hash ID of the original image.
 			 * 
@@ -192,10 +206,37 @@ namespace dynamsoft
 			 * 
 			 */
 			virtual const char* GetErrorString()const = 0;
+
+			/**
+			 * Gets the parsed result item at the specified index.
+			 *
+			 * @param [in] index The zero-based index of the parsed result item to retrieve.
+			 *
+			 * @return Returns a pointer to the CParsedResultItem object at the specified index.
+			 *
+			 */
+			virtual const CParsedResultItem* operator[](int index) const = 0;
+
+			/**
+			 * Increases the reference count of the CParsedResult object.
+			 *
+			 * @return An object of CParsedResult.
+			 */
+			virtual CParsedResult* Retain() = 0;
+
+			/**
+			* Decreases the reference count of the CParsedResult object.
+			*
+			*/
+			virtual void Release() = 0;
 		};
 
 		class CodeParserInner;
 
+		/**
+		 * The `CCodeParser` class provides methods for parsing code data for human-readable results.
+		 *
+		 */
 		class DCP_API CCodeParser
 		{
 		protected:
@@ -260,6 +301,9 @@ namespace dynamsoft
 			CCodeParser& operator=(const CCodeParser& r);
 		};
 
+		/**
+		 * The CCodeParserModule class defines general functions in the code parser  module.
+		 */
 		class DCP_API CCodeParserModule
 		{
 		public:

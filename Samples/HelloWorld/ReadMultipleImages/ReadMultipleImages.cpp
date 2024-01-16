@@ -2,6 +2,7 @@
 #include <string>
 
 #include "../../../Include/DynamsoftCaptureVisionRouter.h"
+#include "../../../Include/DynamsoftUtility.h"
 
 using namespace std;
 using namespace dynamsoft::license;

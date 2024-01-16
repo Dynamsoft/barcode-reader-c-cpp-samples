@@ -1,6 +1,5 @@
 #pragma once
-
-#define DYNAMSOFT_CORE_VERSION "3.0.20.0925"
+#define DYNAMSOFT_CORE_VERSION "3.2.0.1227"
 
 /**Enumeration section*/
 
@@ -155,19 +154,28 @@ typedef enum ErrorCode {
 	/**DynamsoftLabelRecognizer*/
 	/**DynamsoftDocumentNormalizer*/
 	EC_MODULE_NOT_FOUND = -10065,
-
+	
 	/**The api does not support multi-page files. Please use FileFetcher instead.*/
 	EC_MULTI_PAGES_NOT_SUPPORTED = -10066,
 
 	/**The file already exists but overwriting is disabled.*/
 	EC_FILE_ALREADY_EXISTS = -10067,
 
-	/**The file path does not exist but cannot be created, or the file
+	/**The file path does not exist but cannot be created, or the file 
 	cannot be created for any other reason.*/
 	EC_CREATE_FILE_FAILED = -10068,
 
 	/**The input ImageData object contains invalid parameter(s).*/
 	EC_IMAGE_DATA_INVALID = -10069,
+
+	/**The size of the input image does not meet the requirements.*/
+	EC_IMAGE_SIZE_NOT_MATCH = -10070,
+
+	/**The pixel format of the input image does not meet the requirements.*/
+	EC_IMAGE_PIXEL_FORMAT_NOT_MATCH = -10071,
+
+	/**The section level result is irreplaceable.*/
+	EC_SECTION_LEVEL_RESULT_IRREPLACEABLE = -10072,
 
 	/** -20000~-29999: DLS license error code. */
 	/**No license.*/
@@ -264,6 +272,10 @@ typedef enum ErrorCode {
 	/**Character Model file is not found*/
 	EC_CHARACTER_MODEL_FILE_NOT_FOUND = -40100,
 
+	/**There is a conflict in the layout of TextLineGroup. */
+	EC_TEXT_LINE_GROUP_LAYOUT_CONFLICT = -40101,
+	/**There is a conflict in the regex of TextLineGroup. */
+	EC_TEXT_LINE_GROUP_REGEX_CONFLICT = -40102,
 
 	/**-50000~-59999: DDN error code*/
 	/*The quardrilateral is invalid*/
@@ -359,10 +371,13 @@ typedef enum ImagePixelFormat
 	IPF_BGR_888,
 
 	/**0:Black, 255:White */
-	IPF_BINARY_8,
+	IPF_BINARY_8,	
 
 	/**NV12 */
-	IPF_NV12
+	IPF_NV12,
+
+	/**0:White, 255:Black */
+	IPF_BINARY_8_INVERTED
 
 } ImagePixelFormat;
 
@@ -497,7 +512,7 @@ typedef enum CapturedResultItemType
 *
 * Describes the protection modes when the buffer of ImageSourceAdapter is overflow.
 */
-typedef enum BufferOverflowProtectionMode
+typedef enum BufferOverflowProtectionMode 
 {
 	/** New images are blocked when the buffer is full. */
 	BOPM_BLOCK = 0x00,
@@ -512,7 +527,7 @@ typedef enum BufferOverflowProtectionMode
 *
 * Describes the type of the image tag, which is used to distinguish video frame and file images.
 */
-typedef enum ImageTagType
+typedef enum ImageTagType 
 {
 	/**The image is a file image.*/
 	ITT_FILE_IMAGE,
@@ -526,7 +541,7 @@ typedef enum ImageTagType
 *
 * Describes the quality of video frames.
 */
-typedef enum VideoFrameQuality
+typedef enum VideoFrameQuality 
 {
 	/**The frame quality is measured to be high.*/
 	VFQ_HIGH,
@@ -543,7 +558,7 @@ typedef enum VideoFrameQuality
 *
 * Describes how the corner is formed by its sides.
 */
-typedef enum CornerType
+typedef enum CornerType 
 {
 	/**The sides of the corner is normally intersected.*/
 	CT_NORMAL_INTERSECTED = 0,
@@ -561,7 +576,7 @@ typedef enum CornerType
 /**
 * @enum SectionType
 *
-* Describes the section of the algorithm.
+* Describes the section of the algorithm. 
 * In the IntermediateResultReceiver, the SectionType indicate the algorithm section that produced the IntermediateResult.
 */
 typedef enum SectionType
@@ -593,7 +608,7 @@ typedef enum SectionType
 /**
 * @enum IntermediateResultUnitType
 *
-* IntermediateResultUnitType is used in each subclass of IntermediateResult to indicate the type of the result.
+* IntermediateResultUnitType is used in each subclass of IntermediateResult to indicate the type of the result. 
 * It is also used to declare which kinds IntermediateResult should be output by the library.
 */
 enum IntermediateResultUnitType : unsigned long long
@@ -682,8 +697,11 @@ enum IntermediateResultUnitType : unsigned long long
 	/**The type of the IntermediateResult is "normalized image".*/
 	IRUT_NORMALIZED_IMAGES = 1 << 26,
 
+	/**The type of the IntermediateResult is "short lines".*/
+	IRUT_SHORT_LINES = 1 << 27,
+
 	/**The type of the IntermediateResult is "all".*/
-	IRUT_ALL = 0x7FFFFFF
+	IRUT_ALL = 0xFFFFFFF
 };
 
 /**
@@ -728,10 +746,10 @@ typedef enum RegionObjectElementType
 */
 typedef enum ImageCaptureDistanceMode
 {
-	/**The image is taken by close-up shot camera.*/
+	/**The image is taken by a camera from a close distance.*/
 	ICDM_NEAR,
 
-	/**The image is taken by long shot camera.*/
+	/**The image is taken by a camera from a distance.*/
 	ICDM_FAR
 } ImageCaptureDistanceMode;
 
@@ -852,6 +870,7 @@ extern "C" {
 	 *
 	 */
 	DS_API  double DC_Sqrt(double x);
+
 #ifdef __cplusplus
 }
 #endif
@@ -859,47 +878,25 @@ extern "C" {
 #ifdef __cplusplus
 namespace dynamsoft
 {
-	namespace dbr {
-		class CDecodedBarcodesResult;
-		namespace intermediate_results {
-			class CCandidateBarcodeZonesUnit;
-			class CLocalizedBarcodesUnit;
-			class CScaledUpBarcodeImageUnit;
-			class CDeformationResistedBarcodeImageUnit;
-			class CComplementedBarcodeImageUnit;
-			class CDecodedBarcodesUnit;
-		}
-	}
-
-	namespace dlr {
-		class CRecognizedTextLinesResult;
-		namespace intermediate_results {
-			class CLocalizedTextLinesUnit;
-			class CRecognizedTextLinesUnit;
-		}
-	}
-
-	namespace ddn {
-		class CDetectedQuadsResult;
-		class CNormalizedImagesResult;
-		namespace intermediate_results {
-			class CLongLinesUnit;
-			class CCornersUnit;
-			class CCandidateQuadEdgesUnit;
-			class CDetectedQuadsUnit;
-			class CNormalizedImagesUnit;
-		}
-	}
-
-	namespace dcp {
-		class CParsedResult;
-	}
-
 	namespace basic_structures
 	{
 
 #pragma pack(push)
 #pragma pack(1)
+
+		/**
+		 * A 3x3 matrix that represents an identity matrix.
+		 */
+		const double IDENTITY_MATRIX[9] = { 
+			1.0, 0.0, 0.0,
+			0.0, 1.0, 0.0,
+			0.0, 0.0, 1.0 };
+
+		/**
+		 * A function pointer to free bytes.
+		 *
+		 */
+		typedef void(*FreeBytesFunc)(const unsigned char*);
 
 		/**
 		 * The CCoreModule class defines general functions in the core module.
@@ -913,7 +910,6 @@ namespace dynamsoft
 			 * @return Returns a const char pointer representing the version of the core module.
 			 */
 			static const char* GetVersion();
-
 		};
 
 		/**
@@ -926,7 +922,10 @@ namespace dynamsoft
 			/**
 			* Constructor
 			*/
-			DMPoint_(void) {};
+			DMPoint_(void) {
+				coordinate[0] = 0;
+				coordinate[1] = 0;
+			};
 
 			/**
 			* Constructor
@@ -1020,7 +1019,9 @@ namespace dynamsoft
 			*/
 			double DistanceTo(const DMPoint_&pt) const
 			{
-				return DC_Sqrt(double((pt[0] - this->coordinate[0])*(pt[0] - this->coordinate[0]) + (pt[1] - this->coordinate[1])*(pt[1] - this->coordinate[1])));
+				double a = double(pt[0] - this->coordinate[0])*double(pt[0] - this->coordinate[0]);
+				double b = double(pt[1] - this->coordinate[1])*double(pt[1] - this->coordinate[1]);
+				return DC_Sqrt(a + b);
 			}
 
 			/**
@@ -1032,13 +1033,15 @@ namespace dynamsoft
 			* @return Returns a new point with the transformed coordinates.
 			*
 			*/
-			static DMPoint_ TransformCoordinates(const DMPoint_& originalPoint, double transformationMatrix[9])
+			static DMPoint_ TransformCoordinates(const DMPoint_& originalPoint, const double transformationMatrix[9])
 			{
 				DMPoint_<_Tp> dst;
 				double w = originalPoint.coordinate[0] * transformationMatrix[6] + originalPoint.coordinate[1] * transformationMatrix[7] + transformationMatrix[8];
 				w = 1. / w;
-				dst.coordinate[0] = (originalPoint.coordinate[0] * transformationMatrix[0] + originalPoint.coordinate[1] * transformationMatrix[1] + transformationMatrix[2])*w;
-				dst.coordinate[1] = (originalPoint.coordinate[0] * transformationMatrix[3] + originalPoint.coordinate[1] * transformationMatrix[4] + transformationMatrix[5])*w;
+				dst.coordinate[0] = static_cast<_Tp>((originalPoint.coordinate[0] * transformationMatrix[0] +
+					originalPoint.coordinate[1] * transformationMatrix[1] + transformationMatrix[2])*w);
+				dst.coordinate[1] = static_cast<_Tp>((originalPoint.coordinate[0] * transformationMatrix[3] +
+					originalPoint.coordinate[1] * transformationMatrix[4] + transformationMatrix[5])*w);
 				return dst;
 			}
 
@@ -1055,21 +1058,17 @@ namespace dynamsoft
 		typedef DMPoint_<int> CPoint;
 
 		/**
+		 * A function pointer to free points.
+		 *
+		 */
+		typedef void(*FreePointsFunc)(const CPoint*);
+
+		/**
 		* The CContour class represents a contour in 2D space. It contains an array of CPoint objects, which represent the vertices of the contour.
 		*/
 		class DS_API CContour
 		{
-		public:
-			/**
-			* Constructor
-			*/
-			CContour();
-
-			/**
-			* Destructor. It releases the memory of the point array.
-			*/
-			~CContour();
-
+		protected:
 			/**
 			* The number of points in the contour.
 			*/
@@ -1078,7 +1077,74 @@ namespace dynamsoft
 			/**
 			* The point array of the contour. The memory will be released by CContour.
 			*/
-			CPoint* points;
+			const CPoint* points;
+
+			FreePointsFunc freePointsFunc;
+
+		public:
+			/**
+			* Destructor. It releases the memory of the point array.
+			*/
+			~CContour();
+
+			/**
+			* Constructor
+			*/
+			CContour();
+
+			/**
+			 * Copy constructor for CContour.
+			 *
+			 * @param contour The reference to another CContour object.
+			*/
+			CContour(const CContour& contour);
+
+			/**
+			 * Move constructor for CContour.
+			 *
+			 * @param contour The rvalue reference to another CContour object.
+			 */
+			CContour(CContour&& contour);
+
+			/**
+			 * Copy assignment operator for CContour.
+			 *
+			 * @param contour The reference to another CContour object.
+			 * @return A reference to the copied CContour object.
+			 */
+			CContour& operator=(const CContour& contour);
+
+			/**
+			 * Move assignment operator for CContour.
+			 *
+			 * @param barcode The rvalue reference to another CContour object.
+			 * @return A reference to the moved CContour object.
+			 */
+			CContour& operator=(CContour&& contour);
+
+			/**
+			 * Sets the point array and the freePointsFunc function pointer.
+			 *
+			 * @param pointsCount The number of points in the point array.
+			 * @param points The point array.
+			 * @param freePointsFunc The freePointsFunc function pointer.
+			 */
+			void SetPoints(int count, const CPoint* points, FreePointsFunc freePointsFunc);
+
+			/**
+			 * Gets the number of points in the point array.
+			 *
+			 * @return The number of points in the point array.
+			 */
+			int GetPointsCount() const;
+
+			/**
+			 * Gets the point array.
+			 *
+			 * @return The point array.
+			 */
+			const CPoint* GetPoints() const;
+
 		};
 
 		/**
@@ -1129,6 +1195,12 @@ namespace dynamsoft
 			*/
 			void Set(int v1, int v2, int v3, int v4);
 
+			/**
+			 * Copy assignment operator for CVector4.
+			 *
+			 * @param v The reference to another CVector4 object.
+			 * @return A reference to the copied CVector4 object.
+			 */
 			CVector4& operator=(const CVector4& v);
 
 			/**
@@ -1190,6 +1262,12 @@ namespace dynamsoft
 			*/
 			virtual ~CLineSegment();
 
+			/**
+			 * Copies the CLineSegment object.
+			 *
+			 * @param line The CLineSegment object to be copied.
+			 * @return The copied CLineSegment object.
+			 */
 			CLineSegment& operator = (const CLineSegment& line);
 
 			/**
@@ -1253,7 +1331,7 @@ namespace dynamsoft
 		};
 
 		/**
-		* CEdge is a structure composed of two Corner points in an image.
+		* CEdge is a structure composed of two Corner points in an image. 
 		* A Corner represents a point at which the image's brightness or color sharply changes. Therefore, a CEdge is a line segment connecting two such points that have been identified as Corners.
 		*/
 		class DS_API CEdge
@@ -1330,7 +1408,7 @@ namespace dynamsoft
 		/**
 		* The CImageTag class represents an image tag that can be attached to an image in a system. It contains information about the image, such as the image ID and the image capture distance mode.
 		*/
-		class DS_API CImageTag
+		class DS_API CImageTag 
 		{
 		private:
 			int imageId;
@@ -1338,7 +1416,6 @@ namespace dynamsoft
 		protected:
 			CImageTag();
 		public:
-
 			/**
 			* Destructor
 			*/
@@ -1396,15 +1473,15 @@ namespace dynamsoft
 		/**
 		* The CFileImageTag class represents an image tag that is associated with a file. It inherits from the CImageTag class and adds two attributes, a file path and a page number.
 		*/
-		class DS_API CFileImageTag : public CImageTag
+		class DS_API CFileImageTag : public CImageTag 
 		{
 		public:
 			/**
 			* The constructor of the CFileImageTag class.
 			*
-			* @param [in] _filePath The file path of the image tag.
-			*
-			* @param [in] _pageNumber The page number of the image tag.
+			* @param [in] _filePath The file path.
+			* @param [in] _pageNumber The page number of the file image.
+			* @param [in] _totalPages The total pages of the file image.
 			*
 			*/
 			CFileImageTag(const char* _filePath, int _pageNumber, int _totalPages);
@@ -1557,14 +1634,15 @@ namespace dynamsoft
 		class DS_API CImageData
 		{
 		protected:
-			int bytesLength;
-			unsigned char* bytes;
+			unsigned long long bytesLength;
+			const unsigned char* bytes;
 			int width;
 			int height;
 			int stride;
 			ImagePixelFormat format;
 			int orientation;
 			CImageTag* tag;
+			FreeBytesFunc freeBytesFunc;
 		public:
 			/**
 			* Constructs an empty image data object.
@@ -1584,7 +1662,24 @@ namespace dynamsoft
 			* @param [in] _tag The tag of the image.
 			*
 			*/
-			CImageData(int _bytesLength, const unsigned char* _bytes, int _width, int _height, int _stride,
+			CImageData(unsigned long long _bytesLength, const unsigned char* _bytes, int _width, int _height, int _stride,
+				ImagePixelFormat _format, int _orientation = 0, const CImageTag* _tag = NULL);
+
+			/**
+			* Constructs an image data object with the specified parameters.
+			*
+			* @param [in] _bytesLength The length of the image byte array.
+			* @param [in] _bytes The image byte array.
+			* @param [in] _freeBytesFunc The function to free the image byte array.
+			* @param [in] _width The width of the image.
+			* @param [in] _height The height of the image.
+			* @param [in] _stride The stride of the image.
+			* @param [in] _format The pixel format of the image.
+			* @param [in] _orientation The orientation of the image.
+			* @param [in] _tag The tag of the image.
+			*
+			*/
+			CImageData(unsigned long long _bytesLength, const unsigned char* _bytes, FreeBytesFunc _freeBytesFunc, int _width, int _height, int _stride,
 				ImagePixelFormat _format, int _orientation = 0, const CImageTag* _tag = NULL);
 
 			/**
@@ -1606,7 +1701,7 @@ namespace dynamsoft
 			* @return Returns the length of the image byte array.
 			*
 			*/
-			int GetBytesLength() const;
+			unsigned long long GetBytesLength() const;
 
 			/**
 			* Gets the width of the image.
@@ -1663,10 +1758,10 @@ namespace dynamsoft
 			*
 			*/
 			void SetImageTag(const CImageTag* _tag);
-
+			
 		private:
-			CImageData(const CImageData&);
-			CImageData& operator=(const CImageData&);
+			//CImageData(const CImageData&);
+			//CImageData& operator=(const CImageData&);
 		};
 
 		/**
@@ -1674,12 +1769,13 @@ namespace dynamsoft
 		*/
 		class DS_API CCapturedResultItem
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CCapturedResultItem() {};
 
+		public:
 			/**
 			* Gets the type of the captured result item.
 			*
@@ -1695,6 +1791,34 @@ namespace dynamsoft
 			*
 			*/
 			virtual const CCapturedResultItem* GetReferenceItem() const = 0;
+
+			/**
+			 * Gets the name of the target ROI definition.
+			 *
+			 * @return Returns the name of the target ROI definition.
+			 */
+			virtual const char* GetTargetROIDefName() const = 0;
+
+			/**
+			* Gets the name of the task.
+			*
+			* @return Returns the name of the task.
+			*
+			*/
+			virtual const char* GetTaskName() const = 0;
+
+			/**
+			 * Increases the reference count of the CCapturedResultItem object.
+			 *
+			 * @return An object of CCapturedResultItem.
+			 */
+			virtual CCapturedResultItem* Retain() = 0;
+			
+			/**
+			* Decreases the reference count of the CCapturedResultItem object.
+			*
+			*/
+			virtual void Release() = 0;
 		};
 
 		/**
@@ -1702,12 +1826,13 @@ namespace dynamsoft
 		*/
 		class DS_API CCapturedResult
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CCapturedResult() {};
 
+		public:
 			/**
 			* Gets the hash ID of the original image.
 			*
@@ -1785,6 +1910,29 @@ namespace dynamsoft
 			 *
 			 */
 			virtual const char* GetErrorString() const = 0;
+
+			/**
+			 * Gets a pointer to the CCapturedResultItem object at the specified index.
+			 *
+			 * @param [in] index The index of the item to retrieve.
+			 *
+			 * @return Returns a pointer to the CCapturedResultItem object at the specified index.
+			 *
+			 */
+			virtual const CCapturedResultItem* operator[](int index) const = 0;
+
+			/**
+			 * Increases the reference count of the CCapturedResult object.
+			 *
+			 * @return An object of CCapturedResult.
+			 */
+			virtual CCapturedResult* Retain() = 0;
+
+			/**
+			* Decreases the reference count of the CCapturedResult object.
+			*
+			*/
+			virtual void Release() = 0;
 		};
 
 		/**
@@ -1792,12 +1940,13 @@ namespace dynamsoft
 		*/
 		class DS_API COriginalImageResultItem : public CCapturedResultItem
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~COriginalImageResultItem() {};
 
+		public:
 			/**
 			* Gets the image data for the COriginalImageResultItem.
 			*
@@ -1805,202 +1954,6 @@ namespace dynamsoft
 			*
 			*/
 			virtual const CImageData* GetImageData() const = 0;
-		};
-
-		/**
-		* The `CCapturedResultReceiver` class is responsible for receiving captured results. It contains several callback functions for different types of results, including original image, decoded barcodes, recognized text lines, detected quads, normalized images, and parsed results.
-		*/
-		class DS_API CCapturedResultReceiver
-		{
-		protected:
-			unsigned int observedResultItemTypes;
-			const char* name;
-			
-			/**
-			* Constructor.
-			*/
-			CCapturedResultReceiver();
-		public:
-			/**
-			* Destructor.
-			*/
-			virtual ~CCapturedResultReceiver();
-
-			/**
-			* Gets the types of observed result items.
-			*
-			* @return Returns the types of observed result items.
-			*
-			*/
-			unsigned int GetObservedResultItemTypes();
-
-			/**
-			* Gets the name of the captured result receiver.
-			*
-			* @return Returns the name of the captured result receiver.
-			*
-			*/
-			const char* GetName() const;
-
-			/**
-			* Sets the name of the captured result receiver.
-			*
-			* @param [in] name The name of the captured result receiver.
-			*
-			*/
-			void SetName(const char* name);
-
-			/**
-			* Callback function for all captured results. It will be called once for each captured result.
-			*
-			* @param [in] pResult The captured result.
-			*
-			*/
-			virtual void OnCapturedResultReceived(CCapturedResult* pResult);
-
-			/**
-			* Callback function for original image results. It will be called once for each original image result.
-			*
-			* @param [in] pResult The original image result.
-			*
-			*/
-			virtual void OnOriginalImageResultReceived(COriginalImageResultItem* pResult);
-
-			/**
-			* Callback function for decoded barcodes results. It will be called once for each decoded barcodes result.
-			*
-			* @param [in] pResult The decoded barcodes result.
-			*
-			*/
-			virtual void OnDecodedBarcodesReceived(dbr::CDecodedBarcodesResult* pResult);
-
-			/**
-			* Callback function for recognized text lines results. It will be called once for each recognized text lines result.
-			*
-			* @param [in] pResult The recognized text lines result.
-			*
-			*/
-			virtual void OnRecognizedTextLinesReceived(dlr::CRecognizedTextLinesResult* pResult);
-
-			/**
-			* Callback function for detected quads results. It will be called once for each detected quads result.
-			*
-			* @param [in] pResult The detected quads result.
-			*
-			*/
-			virtual void OnDetectedQuadsReceived(ddn::CDetectedQuadsResult* pResult);
-
-			/**
-			* Callback function for normalized images results. It will be called once for each normalized images result.
-			*
-			* @param [in] pResult The normalized images result.
-			*
-			*/
-			virtual void OnNormalizedImagesReceived(ddn::CNormalizedImagesResult* pResult);
-
-			/**
-			* Callback function for parsed results. It will be called once for each parsed result.
-			*
-			* @param [in] pResult The parsed result.
-			*
-			*/
-			virtual void OnParsedResultsReceived(dcp::CParsedResult* pResult);
-
-		};
-
-		/**
-		* The `CCapturedResultFilter` class is responsible for filtering captured results. It contains several callback functions for different types of results, including original image, decoded barcodes, recognized text lines, detected quads, normalized images, and parsed results.
-		*/
-		class DS_API CCapturedResultFilter
-		{
-		protected:
-			unsigned int filteredResultItemTypes;
-			const char* name;
-
-			/**
-			* Constructor.
-			*/
-			CCapturedResultFilter();
-		public:
-			/**
-			* Destructor.
-			*/
-			virtual ~CCapturedResultFilter();
-
-			/**
-			* Gets the types of filtered result items.
-			*
-			* @return Returns the types of filtered result items.
-			*
-			*/
-			unsigned int GetFilteredResultItemTypes();
-
-			/**
-			* Gets the name of the captured result filter.
-			*
-			* @return Returns the name of the captured result filter.
-			*
-			*/
-			const char* GetName() const;
-
-			/**
-			* Sets the name of the captured result filter.
-			*
-			* @param [in] name The name of the captured result filter.
-			*
-			*/
-			void SetName(const char* name);
-
-			/**
-			* Callback function for original image results. It will be called once for each original image result.
-			*
-			* @param [in] pResult The original image result.
-			*
-			*/
-			virtual void OnOriginalImageResultReceived(COriginalImageResultItem* pResult);
-
-			/**
-			* Callback function for decoded barcodes results. It will be called once for each decoded barcodes result.
-			*
-			* @param [in] pResult The decoded barcodes result.
-			*
-			*/
-			virtual void OnDecodedBarcodesReceived(dbr::CDecodedBarcodesResult* pResult);
-
-			/**
-			* Callback function for recognized text lines results. It will be called once for each recognized text lines result.
-			*
-			* @param [in] pResult The recognized text lines result.
-			*
-			*/
-			virtual void OnRecognizedTextLinesReceived(dlr::CRecognizedTextLinesResult* pResult);
-
-			/**
-			* Callback function for detected quads results. It will be called once for each detected quads result.
-			*
-			* @param [in] pResult The detected quads result.
-			*
-			*/
-			virtual void OnDetectedQuadsReceived(ddn::CDetectedQuadsResult* pResult);
-
-			/**
-			* Callback function for normalized images results. It will be called once for each normalized images result.
-			*
-			* @param [in] pResult The normalized images result.
-			*
-			*/
-			virtual void OnNormalizedImagesReceived(ddn::CNormalizedImagesResult* pResult);
-
-			/**
-			* Callback function for parsed results. It will be called once for each parsed result.
-			*
-			* @param [in] pResult The parsed result.
-			*
-			*/
-			virtual void OnParsedResultsReceived(dcp::CParsedResult* pResult);
-
-			virtual void ClearStatus();
-
 		};
 
 		/**
@@ -2025,7 +1978,7 @@ namespace dynamsoft
 		/**
 		* The CImageSourceAdapter class provides an interface for fetching and buffering images. It is an abstract class that needs to be implemented by a concrete class to provide actual functionality.
 		*/
-		class DS_API CImageSourceAdapter
+		class DS_API CImageSourceAdapter 
 		{
 		private:
 			class CImageSourceAdapterInner;
@@ -2034,11 +1987,12 @@ namespace dynamsoft
 			CImageSourceAdapterInner* m_inner;
 		protected:
 			CImageSourceErrorListener* m_listener;
+
 			/**
 			* Constructor
 			*/
 			CImageSourceAdapter();
-
+			
 			/**
 			* Adds an image to the buffer of the adapter.
 			*
@@ -2061,7 +2015,7 @@ namespace dynamsoft
 			*
 			*/
 			virtual bool HasNextImageToFetch()const = 0;
-
+			
 			/**
 			* Starts fetching images.
 			*/
@@ -2071,7 +2025,7 @@ namespace dynamsoft
 			* Stops fetching images.
 			*/
 			virtual void StopFetching();
-
+			
 			/**
 			* Returns a buffered image.
 			*
@@ -2079,7 +2033,7 @@ namespace dynamsoft
 			*
 			*/
 			virtual CImageData* GetImage();
-
+			
 			/**
 			* Sets how many images are allowed to be buffered.
 			*
@@ -2121,7 +2075,7 @@ namespace dynamsoft
 			*
 			*/
 			bool HasImage(int imageId)const;
-
+			
 			/**
 			* Sets the next image to return.
 			*
@@ -2149,11 +2103,11 @@ namespace dynamsoft
 			*/
 			bool IsBufferEmpty() const;
 
-			/**
+			/** 
 			 * Clears the buffer.
 			 */
 			void ClearBuffer();
-
+			
 			/**
 			 * Sets the usage type of a color channel in images.
 			 */
@@ -2196,7 +2150,7 @@ namespace dynamsoft
 			* The raster data source.
 			*/
 			RasterDataSource rasterDataSource;
-
+			
 			CPDFReadingParameter() {
 				mode = PDFRM_RASTER;
 				dpi = 300;
@@ -2204,7 +2158,7 @@ namespace dynamsoft
 			}
 		};
 
-
+		
 #pragma pack(pop)
 	}
 
@@ -2217,12 +2171,13 @@ namespace dynamsoft
 		*/
 		class DS_API CRegionObjectElement
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CRegionObjectElement() {};
 
+		public:
 			/**
 			* Get the location of the region object element.
 			*
@@ -2247,6 +2202,33 @@ namespace dynamsoft
 			*/
 			virtual RegionObjectElementType GetElementType() const = 0;
 
+			/**
+			 * Set the location of the region object element.
+			 *
+			 * @param location The location of the region object element.
+			 * @return Returns 0 if success, otherwise an error code.
+			 */
+			virtual int SetLocation(const CQuadrilateral& location) = 0;
+
+			/**
+			 * Clone the region object element.
+			 *
+			 * @return Returns a pointer to a copy of the region object element.
+			 */
+			virtual CRegionObjectElement* Clone() const = 0;
+
+			/**
+			 * Increases the reference count of the CRegionObjectElement object.
+			 *
+			 * @return An object of CRegionObjectElement.
+			 */
+			virtual CRegionObjectElement* Retain() = 0;
+
+			/**
+			* Decreases the reference count of the CRegionObjectElement object.
+			*
+			*/
+			virtual void Release() = 0;
 		};
 
 		/**
@@ -2255,12 +2237,13 @@ namespace dynamsoft
 		*/
 		class DS_API CPredetectedRegionElement : public CRegionObjectElement
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CPredetectedRegionElement() {};
 
+		public:
 			/**
 			* Gets the name of the detection mode used to detect this region element.
 			*
@@ -2286,12 +2269,13 @@ namespace dynamsoft
 			* Constructor
 			*/
 			CIntermediateResultUnit();
-		public:
+		
 			/**
 			* Destructor
 			*/
 			virtual ~CIntermediateResultUnit();
 
+		public:
 			/**
 			* Gets the hash ID of the intermediate result unit.
 			*
@@ -2332,7 +2316,7 @@ namespace dynamsoft
 			* @param [in] matrix A double array which represents the transform matrix. The corresponding transformation matrices are as follows: local image to original image, original image to local image, rotated image to original image, original image to rotated image.
 			*
 			*/
-			void SetTransformMatrix(TransformMatrixType matrixType, double matrix[9]);
+			void SetTransformMatrix(TransformMatrixType matrixType, const double matrix[9]);
 
 			/**
 			* Gets the type of the intermediate result unit.
@@ -2375,16 +2359,25 @@ namespace dynamsoft
 			void SetOriginalImageTag(const CImageTag* _tag);
 
 			/**
-			* Increases the reference count of the intermediate result unit.
-			*
-			*/
-			virtual void Retain() = 0;
+			 * Increases the reference count of the CIntermediateResultUnit object.
+			 *
+			 * @return An object of CIntermediateResultUnit.
+			 */
+			virtual CIntermediateResultUnit* Retain() = 0;
 
 			/**
-			* Decreases the reference count of the intermediate result unit.
+			* Decreases the reference count of the CIntermediateResultUnit object.
 			*
 			*/
 			virtual void Release() = 0;
+
+			/**
+			 * Replaces the specified CIntermediateResultUnit object with the current CIntermediateResultUnit object.
+			 *
+			 * @param unit The CIntermediateResultUnit object to be replaced.
+			 * @return Returns 0 if succeeds, nonzero otherwise.
+			 */
+			virtual int Replace(CIntermediateResultUnit* unit) = 0;
 		};
 
 		/**
@@ -2393,12 +2386,13 @@ namespace dynamsoft
 		*/
 		class DS_API CIntermediateResult
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CIntermediateResult() {};
 
+		public:
 			/**
 			* Gets the number of CIntermediateResultUnit objects in the collection.
 			*
@@ -2424,12 +2418,13 @@ namespace dynamsoft
 		*/
 		class DS_API CColourImageUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CColourImageUnit() {};
 
+		public:
 			/**
 			* Gets the image data of the color image unit.
 			*
@@ -2437,6 +2432,14 @@ namespace dynamsoft
 			*
 			*/
 			virtual const CImageData* GetImageData() const = 0;
+
+			/**
+			 * Sets the image data of the color image unit.
+			 *
+			 * @param imgData The image data to set.
+			 * @return Returns 0 if succeeds, nonzero otherwise.
+			 */
+			virtual int SetImageData(const CImageData* imgData) = 0;
 		};
 
 		/**
@@ -2444,12 +2447,13 @@ namespace dynamsoft
 		*/
 		class DS_API CScaledDownColourImageUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CScaledDownColourImageUnit() {};
 
+		public:
 			/**
 			* Gets the image data of the unit.
 			*
@@ -2457,6 +2461,14 @@ namespace dynamsoft
 			*
 			*/
 			virtual const CImageData* GetImageData() const = 0;
+
+			/**
+			 * Sets the image data of the scaled down color image unit.
+			 *
+			 * @param imgData The image data to set.
+			 * @return Returns 0 if succeeds, nonzero otherwise.
+			 */
+			virtual int SetImageData(const CImageData* imgData) = 0;
 		};
 
 		/**
@@ -2464,12 +2476,13 @@ namespace dynamsoft
 		*/
 		class DS_API CGrayscaleImageUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CGrayscaleImageUnit() {};
 
+		public:
 			/**
 			* Gets the image data of the grayscale image.
 			*
@@ -2477,6 +2490,14 @@ namespace dynamsoft
 			*
 			*/
 			virtual const CImageData* GetImageData() const = 0;
+
+			/**
+			 * Sets the image data of the grayscale image unit.
+			 *
+			 * @param imgData The image data to set.
+			 * @return Returns 0 if succeeds, nonzero otherwise.
+			 */
+			virtual int SetImageData(const CImageData* imgData) = 0;
 		};
 
 		/**
@@ -2485,12 +2506,13 @@ namespace dynamsoft
 		*/
 		class DS_API CTransformedGrayscaleImageUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CTransformedGrayscaleImageUnit() {};
 
+		public:
 			/**
 			* Gets the image data of the transformed grayscale image. It may be the original grayscale image or the inverted image of the original grayscale image.
 			*
@@ -2498,6 +2520,14 @@ namespace dynamsoft
 			*
 			*/
 			virtual const CImageData* GetImageData() const = 0;
+
+			/**
+			 * Sets the image data of the transformed grayscale image unit.
+			 *
+			 * @param imgData The image data to set.
+			 * @return Returns 0 if succeeds, nonzero otherwise.
+			 */
+			virtual int SetImageData(const CImageData* imgData) = 0;
 		};
 
 		/**
@@ -2505,12 +2535,13 @@ namespace dynamsoft
 		*/
 		class DS_API CPredetectedRegionsUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CPredetectedRegionsUnit() {};
 
+		public:
 			/**
 			* Gets the number of pre-detected regions in the collection.
 			*
@@ -2528,6 +2559,47 @@ namespace dynamsoft
 			*
 			*/
 			virtual const CPredetectedRegionElement* GetPredetectedRegion(int index) const = 0;
+
+			/**
+			* Gets a pointer to a specific pre-detected region in the collection.
+			*
+			* @param [in] index The index of the pre-detected region to retrieve.
+			*
+			* @return Returns a const pointer to the specified pre-detected region in the collection. You don't need to release the memory pointed to by the returned pointer.
+			*
+			*/
+			virtual const CPredetectedRegionElement* operator[](int index) const = 0;
+
+			/**
+			 * Removes all pre-detected regions in the unit.
+			 *
+			 */
+			virtual void RemoveAllPredetectedRegions() = 0;
+
+			/**
+			 * Removes a pre-detected region in the unit at the specified index.
+			 *
+			 * @param index The index of the pre-detected region to remove.
+			 * @return Returns 0 if succeeds, nonzero otherwise.
+			 */
+			virtual int RemovePredetectedRegion(int index) = 0;
+
+			/**
+			 * Adds a pre-detected region in the unit.
+			 *
+			 * @param element The pre-detected region to add.
+			 * @return Returns 0 if succeeds, nonzero otherwise.
+			 */
+			virtual int AddPredetectedRegion(const CPredetectedRegionElement* element, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+
+			/**
+			 * Sets a pre-detected region in the unit at the specified index.
+			 *
+			 * @param index The index of the pre-detected region to set.
+			 * @param element The pre-detected region to set.
+			 * @return Returns 0 if succeeds, nonzero otherwise.
+			 */
+			virtual int SetPredetectedRegion(int index, const CPredetectedRegionElement* element, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
 		};
 
 		/**
@@ -2535,18 +2607,27 @@ namespace dynamsoft
 		*/
 		class DS_API CEnhancedGrayscaleImageUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CEnhancedGrayscaleImageUnit() {};
 
+		public:
 			/**
 			* Gets the enhanced grayscale image data.
 			*
 			* @return Returns a const pointer to the CImageData object that contains the enhanced grayscale image data. You don't need to release the memory pointed to by the returned pointer.
 			*/
 			virtual const CImageData* GetImageData() const = 0;
+
+			/**
+			 * Sets the enhanced grayscale image data.
+			 *
+			 * @param imgData The enhanced grayscale image data.
+			 * @return Returns 0 if succeeds, nonzero otherwise.
+			 */
+			virtual int SetImageData(const CImageData* imgData) = 0;
 		};
 
 		/**
@@ -2555,12 +2636,13 @@ namespace dynamsoft
 		*/
 		class DS_API CBinaryImageUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CBinaryImageUnit() {};
 
+		public:
 			/**
 			* Gets a pointer to the binary image data.
 			*
@@ -2568,6 +2650,14 @@ namespace dynamsoft
 			*
 			*/
 			virtual const CImageData* GetImageData() const = 0;
+
+			/**
+			 * Sets the binary image data.
+			 *
+			 * @param imgData The binary image data.
+			 * @return Returns 0 if succeeds, nonzero otherwise.
+			 */
+			virtual int SetImageData(const CImageData* imgData) = 0;
 		};
 
 		/**
@@ -2576,12 +2666,13 @@ namespace dynamsoft
 		*/
 		class DS_API CTextureDetectionResultUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CTextureDetectionResultUnit() {};
 
+		public:
 			/**
 			* Gets x-direction spacing of the texture stripes.
 			*
@@ -2597,6 +2688,20 @@ namespace dynamsoft
 			*
 			*/
 			virtual int GetYSpacing() = 0;
+
+			/**
+			 * Sets the x-direction spacing of the texture stripes.
+			 *
+			 * @param xSpacing The x-direction spacing of the texture stripes.
+			 */
+			virtual void SetXSpacing(int xSpacing) = 0;
+
+			/**
+			 * Sets the y-direction spacing of the texture stripes.
+			 *
+			 * @param ySpacing The y-direction spacing of the texture stripes.
+			 */
+			virtual void SetYSpacing(int ySpacing) = 0;
 		};
 
 		/**
@@ -2605,12 +2710,13 @@ namespace dynamsoft
 		*/
 		class DS_API CTextureRemovedGrayscaleImageUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CTextureRemovedGrayscaleImageUnit() {};
 
+		public:
 			/**
 			* Gets the grayscale image data with textures removed.
 			*
@@ -2618,6 +2724,14 @@ namespace dynamsoft
 			*
 			*/
 			virtual const CImageData* GetImageData() const = 0;
+
+			/**
+			 * Sets the grayscale image data with textures removed.
+			 *
+			 * @param imgData The grayscale image data with textures removed.
+			 * @return Returns 0 if succeeds, nonzero otherwise.
+			 */
+			virtual int SetImageData(const CImageData* imgData) = 0;
 		};
 
 		/**
@@ -2626,12 +2740,13 @@ namespace dynamsoft
 		*/
 		class DS_API CTextureRemovedBinaryImageUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CTextureRemovedBinaryImageUnit() {};
 
+		public:
 			/**
 			* Gets the image data of the binary image with texture removed.
 			*
@@ -2639,6 +2754,81 @@ namespace dynamsoft
 			*
 			*/
 			virtual const CImageData* GetImageData() const = 0;
+
+			/**
+			 * Sets the binary image data with texture removed.
+			 *
+			 * @param imgData The binary image data with texture removed.
+			 * @return Returns 0 if succeeds, nonzero otherwise.
+			 */
+			virtual int SetImageData(const CImageData* imgData) = 0;
+		};
+
+		class DS_API CTextZone
+		{
+		private:
+			CQuadrilateral location;
+			int charContoursCount;
+			int* charContoursIndices;
+
+		public:
+			/**
+			 * Destructor
+			 *
+			 */
+			~CTextZone();
+
+			/**
+			 * Constructor
+			 *
+			 */
+			CTextZone();
+
+			/**
+			 * Constructor
+			 *
+			 * @param loc The location of the text zone
+			 */
+			CTextZone(const CQuadrilateral& loc);
+
+			/**
+			 * Constructor
+			 *
+			 * @param loc The location of the text zone
+			 * @param charContoursIndices The indices of the character contours
+			 * @param charContoursCount The count of the character contours
+			 */
+			CTextZone(const CQuadrilateral& loc, const int charContoursIndices[], int charContoursCount);
+
+			/**
+			 * Gets the location of the text zone
+			 *
+			 * @return Returns the location of the text zone
+			 */
+			CQuadrilateral GetLocation() const;
+
+			/**
+			 * Sets the location of the text zone
+			 *
+			 * @param loc The location of the text zone
+			 */
+			void SetLocation(const CQuadrilateral& loc);
+
+			/**
+			 * Gets the indices of the character contours
+			 *
+			 * @param ppCharContoursIndices The indices of the character contours
+			 * @param pCharContoursCount The count of the character contours
+			 */
+			void GetCharContoursIndices(int** ppCharContoursIndices, int* pCharContoursCount) const;
+
+			/**
+			 * Sets the indices of the character contours
+			 *
+			 * @param charContoursIndices The indices of the character contours
+			 * @param charContoursCount The count of the character contours
+			 */
+			void SetCharContoursIndices(const int charContoursIndices[], int charContoursCount);
 		};
 
 		/**
@@ -2647,12 +2837,13 @@ namespace dynamsoft
 		*/
 		class DS_API CTextZonesUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CTextZonesUnit() {};
 
+		public:
 			/**
 			* Gets the number of text zones in the unit.
 			*
@@ -2665,12 +2856,45 @@ namespace dynamsoft
 			* Gets the quadrilateral shape of the text zone at the specified index.
 			*
 			* @param [in] index The index of the text zone.
-			* @param [in, out] quad A pointer to a CQuadrilateral object to receive the quadrilateral shape of the text zone.
+			* @param [in, out] textZone A pointer to a CTextZone object to receive  the text zone.
 			*
 			* @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
 			*
 			*/
-			virtual int GetTextZone(int index, CQuadrilateral* quad) const = 0;
+			virtual int GetTextZone(int index, CTextZone* textZone) const = 0;
+
+			/**
+			* Removes all text zones from the unit.
+			*
+			*/
+			virtual void RemoveAllTextZones() = 0;
+
+			/**
+			 * Removes the text zone at the specified index.
+			 *
+			 * @param index The index of the text zone to remove.
+			 * @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
+			 */
+			virtual int RemoveTextZone(int index) = 0;
+
+			/**
+			 * Adds a text zone to the unit.
+			 *
+			 * @param textZone The text zone to add.
+			 * @param matrixToOriginalImage The matrix to original image.
+			 * @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
+			 */
+			virtual int AddTextZone(const CTextZone& textZone, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+
+			/**
+			 * Sets the text zone at the specified index.
+			 *
+			 * @param index The index of the text zone to set.
+			 * @param textZone The text zone to set.
+			 * @param matrixToOriginalImage The matrix to original image.
+			 * @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
+			 */
+			virtual int SetTextZone(int index, const CTextZone& textZone, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
 		};
 
 		/**
@@ -2678,12 +2902,13 @@ namespace dynamsoft
 		*/
 		class DS_API CTextRemovedBinaryImageUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CTextRemovedBinaryImageUnit() {};
 
+		public:
 			/**
 			* Gets the binary image data with the text removed.
 			*
@@ -2691,6 +2916,14 @@ namespace dynamsoft
 			*
 			*/
 			virtual const CImageData* GetImageData() const = 0;
+
+			/**
+			 * Sets the binary image data with the text removed.
+			 *
+			 * @param imgData The binary image data with the text removed.
+			 * @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
+			 */
+			virtual int SetImageData(const CImageData* imgData) = 0;
 		};
 
 
@@ -2699,13 +2932,33 @@ namespace dynamsoft
 		*/
 		class DS_API CContoursUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CContoursUnit() {};
 
+		public:
+			/**
+			 * Gets the contours and hierarchies in the unit.
+			 *
+			 * @param count The number of contours in the unit.
+			 * @param contours The contours in the unit.
+			 * @param hierarchies The hierarchies in the unit.
+			 * @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
+			 */
 			virtual int GetContours(int* count, const CContour** contours, const CVector4** hierarchies) const = 0;
+
+			/**
+			 * Sets the contours and hierarchies in the unit.
+			 *
+			 * @param count The number of contours in the unit.
+			 * @param contours The contours in the unit.
+			 * @param hierarchies The hierarchies in the unit.
+			 * @param matrixToOriginalImage The matrix to original image.
+			 * @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
+			 */
+			virtual int SetContours(int count, const CContour* contours, const CVector4* hierarchies, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
 		};
 
 		/**
@@ -2714,12 +2967,13 @@ namespace dynamsoft
 		*/
 		class DS_API CLineSegmentsUnit : public CIntermediateResultUnit
 		{
-		public:
+		protected:
 			/**
 			* Destructor
 			*/
 			virtual ~CLineSegmentsUnit() {};
 
+		public:
 			/**
 			* Gets the number of line segments in the collection.
 			*
@@ -2728,7 +2982,125 @@ namespace dynamsoft
 			*/
 			virtual int GetCount() const = 0;
 
+			/**
+			 * Gets the line segment at the specified index.
+			 *
+			 * @param index The index of the line segment to get.
+			 * @return A pointer to the CLineSegment object that represents the line segment at the specified index.
+			 */
 			virtual const CLineSegment* GetLineSegment(int index) const = 0;
+
+			/**
+			 * Gets the line segment at the specified index.
+			 *
+			 * @param index The index of the line segment to get.
+			 * @return A pointer to the CLineSegment object that represents the line segment at the specified index.
+			 */
+			virtual const CLineSegment* operator[](int index) const = 0;
+
+			/**
+			 * Removes all line segments from the unit.
+			 *
+			 */
+			virtual void RemoveAllLineSegments() = 0;
+
+			/**
+			 * Removes the line segment at the specified index.
+			 *
+			 * @param index The index of the line segment to remove.
+			 * @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
+			 */
+			virtual int RemoveLineSegment(int index) = 0;
+
+			/**
+			 * Adds a line segment to the unit.
+			 *
+			 * @param line The line segment to add.
+			 * @param matrixToOriginalImage The matrix to original image.
+			 * @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
+			 */
+			virtual int AddLineSegment(const CLineSegment& line, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+
+			/**
+			 * Sets the line segment at the specified index.
+			 *
+			 * @param index The index of the line segment to set.
+			 * @param line The line segment to set.
+			 * @param matrixToOriginalImage The matrix to original image.
+			 * @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
+			 */
+			virtual int SetLineSegment(int index, const CLineSegment& line, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+		};
+
+		/**
+		* The `CShortLinesUnit` class represents a collection of short lines in 2D space. It is a derived class of `CIntermediateResultUnit`.
+		*
+		*/
+		class DS_API CShortLinesUnit : public CIntermediateResultUnit
+		{
+		protected:
+			/**
+			* Destructor
+			*/
+			virtual ~CShortLinesUnit() {};
+
+		public:
+			/**
+			* Gets the number of short lines in the collection.
+			*
+			* @return Returns the number of short lines in the collection.
+			*
+			*/
+			virtual int GetCount() const = 0;
+
+			/**
+			 * Gets the short line at the specified index.
+			 *
+			 * @param index The index of the short line to get.
+			 * @return A pointer to the CLineSegment object that represents the short line at the specified index.
+			 */
+			virtual const CLineSegment* GetShortLine(int index) const = 0;
+
+			/**
+			 * Gets the short line at the specified index.
+			 *
+			 * @param index The index of the short line to get.
+			 * @return A pointer to the CLineSegment object that represents the short line at the specified index.
+			 */
+			virtual const CLineSegment* operator[](int index) const = 0;
+
+			/**
+			 * Removes all short lines from the unit.
+			 *
+			 */
+			virtual void RemoveAllShortLines() = 0;
+
+			/**
+			 * Removes the short line at the specified index.
+			 *
+			 * @param index The index of the short line to remove.
+			 * @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
+			 */
+			virtual int RemoveShortLine(int index) = 0;
+
+			/**
+			 * Adds a short line to the unit.
+			 *
+			 * @param line The short line to add.
+			 * @param matrixToOriginalImage The matrix to original image.
+			 * @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
+			 */
+			virtual int AddShortLine(const CLineSegment& line, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+
+			/**
+			 * Sets the short line at the specified index.
+			 *
+			 * @param index The index of the short line to set.
+			 * @param line The short line to set.
+			 * @param matrixToOriginalImage The matrix to original image.
+			 * @return Returns 0 if the operation succeeds, or a nonzero error code if the operation fails.
+			 */
+			virtual int SetShortLine(int index, const CLineSegment& line, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
 		};
 
 		/**
@@ -2738,6 +3110,11 @@ namespace dynamsoft
 		class DS_API CObservationParameters
 		{
 		public:
+			/**
+			* Destructor
+			*/
+			virtual ~CObservationParameters() {};
+
 			/**
 			* Sets the types of intermediate result units that have been observed.
 			*
@@ -2789,13 +3166,35 @@ namespace dynamsoft
 			*
 			*/
 			virtual bool IsTaskObserved(const char* taskName) const = 0;
+
+			/**
+			* Set the type of intermediate result unit that indicates skipping default calculations and replacing with input data units.
+			*
+			* @param types The type of intermediate result unit that serves as the combination value of IntermediateResultUnitType.
+			*/
+			virtual void SetResultUnitTypesOnlyForInput(unsigned long long types) = 0;
+
+			/**
+			* Gets the type of intermediate result unit that indicates skipping default calculations and replacing with input data units.
+			*
+			* @return Returns the type of intermediate result unit that serves as the combination value of IntermediateResultUnitType.
+			*/
+			virtual unsigned long long GetResultUnitTypesOnlyForInput() const = 0;
+
+			/**
+			* Determines whether the specified type of intermediate result unit indicates skipping default calculations and replacing with input data units.
+			*
+			* @param type The type of intermediate result unit to check.
+			* @return Returns a boolean value indicating whether the specified type of intermediate result unit indicates skipping default calculations and replacing with input data units.
+			*/
+			virtual bool IsResultUnitTypeOnlyForInput(IntermediateResultUnitType type) const = 0;
 		};
 
 		/**
-		* The `CIntermediateResultReceiver` class is responsible for receiving intermediate results of different types.
+		* The `CAbstractIntermediateResultReceiver` class is responsible for receiving intermediate results of different types.
 		* It provides virtual functions for each type of result, which are called when the corresponding result is received.
 		*/
-		class DS_API CIntermediateResultReceiver
+		class DS_API CAbstractIntermediateResultReceiver
 		{
 		protected:
 			CObservationParameters* parameters;
@@ -2803,12 +3202,13 @@ namespace dynamsoft
 			/**
 			* Constructor
 			*/
-			CIntermediateResultReceiver();
+			CAbstractIntermediateResultReceiver();
+
 		public:
 			/**
 			* Destructor
 			*/
-			virtual ~CIntermediateResultReceiver();
+			virtual ~CAbstractIntermediateResultReceiver();
 
 			/**
 			* Gets the observed parameters of the intermediate result receiver.
@@ -2825,292 +3225,16 @@ namespace dynamsoft
 			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
 			*
 			*/
-			virtual void OnTaskResultsReceived(CIntermediateResult *pResult, const IntermediateResultExtraInfo* info);
+			virtual void OnTaskResultsReceived(CIntermediateResult *pResult, const IntermediateResultExtraInfo* info) = 0;
 
 			/**
-			* Called when predetected regions have been received.
+			* Called when a intermediate result unit has been received.
 			*
-			* @param [in] pResult A pointer to the CPredetectedRegionsUnit object that contains the result.
+			* @param [in] pUnit A pointer to the CIntermediateResultUnit object.
 			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
 			*
 			*/
-			virtual void OnPredetectedRegionsReceived(CPredetectedRegionsUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when localized barcodes have been received.
-			*
-			* @param [in] pResult A pointer to the CLocalizedBarcodesUnit object that contains the result.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnLocalizedBarcodesReceived(dbr::intermediate_results::CLocalizedBarcodesUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when decoded barcodes have been received.
-			*
-			* @param [in] pResult A pointer to the CDecodedBarcodesUnit object that contains the result.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnDecodedBarcodesReceived(dbr::intermediate_results::CDecodedBarcodesUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when localized text lines have been received.
-			*
-			* @param [in] pResult A pointer to the CLocalizedTextLinesUnit object that contains the result.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnLocalizedTextLinesReceived(dlr::intermediate_results::CLocalizedTextLinesUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when recognized text lines have been received.
-			*
-			* @param [in] pResult A pointer to the CRecognizedTextLinesUnit object that contains the result.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnRecognizedTextLinesReceived(dlr::intermediate_results::CRecognizedTextLinesUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when detected quadrilaterals have been received.
-			*
-			* @param [in] pResult A pointer to the CDetectedQuadsUnit object that contains the result.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnDetectedQuadsReceived(ddn::intermediate_results::CDetectedQuadsUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when normalized images have been received.
-			*
-			* @param [in] pResult A pointer to the CNormalizedImagesUnit object that contains the result.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnNormalizedImagesReceived(ddn::intermediate_results::CNormalizedImagesUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when colour image units have been received.
-			*
-			* @param [in] pResult A pointer to the received colour image unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnColourImageUnitReceived(CColourImageUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when scaled-down colour image units have been received.
-			*
-			* @param [in] pResult A pointer to the received scaled-down colour image unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnScaledDownColourImageUnitReceived(CScaledDownColourImageUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when grayscale image units have been received.
-			*
-			* @param [in] pResult A pointer to the received grayscale image unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnGrayscaleImageUnitReceived(CGrayscaleImageUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when transformed grayscale image units have been received.
-			*
-			* @param [in] pResult A pointer to the received transformed grayscale image unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnTransformedGrayscaleImageUnitReceived(CTransformedGrayscaleImageUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when enhanced grayscale image units have been received.
-			*
-			* @param [in] pResult A pointer to the received enhanced grayscale image unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnEnhancedGrayscaleImageUnitReceived(CEnhancedGrayscaleImageUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when binary image units have been received.
-			*
-			* @param [in] pResult A pointer to the received binary image unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnBinaryImageUnitReceived(CBinaryImageUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when texture detection result units have been received.
-			*
-			* @param [in] pResult A pointer to the received texture detection result unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnTextureDetectionResultUnitReceived(CTextureDetectionResultUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when texture-removed grayscale image units have been received.
-			*
-			* @param [in] pResult A pointer to the received texture-removed grayscale image unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnTextureRemovedGrayscaleImageUnitReceived(CTextureRemovedGrayscaleImageUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when texture-removed binary image units have been received.
-			*
-			* @param [in] pResult A pointer to the received texture-removed binary image unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnTextureRemovedBinaryImageUnitReceived(CTextureRemovedBinaryImageUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when contours units have been received.
-			*
-			* @param [in] pResult A pointer to the received contours unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnContoursUnitReceived(CContoursUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when line segments units have been received.
-			*
-			* @param [in] pResult A pointer to the received line segments unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnLineSegmentsUnitReceived(CLineSegmentsUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when text zones units have been received.
-			*
-			* @param [in] pResult A pointer to the received text zones unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnTextZonesUnitReceived(CTextZonesUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when text-removed binary image units have been received.
-			*
-			* @param [in] pResult A pointer to the received text-removed binary image unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnTextRemovedBinaryImageUnitReceived(CTextRemovedBinaryImageUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when long lines units have been received.
-			*
-			* @param [in] pResult A pointer to the received long lines unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnLongLinesUnitReceived(ddn::intermediate_results::CLongLinesUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when corners units have been received.
-			*
-			* @param [in] pResult A pointer to the received corners unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnCornersUnitReceived(ddn::intermediate_results::CCornersUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when candidate quad edges units have been received.
-			*
-			* @param [in] pResult A pointer to the received candidate quad edges unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnCandidateQuadEdgesUnitReceived(ddn::intermediate_results::CCandidateQuadEdgesUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when candidate barcode zones units have been received.
-			*
-			* @param [in] pResult A pointer to the received candidate barcode zones unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnCandidateBarcodeZonesUnitReceived(dbr::intermediate_results::CCandidateBarcodeZonesUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when scaled up barcode image units have been received.
-			*
-			* @param [in] pResult A pointer to the received scaled up barcode image unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnScaledUpBarcodeImageUnitReceived(dbr::intermediate_results::CScaledUpBarcodeImageUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when deformation resisted barcode image units have been received.
-			*
-			* @param [in] pResult A pointer to the received deformation resisted barcode image unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnDeformationResistedBarcodeImageUnitReceived(dbr::intermediate_results::CDeformationResistedBarcodeImageUnit *pResult, const IntermediateResultExtraInfo* info);
-
-			/**
-			* Called when complemented barcode image units have been received.
-			*
-			* @param [in] pResult A pointer to the received complemented barcode image unit.
-			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
-			*
-			*/
-			virtual void OnComplementedBarcodeImageUnitReceived(dbr::intermediate_results::CComplementedBarcodeImageUnit *pResult, const IntermediateResultExtraInfo* info);
-
-
-			virtual const char* GetEncryptedString();
-		};
-
-		/**
-		* The CIntermediateResultManager class manages intermediate results generated during data capturing.
-		*
-		*/
-		class DS_API CIntermediateResultManager
-		{
-		public:
-			/**
-			* Destructor
-			*/
-			virtual ~CIntermediateResultManager() {};
-
-			/**
-			* Adds an intermediate result receiver to the manager.
-			*
-			* @param [in] receiver The intermediate result receiver to add.
-			*
-			*/
-			virtual int AddResultReceiver(CIntermediateResultReceiver* receiver) = 0;
-
-			/**
-			* Removes an intermediate result receiver from the manager.
-			*
-			* @param [in] receiver The intermediate result receiver to remove.
-			*
-			*/
-			virtual int RemoveResultReceiver(CIntermediateResultReceiver* receiver) = 0;
-
-			/**
-			* Gets the original image data using an image hash id.
-			*
-			* @param [in] imageHashId The hash id of the image to retrieve.
-			*
-			* @return Returns a pointer to the CImageData object containing the original image data. You don't need to release the memory pointed to by the returned pointer.
-			*
-			*/
-			virtual CImageData* GetOriginalImage(const char* imageHashId) = 0;
+			virtual void OnUnitResultReceived(CIntermediateResultUnit *pUnit, const IntermediateResultExtraInfo* info) = 0;
 		};
 	}
 }

@@ -58,8 +58,10 @@ int main()
 		}
 	}
 
+	if (result)
+		result->Release();
 	delete cvr, cvr = NULL;
-	delete result, result = NULL;
+
 
 	cout << "Press any key to quit..." << endl;
 	cin.ignore();

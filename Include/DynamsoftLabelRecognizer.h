@@ -20,7 +20,7 @@
 
 #include "DynamsoftCore.h"
 
-#define DLR_VERSION                  "3.0.20.0925"
+#define DLR_VERSION                  "3.2.0.1227"
 
 /**Structures section*/
 
@@ -30,7 +30,7 @@
 /**
 * The SimplifiedLabelRecognizerSettings struct contains settings for label recognition. It is a sub-parameter of SimplifiedCaptureVisionSettings.
 */
-typedef struct tagSimplifiedLabelRecognizerSettings 
+typedef struct tagSimplifiedLabelRecognizerSettings
 {
 	/**Set the grayscale transformation modes with an array of enumeration GrayscaleTransformationMode.*/
 	GrayscaleTransformationMode grayscaleTransformationModes[8];
@@ -41,7 +41,7 @@ typedef struct tagSimplifiedLabelRecognizerSettings
 	/**Specify a character model by its name.*/
 	char characterModelName[64];
 
-	/**Set the RegEx pattern of the text line string to filter out the unqualified results.*/
+	/**Set the RegEx pattern of the text line string for error correction and filtering.*/
 	char lineStringRegExPattern[1024];
 
 	/**Set the maximum available threads count in one label recognition task.*/
@@ -114,12 +114,13 @@ namespace dynamsoft
 			*/
 			class DLR_API CLocalizedTextLineElement : public CRegionObjectElement
 			{
-			public:
+			protected:
 				/**
 				 * Destructor
 				 */
 				virtual ~CLocalizedTextLineElement() {};
 
+			public:
 				/**
 				* Gets the number of character quads in the text line.
 				*
@@ -154,12 +155,13 @@ namespace dynamsoft
 			*/
 			class DLR_API CRecognizedTextLineElement : public CRegionObjectElement
 			{
-			public:
+			protected:
 				/**
 				 * Destructor
 				 */
 				virtual ~CRecognizedTextLineElement() {};
 
+			public:
 				/**
 				* Gets the recognized text.
 				*
@@ -185,23 +187,28 @@ namespace dynamsoft
 				virtual int GetCharacterResultsCount() const = 0;
 
 				/**
-				* Gets the character recognition result at the specified index.
-				*
-				* @param [in] index The index of the character recognition result to retrieve.
-				* @param [out] charResult A pointer to a CCharacterResult object to store the result in.
-				*
-				* @return Returns an integer value representing the success of the operation. Zero indicates success, while any other value indicates failure.
-				*
-				*/
-				virtual int GetCharacterResult(int index, CCharacterResult* charResult) const = 0;
-
-				/**
 				* Gets the row number of the text line within the image.
 				*
 				* @return Returns an integer value representing the row number of the text line within the image.
 				*
 				*/
 				virtual int GetRowNumber() const = 0;
+
+				/**
+				* Gets the character recognition result at the specified index.
+				*
+				* @param [in] index The index of the character recognition result to retrieve.
+				* @return Returns a pointer to the character recognition result.
+				*
+				*/
+				virtual const CCharacterResult* GetCharacterResult(int index) const = 0;
+
+				/**
+				 * Sets the recognized text.
+				 *
+				 * @param text The text to be set.
+				 */
+				virtual void SetText(const char* text) = 0;
 			};
 
 			/**
@@ -210,12 +217,13 @@ namespace dynamsoft
 			*/
 			class DLR_API CLocalizedTextLinesUnit : public CIntermediateResultUnit
 			{
-			public:
+			protected:
 				/**
 				 * Destructor
 				 */
 				virtual ~CLocalizedTextLinesUnit() {};
 
+			public:
 				/**
 				* Gets the number of localized text lines in the unit.
 				*
@@ -233,6 +241,49 @@ namespace dynamsoft
 				*
 				*/
 				virtual const CLocalizedTextLineElement* GetLocalizedTextLine(int index) const = 0;
+
+				/**
+				* Gets a pointer to a specific localized text line element.
+				*
+				* @param [in] index The index of the localized text line element to retrieve.
+				*
+				* @return Returns a const pointer to the localized text line element at the specified index.
+				*
+				*/
+				virtual const CLocalizedTextLineElement* operator[](int index) const = 0;
+
+				/**
+				 * Removes all localized text lines.
+				 *
+				 */
+				virtual void RemoveAllLocalizedTextLines() = 0;
+
+				/**
+				 * Removes the localized text line at the specified index.
+				 *
+				 * @param index The index of the localized text line to remove.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int RemoveLocalizedTextLine(int index) = 0;
+
+				/**
+				 * Adds a localized text line.
+				 *
+				 * @param element The localized text line element to add.
+				 * @param matrixToOriginalImage The matrix to original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int AddLocalizedTextLine(const CLocalizedTextLineElement* element, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+
+				/**
+				 * Sets the localized text line at the specified index.
+				 *
+				 * @param index The index of the localized text line to set.
+				 * @param element The localized text line element to set.
+				 * @param matrixToOriginalImage The matrix to original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int SetLocalizedTextLine(int index, const CLocalizedTextLineElement* element, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
 			};
 
 			/**
@@ -241,12 +292,13 @@ namespace dynamsoft
 			*/
 			class DLR_API CRecognizedTextLinesUnit : public CIntermediateResultUnit
 			{
-			public:
+			protected:
 				/**
 				 * Destructor
 				 */
 				virtual ~CRecognizedTextLinesUnit() {};
 
+			public:
 				/**
 				* Gets the number of recognized text lines in the unit.
 				*
@@ -264,6 +316,31 @@ namespace dynamsoft
 				*
 				*/
 				virtual const CRecognizedTextLineElement* GetRecognizedTextLine(int index) const = 0;
+
+				/**
+				* Gets a pointer to the CRecognizedTextLineElement object at the specified index.
+				*
+				* @param [in] index The index of the desired CRecognizedTextLineElement object.
+				*
+				* @return Returns a pointer to the CRecognizedTextLineElement object at the specified index.
+				*
+				*/
+				virtual const CRecognizedTextLineElement* operator[](int index) const = 0;
+
+				/**
+				 * Removes all recognized text lines.
+				 *
+				 */
+				virtual void RemoveAllRecognizedTextLines() = 0;
+
+				/**
+				 * Sets the recognized text line.
+				 *
+				 * @param element The recognized text line element to set.
+				 * @param matrixToOriginalImage The matrix to original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int SetRecognizedTextLine(const CRecognizedTextLineElement* element, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
 			};
 		}
 
@@ -273,12 +350,13 @@ namespace dynamsoft
 		*/
 		class DLR_API CTextLineResultItem : public CCapturedResultItem
 		{
-		public:
+		protected:
 			/**
 			 * Destructor
 			 */
 			virtual ~CTextLineResultItem() {};
 
+		public:
 			/**
 			* It is used to get the text content of the text line.
 			*
@@ -315,12 +393,10 @@ namespace dynamsoft
 			* It is used to get the character result at the specified index.
 			*
 			* @param [in] index The index of the character result to get.
-			* @param [out] charResult The character result at the specified index.
-			*
-			* @return Returns 0 if successful, otherwise returns a non-zero error code.
+			* @return Returns the character result at the specified index.
 			*
 			*/
-			virtual int GetCharacterResult(int index, CCharacterResult* charResult) const = 0;
+			virtual const CCharacterResult* GetCharacterResult(int index) const = 0;
 
 		};
 
@@ -330,12 +406,13 @@ namespace dynamsoft
 		*/
 		class DLR_API CRecognizedTextLinesResult
 		{
-		public:
+		protected:
 			/**
 			 * Destructor
 			 */
 			virtual ~CRecognizedTextLinesResult() {};
 
+		public:
 			/**
 			* Gets the hash ID of the original image.
 			*
@@ -413,6 +490,29 @@ namespace dynamsoft
 			*
 			*/
 			virtual const char* GetErrorString() const = 0;
+
+			/**
+			* Gets the text line result item at the specified index.
+			*
+			* @param [in] index The zero-based index of the text line result item to retrieve.
+			*
+			* @return Returns a pointer to the CTextLineResultItem object at the specified index.
+			*
+			*/
+			virtual const CTextLineResultItem* operator[](int index) const = 0;
+
+			/**
+			 * Increases the reference count of the CRecognizedTextLinesResult object.
+			 *
+			 * @return An object of CRecognizedTextLinesResult.
+			 */
+			virtual CRecognizedTextLinesResult* Retain() = 0;
+
+			/**
+			* Decreases the reference count of the CRecognizedTextLinesResult object.
+			*
+			*/
+			virtual void Release() = 0;
 		};
 
 		/**
@@ -427,6 +527,20 @@ namespace dynamsoft
 			 * @return Returns a const char pointer representing the version of the label recognizer module.
 			 */
 			static const char* GetVersion();
+
+			/**
+			 * @brief Create a Recognized Text Line Element object
+			 *
+			 * @return An instance of CRecognizedTextLineElement
+			 */
+			static intermediate_results::CRecognizedTextLineElement* CreateRecognizedTextLineElement();
+
+			/**
+			 * @brief Create a Localized Text Line Element object
+			 *
+			 * @return An instance of CLocalizedTextLineElement
+			 */
+			static intermediate_results::CLocalizedTextLineElement* CreateLocalizedTextLineElement();
 		};
 
 	}

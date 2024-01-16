@@ -19,8 +19,68 @@
 #endif
 #include "DynamsoftCore.h"
 
-#define DDN_VERSION                  "2.0.20.0925"
+#define DDN_VERSION                  "2.2.0.1227"
 
+/**Enums section*/
+
+/**
+* @enum ImageColourMode
+*
+* Describes the output colour mode of the normalized image.
+*/
+typedef enum ImageColourMode
+{
+	/** Output image in colour mode. */
+	ICM_COLOUR = 0,
+
+	/** Output image in grayscale mode. */
+	ICM_GRAYSCALE = 1,
+
+	/** Output image in binary mode. */
+	ICM_BINARY = 2
+}ImageColourMode;
+
+/**Structures section*/
+
+#pragma pack(push)
+#pragma pack(1)
+
+/**
+* The SimplifiedDocumentNormalizerSettings struct contains settings for document normalization. It is a sub-parameter of SimplifiedCaptureVisionSettings.
+*/
+typedef struct SimplifiedDocumentNormalizerSettings
+{
+	/**Set the grayscale transformation modes with an array of enumeration GrayscaleTransformationMode.*/
+	GrayscaleTransformationMode grayscaleTransformationModes[8];
+
+	/**Set the grayscale enhancement modes with an array of enumeration GrayscaleEnhancementMode.*/
+	GrayscaleEnhancementMode grayscaleEnhancementModes[8];
+
+	/**Set the output image colour mode. Default value is ICM_COLOUR.*/
+	ImageColourMode colourMode;
+
+	/**Set the page size (width by height in pixels) of the normalized image.*/
+	int pageSize[2];
+
+	/**Set the brightness of the normalized image. Value range: [-100,100], default value: 0.*/
+	int brightness;
+
+	/**Set the contrast of the normalized image. Value range: [-100,100], default value: 0.*/
+	int contrast;
+
+	/**Set the maximum available threads count in one document normalization task.*/
+	int maxThreadsInOneTask;
+
+	/**Set the threshold for image shrinking. If the shorter edge size exceeds the specified threshold value,
+	* the library will calculate the resized height and width of the image and and perform shrinking.
+	*/
+	int scaleDownThreshold;
+
+	/**Reserved for future use.*/
+	char reserved[512];
+}SimplifiedDocumentNormalizerSettings;
+
+#pragma pack(pop)
 
 #ifdef __cplusplus
 
@@ -38,12 +98,13 @@ namespace dynamsoft
 			 */
 			class DDN_API CDetectedQuadElement : public CRegionObjectElement
 			{
-			public:
+			protected:
 				/**
 				 * Destructor
 				 */
 				virtual ~CDetectedQuadElement() {};
 
+			public:
 				/**
 				 * Gets the confidence as document boundary of current object.
 				 *
@@ -58,12 +119,13 @@ namespace dynamsoft
 			 */
 			class DDN_API CNormalizedImageElement : public CRegionObjectElement
 			{
-			public:
+			protected:
 				/**
 				 * Destructor
 				 */
 				virtual ~CNormalizedImageElement() {};
 
+			public:
 				/**
 				 * Gets the ImageData of current object.
 				 *
@@ -80,12 +142,13 @@ namespace dynamsoft
 			 */
 			class DDN_API CLongLinesUnit : public CIntermediateResultUnit
 			{
-			public:
+			protected:
 				/**
 				 * Destructor
 				 */
 				virtual ~CLongLinesUnit() {};
 
+			public:
 				/**
 				 * Gets the count of LongLine objects in current object.
 				 *
@@ -103,6 +166,49 @@ namespace dynamsoft
 				 * @see [CLineSegment]()
 				 */
 				virtual const CLineSegment* GetLongLine(int index) const = 0;
+
+				/**
+				 * Gets a LongLine object from current object by specifying an index.
+				 *
+				 * @param [in] index The index of the LongLine object.
+				 *
+				 * @return Returns the LongLine object got by the specific index.
+				 *
+				 */
+				virtual const CLineSegment* operator[](int index) const = 0;
+
+				/**
+				 * Removes all the long lines in current object.
+				 *
+				 */
+				virtual void RemoveAllLongLines() = 0;
+
+				/**
+				 * Removes a longline from current object by specifying an index.
+				 *
+				 * @param index The index of the longline to be removed.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int RemoveLongLine(int index) = 0;
+
+				/**
+				 * Adds a longline to current object.
+				 *
+				 * @param line The longline to be added.
+				 * @param matrixToOriginalImage The matrix to the original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int AddLongLine(const CLineSegment& line, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+
+				/**
+				 * @brief Set the longline at the specified index.
+				 *
+				 * @param index The index of the longline to be set.
+				 * @param line The longline to be set.
+				 * @param matrixToOriginalImage The matrix to the original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int SetLongLine(int index, const CLineSegment& line, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
 			};
 
 			/**
@@ -110,12 +216,13 @@ namespace dynamsoft
 			 */
 			class DDN_API CCornersUnit : public CIntermediateResultUnit
 			{
-			public:
+			protected:
 				/**
 				 * Destructor
 				 */
 				virtual ~CCornersUnit() {};
 
+			public:
 				/**
 				 * Gets the count of Corner objects in current object.
 				 *
@@ -135,6 +242,39 @@ namespace dynamsoft
 				 * @see ErrorCode
 				 */
 				virtual int GetCorner(int index, CCorner* corner) const = 0;
+
+				/**
+				 * Removes all the corners in current object.
+				 *
+				 */
+				virtual void RemoveAllCorners() = 0;
+
+				/**
+				 * Removes a corner from current object by specifying an index.
+				 *
+				 * @param index The index of the corner to be removed.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int RemoveCorner(int index) = 0;
+
+				/**
+				 * Adds a corner to current object.
+				 *
+				 * @param corner The corner to be added.
+				 * @param matrixToOriginalImage The matrix to the original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int AddCorner(const CCorner& corner, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+
+				/**
+				 * Sets the corner at the specified index.
+				 *
+				 * @param index The index of the corner to be set.
+				 * @param corner The corner to be set.
+				 * @param matrixToOriginalImage The matrix to the original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int SetCorner(int index, const CCorner& corner, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
 			};
 
 			/**
@@ -142,12 +282,13 @@ namespace dynamsoft
 			 */
 			class DDN_API CCandidateQuadEdgesUnit : public CIntermediateResultUnit
 			{
-			public:
+			protected:
 				/**
 				 * Destructor
 				 */
 				virtual ~CCandidateQuadEdgesUnit() {};
 
+			public:
 				/**
 				 * Gets the count of CandidateQuadEdge objects in current object.
 				 *
@@ -163,6 +304,39 @@ namespace dynamsoft
 				 * @return Returns the error code.
 				 */
 				virtual int GetCandidateQuadEdge(int index, CEdge* edge) const = 0;
+
+				/**
+				 * Removes all the candidate quad edges in current object.
+				 *
+				 */
+				virtual void RemoveAllCandidateQuadEdges() = 0;
+
+				/**
+				 * Removes a candidate quad edge from current object by specifying an index.
+				 *
+				 * @param index The index of the candidate quad edge to be removed.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int RemoveCandidateQuadEdge(int index) = 0;
+
+				/**
+				 * Adds a candidate quad edge to current object.
+				 *
+				 * @param edge The candidate quad edge to be added.
+				 * @param matrixToOriginalImage The matrix to the original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int AddCandidateQuadEdge(const CEdge& edge, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+
+				/**
+				 * Sets the candidate quad edge at the specified index.
+				 *
+				 * @param index The index of the candidate quad edge to be set.
+				 * @param edge The candidate quad edge to be set.
+				 * @param matrixToOriginalImage The matrix to the original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int SetCandidateQuadEdge(int index, const CEdge& edge, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
 			};
 
 			/**
@@ -170,12 +344,13 @@ namespace dynamsoft
 			 */
 			class DDN_API CDetectedQuadsUnit : public CIntermediateResultUnit
 			{
-			public:
+			protected:
 				/**
 				 * Destructor
 				 */
 				virtual ~CDetectedQuadsUnit() {};
 
+			public:
 				/**
 				 * Gets the count of DetectedQuad objects in current object.
 				 *
@@ -194,6 +369,49 @@ namespace dynamsoft
 				 * @see CDetectedQuadElement
 				 */
 				virtual const CDetectedQuadElement* GetDetectedQuad(int index) const = 0;
+
+				/**
+				 * Gets a DetectedQuad object from current object by specifying a index.
+				 *
+				 * @param index The index of the DetectedQuad object.
+				 *
+				 * @return Returns the DetectedQuad object got by the specific index.
+				 *
+				 */
+				virtual const CDetectedQuadElement* operator[](int index) const = 0;
+
+				/**
+				 * Removes all the detected quads in current object.
+				 *
+				 */
+				virtual void RemoveAllDetectedQuads() = 0;
+
+				/**
+				 * Removes a detected quad from current object by specifying an index.
+				 *
+				 * @param index The index of the detected quad to be removed.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int RemoveDetectedQuad(int index) = 0;
+
+				/**
+				 * Adds a detected quad to current object.
+				 *
+				 * @param element The detected quad to be added.
+				 * @param matrixToOriginalImage The matrix to the original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int AddDetectedQuad(const CDetectedQuadElement* element, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+
+				/**
+				 * Sets the detected quad at the specified index.
+				 *
+				 * @param index The index of the detected quad to be set.
+				 * @param element The detected quad to be set.
+				 * @param matrixToOriginalImage The matrix to the original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int SetDetectedQuad(int index, const CDetectedQuadElement* element, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
 			};
 
 			/**
@@ -201,12 +419,13 @@ namespace dynamsoft
 			 */
 			class DDN_API CNormalizedImagesUnit : public CIntermediateResultUnit
 			{
-			public:
+			protected:
 				/**
 				 * Destructor
 				 */
 				virtual ~CNormalizedImagesUnit() {};
 
+			public:
 				/**
 				 * Gets the count of CNormalizedImageElement objects in current object.
 				 *
@@ -225,6 +444,31 @@ namespace dynamsoft
 				 * @see CNormalizedImageElement
 				 */
 				virtual const CNormalizedImageElement* GetNormalizedImage(int index) const = 0;
+
+				/**
+				 * Gets a NormalizedImage object from current object by specifying a index.
+				 *
+				 * @param index The index of the NormalizedImage object.
+				 *
+				 * @return Returns the NormalizedImage object got by the specific index.
+				 *
+				 */
+				virtual const CNormalizedImageElement* operator[](int index) const = 0;
+
+				/**
+				 * Removes all the normalized images in current object.
+				 *
+				 */
+				virtual void RemoveAllNormalizedImages() = 0;
+
+				/**
+				 * Sets the normalized image.
+				 *
+				 * @param element The normalized image to be set.
+				 * @param matrixToOriginalImage The matrix to the original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int SetNormalizedImage(const CNormalizedImageElement* element, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
 			};
 		}
 
@@ -234,12 +478,13 @@ namespace dynamsoft
 		 */
 		class DDN_API CDetectedQuadResultItem : public CCapturedResultItem
 		{
-		public:
+		protected:
 			/**
 			 * Destructor
 			 */
 			virtual ~CDetectedQuadResultItem() {};
 
+		public:
 			/**
 			 * Gets the location of current object.
 			 *
@@ -265,12 +510,13 @@ namespace dynamsoft
 		 */
 		class DDN_API CNormalizedImageResultItem : public CCapturedResultItem
 		{
-		public:
+		protected:
 			/**
 			 * Destructor
 			 */
 			virtual ~CNormalizedImageResultItem() {};
 
+		public:
 			/**
 			 * Gets the ImageData of current object.
 			 *
@@ -298,12 +544,13 @@ namespace dynamsoft
 		 */
 		class DDN_API CDetectedQuadsResult
 		{
-		public:
+		protected:
 			/**
 			 * Destructor
 			 */
 			virtual ~CDetectedQuadsResult() {}
 
+		public:
 			/**
 			 * Gets the hash ID of the original image.
 			 *
@@ -387,6 +634,29 @@ namespace dynamsoft
 			 *
 			 */
 			virtual const char* GetErrorString()const = 0;
+
+			/**
+			 * Gets the detected quadrilateral item at a specified index.
+			 *
+			 * @param [in] index The index of the detected quadrilateral to retrieve.
+			 *
+			 * @return Returns a pointer to a CDetectedQuadResultItem object that represents the detected quadrilateral at the specified index.
+			 *
+			 */
+			virtual const CDetectedQuadResultItem* operator[](int index) const = 0;
+
+			/**
+			 * Increases the reference count of the CDetectedQuadsResult object.
+			 *
+			 * @return An object of CDetectedQuadsResult.
+			 */
+			virtual CDetectedQuadsResult* Retain() = 0;
+
+			/**
+			 * Decreases the reference count of the CDetectedQuadsResult object.
+			 *
+			 */
+			virtual void Release() = 0;
 		};
 
 		/**
@@ -395,12 +665,13 @@ namespace dynamsoft
 		 */
 		class DDN_API CNormalizedImagesResult
 		{
-		public:
+		protected:
 			/**
 			 * Destructor
 			 */
 			virtual ~CNormalizedImagesResult() {};
 
+		public:
 			/**
 			 * Gets the hash ID of the original image that was normalized.
 			 *
@@ -484,6 +755,29 @@ namespace dynamsoft
 			 *
 			 */
 			virtual const char* GetErrorString()const = 0;
+
+			/**
+			 * Gets a specific normalized image from the result.
+			 *
+			 * @param [in] index The index of the normalized image to get.
+			 *
+			 * @return Returns a pointer to the normalized image at the specified index. If the index is out of range, returns nullptr.
+			 *
+			 */
+			virtual const CNormalizedImageResultItem* operator[](int index) const = 0;
+
+			/**
+			 * Increases the reference count of the CNormalizedImagesResult object.
+			 *
+			 * @return An object of CNormalizedImagesResult.
+			 */
+			virtual CNormalizedImagesResult* Retain() = 0;
+
+			/**
+			 * Decreases the reference count of the CNormalizedImagesResult object.
+			 *
+			 */
+			virtual void Release() = 0;
 		};
 
 		/**
@@ -498,6 +792,20 @@ namespace dynamsoft
 			 * @return Returns a const char pointer representing the version of the document normalizer module.
 			 */
 			static const char* GetVersion();
+
+			/**
+			 * Create a Normalized Image Element object
+			 *
+			 * @return An object of CNormalizedImageElement
+			 */
+			static intermediate_results::CNormalizedImageElement* CreateNormalizedImageElement();
+
+			/**
+			 * Create a Detected Quad Element object
+			 *
+			 * @return An object of CDetectedQuadElement
+			 */
+			static intermediate_results::CDetectedQuadElement* CreateDetectedQuadElement();
 		};
 		
 	}

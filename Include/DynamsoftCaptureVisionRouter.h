@@ -1,7 +1,13 @@
 #pragma once
 
 #if !defined(_WIN32) && !defined(_WIN64)
+
+#ifdef __EMSCRIPTEN__
+#define CVR_API __attribute__((used))
+#else
 #define CVR_API __attribute__((visibility("default")))
+#endif
+
 #include <stddef.h>
 #else
 #ifdef CVR_EXPORTS
@@ -18,9 +24,8 @@
 #include "DynamsoftDocumentNormalizer.h"
 #include "DynamsoftCodeParser.h"
 #include "DynamsoftLicense.h"
-#include "DynamsoftUtility.h"
 
-#define DCV_VERSION                  "2.0.20.0925"
+#define DCV_VERSION                  "2.2.0.1227"
 
 /**Enumeration section*/
 
@@ -35,7 +40,13 @@ typedef enum CaptureState
 	CS_STARTED,
 
 	/**The data capturing is stopped.*/
-	CS_STOPPED
+	CS_STOPPED,
+
+	/**The data capturing is paused.*/
+	CS_PAUSED,
+
+	/**The data capturing is resumed.*/
+	CS_RESUMED
 } CaptureState;
 
 /**
@@ -59,19 +70,18 @@ typedef enum ImageSourceState
 /**
 * The `SimplifiedCaptureVisionSettings` struct contains settings for capturing and recognizing images with the `CCaptureVisionRouter` class.
 */
-typedef struct tagSimplifiedCaptureVisionSettings 
+typedef struct tagSimplifiedCaptureVisionSettings
 {
 	/**
 	 * Specifies the type(s) of CapturedItem(s) that will be captured.
 	 *
-	 * @values The value should be a bitwise OR combination of one or more of the following constants:
-	 *         `DCV_CAPTURED_ITEM_TYPE_BARCODE`
-	 *         `DCV_CAPTURED_ITEM_TYPE_LABEL`
+	 * @values The value should be a bitwise OR combination of one or more CapturedResultItemType
 	 */
 	int capturedResultItemTypes;
 
 	/**
 	 * Specifies the region of interest (ROI) where the image capture and recognition will take place.
+	 * Default is [[0,0],[100,0],[100,100],[0,100]]
 	 */
 	CQuadrilateral roi;
 
@@ -120,15 +130,20 @@ typedef struct tagSimplifiedCaptureVisionSettings
 	int minImageCaptureInterval;
 
 	/**
+	 * Specifies the settings for document normalization.
+	 */
+	SimplifiedDocumentNormalizerSettings documentSettings;
+
+	/**
 	 * Reserved for future use.
 	 */
-	char reserved[2044];
+	char reserved[1440];
 
 } SimplifiedCaptureVisionSettings;
 
 #pragma pack(pop)
 
-/**C API section*/
+/**C++ API section*/
 #ifdef __cplusplus
 
 using namespace dynamsoft::basic_structures;
@@ -140,6 +155,528 @@ namespace dynamsoft
 {
 	namespace cvr
 	{
+		/**
+		* The `CIntermediateResultReceiver` class is responsible for receiving intermediate results of different types.
+		* It provides virtual functions for each type of result, which are called when the corresponding result is received.
+		*/
+		class CVR_API CIntermediateResultReceiver : public CAbstractIntermediateResultReceiver
+		{
+		protected:
+			/**
+			* Constructor
+			*/
+			CIntermediateResultReceiver();
+
+		public:
+			/**
+			* Destructor
+			*/
+			virtual ~CIntermediateResultReceiver();
+
+			/**
+			* Called when a task result has been received.
+			*
+			* @param [in] pResult A pointer to the CIntermediateResult object that contains several result units.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnTaskResultsReceived(CIntermediateResult *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when predetected regions have been received.
+			*
+			* @param [in] pResult A pointer to the CPredetectedRegionsUnit object that contains the result.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnPredetectedRegionsReceived(CPredetectedRegionsUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when localized barcodes have been received.
+			*
+			* @param [in] pResult A pointer to the CLocalizedBarcodesUnit object that contains the result.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnLocalizedBarcodesReceived(dbr::intermediate_results::CLocalizedBarcodesUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when decoded barcodes have been received.
+			*
+			* @param [in] pResult A pointer to the CDecodedBarcodesUnit object that contains the result.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnDecodedBarcodesReceived(dbr::intermediate_results::CDecodedBarcodesUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when localized text lines have been received.
+			*
+			* @param [in] pResult A pointer to the CLocalizedTextLinesUnit object that contains the result.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnLocalizedTextLinesReceived(dlr::intermediate_results::CLocalizedTextLinesUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when recognized text lines have been received.
+			*
+			* @param [in] pResult A pointer to the CRecognizedTextLinesUnit object that contains the result.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnRecognizedTextLinesReceived(dlr::intermediate_results::CRecognizedTextLinesUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when detected quadrilaterals have been received.
+			*
+			* @param [in] pResult A pointer to the CDetectedQuadsUnit object that contains the result.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnDetectedQuadsReceived(ddn::intermediate_results::CDetectedQuadsUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when normalized images have been received.
+			*
+			* @param [in] pResult A pointer to the CNormalizedImagesUnit object that contains the result.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnNormalizedImagesReceived(ddn::intermediate_results::CNormalizedImagesUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when colour image units have been received.
+			*
+			* @param [in] pResult A pointer to the received colour image unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnColourImageUnitReceived(CColourImageUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when scaled-down colour image units have been received.
+			*
+			* @param [in] pResult A pointer to the received scaled-down colour image unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnScaledDownColourImageUnitReceived(CScaledDownColourImageUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when grayscale image units have been received.
+			*
+			* @param [in] pResult A pointer to the received grayscale image unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnGrayscaleImageUnitReceived(CGrayscaleImageUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when transformed grayscale image units have been received.
+			*
+			* @param [in] pResult A pointer to the received transformed grayscale image unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnTransformedGrayscaleImageUnitReceived(CTransformedGrayscaleImageUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when enhanced grayscale image units have been received.
+			*
+			* @param [in] pResult A pointer to the received enhanced grayscale image unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnEnhancedGrayscaleImageUnitReceived(CEnhancedGrayscaleImageUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when binary image units have been received.
+			*
+			* @param [in] pResult A pointer to the received binary image unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnBinaryImageUnitReceived(CBinaryImageUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when texture detection result units have been received.
+			*
+			* @param [in] pResult A pointer to the received texture detection result unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnTextureDetectionResultUnitReceived(CTextureDetectionResultUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when texture-removed grayscale image units have been received.
+			*
+			* @param [in] pResult A pointer to the received texture-removed grayscale image unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnTextureRemovedGrayscaleImageUnitReceived(CTextureRemovedGrayscaleImageUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when texture-removed binary image units have been received.
+			*
+			* @param [in] pResult A pointer to the received texture-removed binary image unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnTextureRemovedBinaryImageUnitReceived(CTextureRemovedBinaryImageUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when contours units have been received.
+			*
+			* @param [in] pResult A pointer to the received contours unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnContoursUnitReceived(CContoursUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when short lines units have been received.
+			*
+			* @param [in] pResult A pointer to the received short lines unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnShortLinesUnitReceived(CShortLinesUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when line segments units have been received.
+			*
+			* @param [in] pResult A pointer to the received line segments unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnLineSegmentsUnitReceived(CLineSegmentsUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when text zones units have been received.
+			*
+			* @param [in] pResult A pointer to the received text zones unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnTextZonesUnitReceived(CTextZonesUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when text-removed binary image units have been received.
+			*
+			* @param [in] pResult A pointer to the received text-removed binary image unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnTextRemovedBinaryImageUnitReceived(CTextRemovedBinaryImageUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when long lines units have been received.
+			*
+			* @param [in] pResult A pointer to the received long lines unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnLongLinesUnitReceived(ddn::intermediate_results::CLongLinesUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when corners units have been received.
+			*
+			* @param [in] pResult A pointer to the received corners unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnCornersUnitReceived(ddn::intermediate_results::CCornersUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when candidate quad edges units have been received.
+			*
+			* @param [in] pResult A pointer to the received candidate quad edges unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnCandidateQuadEdgesUnitReceived(ddn::intermediate_results::CCandidateQuadEdgesUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when candidate barcode zones units have been received.
+			*
+			* @param [in] pResult A pointer to the received candidate barcode zones unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnCandidateBarcodeZonesUnitReceived(dbr::intermediate_results::CCandidateBarcodeZonesUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when scaled up barcode image units have been received.
+			*
+			* @param [in] pResult A pointer to the received scaled up barcode image unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnScaledUpBarcodeImageUnitReceived(dbr::intermediate_results::CScaledUpBarcodeImageUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when deformation resisted barcode image units have been received.
+			*
+			* @param [in] pResult A pointer to the received deformation resisted barcode image unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnDeformationResistedBarcodeImageUnitReceived(dbr::intermediate_results::CDeformationResistedBarcodeImageUnit *pResult, const IntermediateResultExtraInfo* info);
+
+			/**
+			* Called when complemented barcode image units have been received.
+			*
+			* @param [in] pResult A pointer to the received complemented barcode image unit.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			*/
+			virtual void OnComplementedBarcodeImageUnitReceived(dbr::intermediate_results::CComplementedBarcodeImageUnit *pResult, const IntermediateResultExtraInfo* info);
+
+
+			virtual const char* GetEncryptedString();
+
+			virtual void OnUnitResultReceived(CIntermediateResultUnit *pUnit, const IntermediateResultExtraInfo* info) final;
+		};
+
+		/**
+		* The CIntermediateResultManager class manages intermediate results generated during data capturing.
+		*
+		*/
+		class CVR_API CIntermediateResultManager
+		{
+		public:
+			/**
+			* Destructor
+			*/
+			virtual ~CIntermediateResultManager() {};
+
+			/**
+			* Adds an intermediate result receiver to the manager.
+			*
+			* @param [in] receiver The intermediate result receiver to add.
+			*
+			*/
+			virtual int AddResultReceiver(CIntermediateResultReceiver* receiver) = 0;
+
+			/**
+			* Removes an intermediate result receiver from the manager.
+			*
+			* @param [in] receiver The intermediate result receiver to remove.
+			*
+			*/
+			virtual int RemoveResultReceiver(CIntermediateResultReceiver* receiver) = 0;
+
+			/**
+			* Gets the original image data using an image hash id.
+			*
+			* @param [in] imageHashId The hash id of the image to retrieve.
+			*
+			* @return Returns a pointer to the CImageData object containing the original image data. You don't need to release the memory pointed to by the returned pointer.
+			*
+			*/
+			virtual CImageData* GetOriginalImage(const char* imageHashId) = 0;
+		};
+
+		/**
+		* The `CCapturedResultReceiver` class is responsible for receiving captured results. It contains several callback functions for different types of results, including original image, decoded barcodes, recognized text lines, detected quads, normalized images, and parsed results.
+		*/
+		class CVR_API CCapturedResultReceiver
+		{
+		protected:
+			unsigned int observedResultItemTypes;
+			const char* name;
+
+			/**
+			* Constructor.
+			*/
+			CCapturedResultReceiver();
+
+		public:
+			/**
+			* Destructor.
+			*/
+			virtual ~CCapturedResultReceiver();
+
+			/**
+			* Gets the types of observed result items.
+			*
+			* @return Returns the types of observed result items.
+			*
+			*/
+			unsigned int GetObservedResultItemTypes();
+
+			/**
+			* Gets the name of the captured result receiver.
+			*
+			* @return Returns the name of the captured result receiver.
+			*
+			*/
+			const char* GetName() const;
+
+			/**
+			* Sets the name of the captured result receiver.
+			*
+			* @param [in] name The name of the captured result receiver.
+			*
+			*/
+			void SetName(const char* name);
+
+			/**
+			* Callback function for all captured results. It will be called once for each captured result.
+			*
+			* @param [in] pResult The captured result.
+			*
+			*/
+			virtual void OnCapturedResultReceived(CCapturedResult* pResult);
+
+			/**
+			* Callback function for original image results. It will be called once for each original image result.
+			*
+			* @param [in] pResult The original image result.
+			*
+			*/
+			virtual void OnOriginalImageResultReceived(COriginalImageResultItem* pResult);
+
+			/**
+			* Callback function for decoded barcodes results. It will be called once for each decoded barcodes result.
+			*
+			* @param [in] pResult The decoded barcodes result.
+			*
+			*/
+			virtual void OnDecodedBarcodesReceived(dbr::CDecodedBarcodesResult* pResult);
+
+			/**
+			* Callback function for recognized text lines results. It will be called once for each recognized text lines result.
+			*
+			* @param [in] pResult The recognized text lines result.
+			*
+			*/
+			virtual void OnRecognizedTextLinesReceived(dlr::CRecognizedTextLinesResult* pResult);
+
+			/**
+			* Callback function for detected quads results. It will be called once for each detected quads result.
+			*
+			* @param [in] pResult The detected quads result.
+			*
+			*/
+			virtual void OnDetectedQuadsReceived(ddn::CDetectedQuadsResult* pResult);
+
+			/**
+			* Callback function for normalized images results. It will be called once for each normalized images result.
+			*
+			* @param [in] pResult The normalized images result.
+			*
+			*/
+			virtual void OnNormalizedImagesReceived(ddn::CNormalizedImagesResult* pResult);
+
+			/**
+			* Callback function for parsed results. It will be called once for each parsed result.
+			*
+			* @param [in] pResult The parsed result.
+			*
+			*/
+			virtual void OnParsedResultsReceived(dcp::CParsedResult* pResult);
+
+		};
+
+		/**
+		* The `CCapturedResultFilter` class is responsible for filtering captured results. It contains several callback functions for different types of results, including original image, decoded barcodes, recognized text lines, detected quads, normalized images, and parsed results.
+		*/
+		class CVR_API CCapturedResultFilter
+		{
+		protected:
+			unsigned int filteredResultItemTypes;
+			const char* name;
+
+			/**
+			* Constructor.
+			*/
+			CCapturedResultFilter();
+
+		public:
+			/**
+			* Destructor.
+			*/
+			virtual ~CCapturedResultFilter();
+
+			/**
+			* Gets the types of filtered result items.
+			*
+			* @return Returns the types of filtered result items.
+			*
+			*/
+			unsigned int GetFilteredResultItemTypes();
+
+			/**
+			* Gets the name of the captured result filter.
+			*
+			* @return Returns the name of the captured result filter.
+			*
+			*/
+			const char* GetName() const;
+
+			/**
+			* Sets the name of the captured result filter.
+			*
+			* @param [in] name The name of the captured result filter.
+			*
+			*/
+			void SetName(const char* name);
+
+			/**
+			* Callback function for original image results. It will be called once for each original image result.
+			*
+			* @param [in] pResult The original image result.
+			*
+			*/
+			virtual void OnOriginalImageResultReceived(COriginalImageResultItem* pResult);
+
+			/**
+			* Callback function for decoded barcodes results. It will be called once for each decoded barcodes result.
+			*
+			* @param [in] pResult The decoded barcodes result.
+			*
+			*/
+			virtual void OnDecodedBarcodesReceived(dbr::CDecodedBarcodesResult* pResult);
+
+			/**
+			* Callback function for recognized text lines results. It will be called once for each recognized text lines result.
+			*
+			* @param [in] pResult The recognized text lines result.
+			*
+			*/
+			virtual void OnRecognizedTextLinesReceived(dlr::CRecognizedTextLinesResult* pResult);
+
+			/**
+			* Callback function for detected quads results. It will be called once for each detected quads result.
+			*
+			* @param [in] pResult The detected quads result.
+			*
+			*/
+			virtual void OnDetectedQuadsReceived(ddn::CDetectedQuadsResult* pResult);
+
+			/**
+			* Callback function for normalized images results. It will be called once for each normalized images result.
+			*
+			* @param [in] pResult The normalized images result.
+			*
+			*/
+			virtual void OnNormalizedImagesReceived(ddn::CNormalizedImagesResult* pResult);
+
+			/**
+			* Callback function for parsed results. It will be called once for each parsed result.
+			*
+			* @param [in] pResult The parsed result.
+			*
+			*/
+			virtual void OnParsedResultsReceived(dcp::CParsedResult* pResult);
+
+			virtual void ClearStatus();
+
+		};
+
 		/**
 		* The CCaptureStateListener class is an abstract class that defines a listener for capture state changes.
 		*
@@ -472,7 +1009,7 @@ namespace dynamsoft
 			int RemoveCaptureStateListener(CCaptureStateListener* listener);
 
 			/**
-			* Starts to process images consecutively.
+			* Starts to capture meaningful information such as barcodes, labels, document borders, etc. from images consecutively.
 			*
 			* @param [in] templateName Specifies a template to use for capturing. If not specified, an empty string is used which means the factory default template.
 			*
@@ -488,13 +1025,11 @@ namespace dynamsoft
 			int StartCapturing(const char* templateName = "", bool waitForThreadExit = false, char errorMsgBuffer[] = NULL, const int errorMsgBufferLen = 0);
 
 			/**
-			* Stops the multiple-file processing.
+			* Stops the capture process.
 			*
 			* @param [in] waitForRemainingTasks Indicates whether to wait for the remaining tasks to complete before returning. The default value is true.
 			*
 			* @param [in] waitForThreadExit Indicates whether to wait for the capture process to complete before returning. The default value is false.
-			*
-			* @return None.
 			*
 			*/
 			void StopCapturing(bool waitForRemainingTasks = true, bool waitForThreadExit = false);
@@ -514,6 +1049,18 @@ namespace dynamsoft
 			*
 			*/
 			CIntermediateResultManager* GetIntermediateResultManager();
+
+			/**
+			* Pauses the capture process. The current thread will be blocked until the capture process is resumed.
+			*
+			*/
+			void PauseCapturing();
+
+			/**
+			* Resumes the capture process. The current thread will be unblocked after the capture process is resumed.
+			*
+			*/
+			void ResumeCapturing();
 
 		private:
 			CCaptureVisionRouter(const CCaptureVisionRouter& r);
