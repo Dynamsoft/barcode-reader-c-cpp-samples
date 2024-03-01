@@ -1,6 +1,6 @@
 #pragma once
 
-#define DYNAMSOFT_LICENSE_VERSION "3.2.0.1227"
+#define DYNAMSOFT_LICENSE_VERSION "3.2.10.0220"
 
 #if !defined(_WIN32) && !defined(_WIN64)
 #define LIC_API __attribute__((visibility("default")))

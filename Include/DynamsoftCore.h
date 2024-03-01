@@ -1,5 +1,5 @@
 #pragma once
-#define DYNAMSOFT_CORE_VERSION "3.2.0.1227"
+#define DYNAMSOFT_CORE_VERSION "3.2.10.0220"
 
 /**Enumeration section*/
 
@@ -176,6 +176,12 @@ typedef enum ErrorCode {
 
 	/**The section level result is irreplaceable.*/
 	EC_SECTION_LEVEL_RESULT_IRREPLACEABLE = -10072,
+	
+	/**The axis definition is incorrect.*/
+	EC_AXIS_DEFINITION_INCORRECT = -10073,
+
+	/**The result is not replaceable due to type mismatch.*/
+	EC_RESULT_TYPE_MISMATCH_IRREPLACEABLE = -10074,
 
 	/** -20000~-29999: DLS license error code. */
 	/**No license.*/
@@ -210,6 +216,9 @@ typedef enum ErrorCode {
 
 	/**The license is not valid for current version*/
 	EC_LICENSE_VERSION_NOT_MATCH = -20011,
+
+	/**Online license validation failed due to network issues.Using cached license information for validation.*/
+	EC_LICENSE_CACHE_USED = -20012,
 
 	/**Failed to reach License Server.*/
 	EC_FAILED_TO_REACH_DLS = -20200,
@@ -1822,120 +1831,6 @@ namespace dynamsoft
 		};
 
 		/**
-		* The CCapturedResult class represents the result of a capture operation on an image. Internally, CaptureResult stores an array that contains multiple items, each of which may be a barcode, text line, detected quad, normalized image, original image, parsed item, etc.
-		*/
-		class DS_API CCapturedResult
-		{
-		protected:
-			/**
-			* Destructor
-			*/
-			virtual ~CCapturedResult() {};
-
-		public:
-			/**
-			* Gets the hash ID of the original image.
-			*
-			* @return Returns the hash ID of the original image as a null-terminated string. You are not required to release the memory pointed to by the returned pointer.
-			*
-			*/
-			virtual const char* GetOriginalImageHashId() const = 0;
-
-			/**
-			 * Gets a pointer to the CImageTag object containing the tag of the original image.
-			 *
-			 * @return Returns a pointer to the CImageTag object containing the tag of the original image. You are not required to release the memory pointed to by the returned pointer.
-			 *
-			 */
-			virtual const CImageTag* GetOriginalImageTag() const = 0;
-
-			/**
-			 * Get the rotation transformation matrix of the original image relative to the rotated image.
-			 *
-			 * @param [out] matrix A double array which represents the rotation transform matrix.
-			 *
-			 */
-			virtual void GetRotationTransformMatrix(double matrix[9]) const = 0;
-
-			/**
-			 * Gets the number of items in the captured result.
-			 *
-			 * @return Returns the number of items in the captured result.
-			 *
-			 */
-			virtual int GetItemsCount() const = 0;
-
-			/**
-			 * Gets a pointer to the CCapturedResultItem object at the specified index.
-			 *
-			 * @param [in] index The index of the item to retrieve.
-			 *
-			 * @return Returns a pointer to the CCapturedResultItem object at the specified index.
-			 *
-			 */
-			virtual const CCapturedResultItem* GetItem(int index) const = 0;
-
-			/**
-			 * Remove a specific item from the array in the captured result.
-			 *
-			 * @param [in] item The specific item to remove.
-			 *
-			 * @return Returns value indicating whether the deletion was successful or not.
-			 *
-			 */
-			virtual int RemoveItem(const CCapturedResultItem* item) = 0;
-
-			/**
-			 * Check if the item is present in the array.
-			 *
-			 * @param [in] item The specific item to check.
-			 *
-			 * @return Returns a bool value indicating whether the item is present in the array or not.
-			 *
-			 */
-			virtual bool HasItem(const CCapturedResultItem* item) const = 0;
-
-			/**
-			 * Gets the error code of the capture operation.
-			 *
-			 * @return Returns the error code of the capture operation.
-			 *
-			 */
-			virtual int GetErrorCode() const = 0;
-
-			/**
-			 * Gets the error message of the capture operation as a null-terminated string.
-			 *
-			 * @return Returns the error message of the capture operation as a null-terminated string. You are not required to release the memory pointed to by the returned pointer.
-			 *
-			 */
-			virtual const char* GetErrorString() const = 0;
-
-			/**
-			 * Gets a pointer to the CCapturedResultItem object at the specified index.
-			 *
-			 * @param [in] index The index of the item to retrieve.
-			 *
-			 * @return Returns a pointer to the CCapturedResultItem object at the specified index.
-			 *
-			 */
-			virtual const CCapturedResultItem* operator[](int index) const = 0;
-
-			/**
-			 * Increases the reference count of the CCapturedResult object.
-			 *
-			 * @return An object of CCapturedResult.
-			 */
-			virtual CCapturedResult* Retain() = 0;
-
-			/**
-			* Decreases the reference count of the CCapturedResult object.
-			*
-			*/
-			virtual void Release() = 0;
-		};
-
-		/**
 		* The `COriginalImageResultItem` class represents a captured original image result item. It is a derived class of `CCapturedResultItem` and provides an interface to get the image data.
 		*/
 		class DS_API COriginalImageResultItem : public CCapturedResultItem
@@ -1964,6 +1859,10 @@ namespace dynamsoft
 		*/
 		class DS_API CImageSourceErrorListener {
 		public:
+			/**
+			* Destructor
+			*/
+			virtual ~CImageSourceErrorListener() {};
 
 			/**
 			* Called when an error is received from the image source.

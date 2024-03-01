@@ -25,7 +25,7 @@
 #include "DynamsoftCodeParser.h"
 #include "DynamsoftLicense.h"
 
-#define DCV_VERSION                  "2.2.0.1227"
+#define DCV_VERSION                  "2.2.10.0220"
 
 /**Enumeration section*/
 
@@ -155,6 +155,160 @@ namespace dynamsoft
 {
 	namespace cvr
 	{
+		/**
+		* The CCapturedResult class represents the result of a capture operation on an image. Internally, CaptureResult stores an array that contains multiple items, each of which may be a barcode, text line, detected quad, normalized image, original image, parsed item, etc.
+		*/
+		class CVR_API CCapturedResult
+		{
+		protected:
+			/**
+			* Destructor
+			*/
+			virtual ~CCapturedResult() {};
+
+		public:
+			/**
+			* Gets the hash ID of the original image.
+			*
+			* @return Returns the hash ID of the original image as a null-terminated string. You are not required to release the memory pointed to by the returned pointer.
+			*
+			*/
+			virtual const char* GetOriginalImageHashId() const = 0;
+
+			/**
+			 * Gets a pointer to the CImageTag object containing the tag of the original image.
+			 *
+			 * @return Returns a pointer to the CImageTag object containing the tag of the original image. You are not required to release the memory pointed to by the returned pointer.
+			 *
+			 */
+			virtual const CImageTag* GetOriginalImageTag() const = 0;
+
+			/**
+			 * Get the rotation transformation matrix of the original image relative to the rotated image.
+			 *
+			 * @param [out] matrix A double array which represents the rotation transform matrix.
+			 *
+			 */
+			virtual void GetRotationTransformMatrix(double matrix[9]) const = 0;
+
+			/**
+			 * Gets the number of items in the captured result.
+			 *
+			 * @return Returns the number of items in the captured result.
+			 *
+			 */
+			virtual int GetItemsCount() const = 0;
+
+			/**
+			 * Gets a pointer to the CCapturedResultItem object at the specified index.
+			 *
+			 * @param [in] index The index of the item to retrieve.
+			 *
+			 * @return Returns a pointer to the CCapturedResultItem object at the specified index.
+			 *
+			 */
+			virtual const CCapturedResultItem* GetItem(int index) const = 0;
+
+			/**
+			 * Remove a specific item from the array in the captured result.
+			 *
+			 * @param [in] item The specific item to remove.
+			 *
+			 * @return Returns value indicating whether the deletion was successful or not.
+			 *
+			 */
+			virtual int RemoveItem(const CCapturedResultItem* item) = 0;
+
+			/**
+			 * Check if the item is present in the array.
+			 *
+			 * @param [in] item The specific item to check.
+			 *
+			 * @return Returns a bool value indicating whether the item is present in the array or not.
+			 *
+			 */
+			virtual bool HasItem(const CCapturedResultItem* item) const = 0;
+
+			/**
+			 * Gets the error code of the capture operation.
+			 *
+			 * @return Returns the error code of the capture operation.
+			 *
+			 */
+			virtual int GetErrorCode() const = 0;
+
+			/**
+			 * Gets the error message of the capture operation as a null-terminated string.
+			 *
+			 * @return Returns the error message of the capture operation as a null-terminated string. You are not required to release the memory pointed to by the returned pointer.
+			 *
+			 */
+			virtual const char* GetErrorString() const = 0;
+
+			/**
+			 * Gets a pointer to the CCapturedResultItem object at the specified index.
+			 *
+			 * @param [in] index The index of the item to retrieve.
+			 *
+			 * @return Returns a pointer to the CCapturedResultItem object at the specified index.
+			 *
+			 */
+			virtual const CCapturedResultItem* operator[](int index) const = 0;
+
+			/**
+			 * Increases the reference count of the CCapturedResult object.
+			 *
+			 * @return An object of CCapturedResult.
+			 */
+			virtual CCapturedResult* Retain() = 0;
+
+			/**
+			* Decreases the reference count of the CCapturedResult object.
+			*
+			*/
+			virtual void Release() = 0;
+
+			/**
+			 * Gets the decoded barcode items from the `CCapturedResult`.
+			 *
+			 * @return Returns a pointer to the CDecodedBarcodesResult object containing the decoded barcode items.
+			 * @remark Do not forget to release the memory pointed to by the returned pointer.
+			 */
+			virtual dbr::CDecodedBarcodesResult* GetDecodedBarcodesResult() const = 0;
+
+			/**
+			 * Gets the recognized text line items from the `CCapturedResult`.
+			 *
+			 * @return Returns a pointer to the CRecognizedTextLinesResult object containing the recognized text line items.
+			 * @remark Do not forget to release the memory pointed to by the returned pointer.
+			 */
+			virtual dlr::CRecognizedTextLinesResult* GetRecognizedTextLinesResult() const = 0;
+
+			/**
+			 * Gets the detected quads items from the `CCapturedResult`.
+			 *
+			 * @return Returns a pointer to the CDetectedQuadsResult object containing the detected quads items.
+			 * @remark Do not forget to release the memory pointed to by the returned pointer.
+			 */
+			virtual ddn::CDetectedQuadsResult* GetDetectedQuadsResult() const = 0;
+
+			/**
+			 * Gets the normalized images items from the `CCapturedResult`.
+			 *
+			 * @return Returns a pointer to the CNormalizedImagesResult object containing the normalized images items.
+			 * @remark Do not forget to release the memory pointed to by the returned pointer.
+			 */
+			virtual ddn::CNormalizedImagesResult* GetNormalizedImagesResult() const = 0;
+
+			/**
+			 * Gets the parsed result items from the `CCapturedResult`.
+			 *
+			 * @return Returns a pointer to the CParsedResult object containing the parsed result items.
+			 * @remark Do not forget to release the memory pointed to by the returned pointer.
+			 */
+			virtual dcp::CParsedResult* GetParsedResult() const = 0;
+		};
+
 		/**
 		* The `CIntermediateResultReceiver` class is responsible for receiving intermediate results of different types.
 		* It provides virtual functions for each type of result, which are called when the corresponding result is received.
@@ -685,6 +839,11 @@ namespace dynamsoft
 		{
 		public:
 			/**
+			* Destructor.
+			*/
+			virtual ~CCaptureStateListener() {};
+
+			/**
 			* Called when the capture state changes.
 			*
 			* @param [in] state The new capture state.
@@ -702,6 +861,11 @@ namespace dynamsoft
 		class CVR_API CImageSourceStateListener
 		{
 		public:
+			/**
+			* Destructor.
+			*/
+			virtual ~CImageSourceStateListener() {};
+
 			/**
 			* This method is called when the state of the image source changes.
 			*
