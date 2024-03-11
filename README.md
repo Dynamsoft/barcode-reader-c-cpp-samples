@@ -18,6 +18,7 @@ This repository contains multiple samples that demonstrates how to use the <a hr
 | [`ReadAnImage`](Samples/HelloWorld/ReadAnImage) | This sample demonstrates the simplest way to read barcodes from an image file and output barcode format and text. |
 | [`ReadMultipleImages`](Samples/HelloWorld/ReadMultipleImages) | This sample demonstrates the simplest way to read barcodes from directory with image files and output barcode format and text. |
 | [`VideoDecoding`](Samples/VideoDecoding) | This sample demonstrates how to read barcodes from video frames. |
+| [`MultiThreadDecoding`](Samples/MultiThreadDecoding) | This sample demonstrates how to read barcodes and get barcode results in self-managed thread. |
 
 ## License
 
