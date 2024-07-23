@@ -20,7 +20,28 @@
 
 #include "DynamsoftCore.h"
 
-#define DLR_VERSION                  "3.2.10.0220"
+#define DLR_VERSION                  "3.4.10.1677"
+
+/**Enumeration section*/
+
+/**
+* @enum RawTextLineStatus
+*
+* Enumerates the status of a raw text line.
+*/
+typedef enum RawTextLineStatus
+{
+	/**Localized but recognition not performed. */
+	RTLS_LOCALIZED,
+
+	/**Recognition failed. */
+	RTLS_RECOGNITION_FAILED,
+
+	/**Successfully recognized. */
+	RTLS_RECOGNITION_SUCCEEDED
+
+} RawTextLineStatus;
+
 
 /**Structures section*/
 
@@ -209,6 +230,22 @@ namespace dynamsoft
 				 * @param text The text to be set.
 				 */
 				virtual void SetText(const char* text) = 0;
+
+				/**
+				* Gets the name of the text line specification that generated this element.
+				*
+				* @return Returns the name of the text line specification.
+				*
+				*/
+				virtual const char* GetSpecificationName() const = 0;
+
+				/**
+				* Gets the recognized raw text, excluding any concatenation separators.
+				*
+				* @return Returns a pointer to the recognized raw text.
+				*
+				*/
+				virtual const char* GetRawText() const = 0;
 			};
 
 			/**
@@ -334,13 +371,237 @@ namespace dynamsoft
 				virtual void RemoveAllRecognizedTextLines() = 0;
 
 				/**
-				 * Sets the recognized text line.
+				 * Removes the recognized text line at the specified index.
 				 *
-				 * @param element The recognized text line element to set.
+				 * @param index The index of the text line to remove.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int RemoveRecognizedTextLine(int index) = 0;
+
+				/**
+				 * Adds a recognized text line.
+				 *
+				 * @param element The recognized text line to add.
 				 * @param matrixToOriginalImage The matrix to original image.
 				 * @return Returns 0 if successful, otherwise returns a negative value.
 				 */
-				virtual int SetRecognizedTextLine(const CRecognizedTextLineElement* element, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+				virtual int AddRecognizedTextLine(const CRecognizedTextLineElement* element, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+
+				/**
+				 * Sets the recognized text line at the specified index.
+				 *
+				 * @param index The index of the recognized text line to set.
+				 * @param element The recognized text line to set.
+				 * @param matrixToOriginalImage The matrix to original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int SetRecognizedTextLine(int index, const CRecognizedTextLineElement* element, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+			};
+
+			/**
+			* The `CRawTextLine` class represents a text line in an image. It can be in one of the following states:
+			* - `RTLS_LOCALIZED`: Localized but recognition not performed.
+			* - `RTLS_RECOGNITION_FAILED`: Recognition failed.
+			* - `RTLS_RECOGNITION_SUCCESSFULLY`: Successfully recognized.
+			*/
+			class DLR_API CRawTextLine
+			{
+			protected:
+				/**
+				 * Destructor
+				 */
+				virtual ~CRawTextLine() {};
+
+			public:
+				/**
+				* Gets the recognized text.
+				*
+				* @return Returns a pointer to the recognized text.
+				*
+				*/
+				virtual const char* GetText() const = 0;
+
+				/**
+				* Gets the confidence level of the recognized text.
+				*
+				* @return Returns an integer value representing the confidence level of the recognized text.
+				*
+				*/
+				virtual int GetConfidence() const = 0;
+
+				/**
+				* Gets the number of individual character recognition results in the line.
+				*
+				* @return Returns an integer value representing the number of individual character recognition results.
+				*
+				*/
+				virtual int GetCharacterResultsCount() const = 0;
+
+				/**
+				* Gets the row number of the text line within the image.
+				*
+				* @return Returns an integer value representing the row number of the text line within the image.
+				*
+				*/
+				virtual int GetRowNumber() const = 0;
+
+				/**
+				* Gets the character recognition result at the specified index.
+				*
+				* @param [in] index The index of the character recognition result to retrieve.
+				* @return Returns a pointer to the character recognition result.
+				*
+				*/
+				virtual const CCharacterResult* GetCharacterResult(int index) const = 0;
+
+				/**
+				 * Sets the recognized text.
+				 *
+				 * @param text The text to be set.
+				 */
+				virtual void SetText(const char* text) = 0;
+
+				/**
+				* Gets the name of the text line specification that generated this element.
+				*
+				* @return Returns the name of the text line specification.
+				*
+				*/
+				virtual const char* GetSpecificationName() const = 0;
+
+				/**
+				* Gets the location of the text line.
+				*
+				* @return Returns a CQuadrilateral object which represents the location of the text line.
+				*
+				*/
+				virtual CQuadrilateral GetLocation() const = 0;
+
+				/**
+				* Sets the location of the text line.
+				*
+				* @param [in] location The location of the text line.
+				* @return Returns 0 if success, otherwise an error code.
+				*
+				*/
+				virtual int SetLocation(const CQuadrilateral& location) = 0;
+
+				/**
+				* Gets the status of the text line.
+				*
+				* @return Returns the status of the text line.
+				*
+				*/
+				virtual RawTextLineStatus GetStatus() const = 0;
+
+				/**
+				* Decreases the reference count of the CRawTextLine object.
+				*
+				*/
+				virtual void Release() = 0;
+
+				/**
+				* Clone the CRawTextLine object.
+				*
+				* @return Returns a pointer to a copy of the CRawTextLine object.
+				*
+				*/
+				virtual CRawTextLine* Clone() const = 0;
+
+				/**
+				* Sets the row number of the text line within the image.
+				*
+				* @param [in] rowNumber The row number of the text line.
+				* @return Returns 0 if success, otherwise an error code.
+				*
+				*/
+				virtual int SetRowNumber(int rowNumber) = 0;
+
+				/**
+				* Sets the name of the text line specification that generated this element.
+				*
+				* @param [in] specificationName The name of the text line specification.
+				* @return Returns 0 if success, otherwise an error code.
+				*
+				*/
+				virtual int SetSpecificationName(const char* specificationName) = 0;
+			};
+
+			/**
+			* The `CRawTextLinesUnit` class represents an intermediate result unit containing raw text lines. It inherits from the `CIntermediateResultUnit` class.
+			*
+			*/
+			class DLR_API CRawTextLinesUnit : public CIntermediateResultUnit
+			{
+			protected:
+				/**
+				 * Destructor
+				 */
+				virtual ~CRawTextLinesUnit() {};
+
+			public:
+				/**
+				* Gets the number of raw text lines in the unit.
+				*
+				* @return Returns the number of raw text lines in the unit.
+				*
+				*/
+				virtual int GetCount() const = 0;
+
+				/**
+				* Gets a raw text line at the specified index.
+				*
+				* @param [in] index The index of the raw text line.
+				*
+				* @return Returns a pointer to the CRawTextLine object at the specified index.
+				*
+				*/
+				virtual const CRawTextLine* GetRawTextLine(int index) const = 0;
+
+				/**
+				* Gets a raw text line at the specified index.
+				*
+				* @param [in] index The index of the raw text line.
+				*
+				* @return Returns a pointer to the CRawTextLine object at the specified index.
+				*
+				*/
+				virtual const CRawTextLine* operator[](int index) const = 0;
+
+				/**
+				 * Removes all raw text lines.
+				 *
+				 */
+				virtual void RemoveAllRawTextLines() = 0;
+
+				/**
+				* Removes the raw text line at the specified index.
+				*
+				* @param [in] index The index of the raw text line to remove.
+				*
+				* @return Returns 0 if successful, otherwise returns a negative value.
+				*
+				*/
+				virtual int RemoveRawTextLine(int index) = 0;
+
+				/**
+				 * Adds a raw text line.
+				 *
+				 * @param textline The raw text line to add.
+				 * @param matrixToOriginalImage The matrix to original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int AddRawTextLine(const CRawTextLine* textline, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
+
+				/**
+				 * Sets the raw text line at the specified index.
+				 *
+				 * @param index The index of the raw text line to set.
+				 * @param textline The raw text line to set.
+				 * @param matrixToOriginalImage The matrix to original image.
+				 * @return Returns 0 if successful, otherwise returns a negative value.
+				 */
+				virtual int SetRawTextLine(int index, const CRawTextLine* textline, const double matrixToOriginalImage[9] = IDENTITY_MATRIX) = 0;
 			};
 		}
 
@@ -398,6 +659,31 @@ namespace dynamsoft
 			*/
 			virtual const CCharacterResult* GetCharacterResult(int index) const = 0;
 
+			/**
+			* Gets the name of the text line specification that generated this item.
+			*
+			* @return Returns the name of the text line specification.
+			*
+			*/
+			virtual const char* GetSpecificationName() const = 0;
+
+			/**
+			* Gets the recognized raw text, excluding any concatenation separators.
+			*
+			* @return Returns a pointer to the recognized raw text.
+			*
+			*/
+			virtual const char* GetRawText() const = 0;
+
+			/**
+			 * Sets the location of the text line item.
+			 *
+			 * @param [in] location The location of the text line item.
+			 *
+			 * @return Returns 0 if success, otherwise an error code.
+			 *
+			 */
+			virtual int SetLocation(const CQuadrilateral& location) = 0;
 		};
 
 		/**
@@ -513,6 +799,16 @@ namespace dynamsoft
 			*
 			*/
 			virtual void Release() = 0;
+
+			/**
+			 * Adds a specific item to the array in the recognized text lines result.
+			 *
+			 * @param [in] item The specific item to add.
+			 *
+			 * @return Returns value indicating whether the addition was successful or not.
+			 *
+			 */
+			virtual int AddItem(const CTextLineResultItem* item) = 0;
 		};
 
 		/**
@@ -541,6 +837,160 @@ namespace dynamsoft
 			 * @return An instance of CLocalizedTextLineElement
 			 */
 			static intermediate_results::CLocalizedTextLineElement* CreateLocalizedTextLineElement();
+
+			/**
+			 * @brief Create a Raw Text Line object
+			 *
+			 * @return An instance of CRawTextLine
+			 */
+			static intermediate_results::CRawTextLine* CreateRawTextLine();
+		};
+
+		/**
+		* The CBufferedCharacterItem class represents a buffered character item.
+		*
+		*/
+		class DLR_API CBufferedCharacterItem
+		{
+		public:
+			/**
+			 * Destructor
+			 */
+			virtual ~CBufferedCharacterItem() {};
+
+			/**
+			* Gets the buffered character.
+			*
+			* @return Returns the buffered character.
+			*
+			*/
+			virtual char GetCharacter() const = 0;
+
+			/**
+			* Gets the image data of the buffered character.
+			*
+			* @return Returns the image data of the buffered character.
+			*
+			*/
+			virtual CImageData* GetImage() const = 0;
+
+			/**
+			* Gets the number of features of the buffered character.
+			*
+			* @return Returns the number of features of the buffered character.
+			*
+			*/
+			virtual int GetFeaturesCount() const = 0;
+
+			/**
+			* Gets the feature id and value of the buffered character at the specified index.
+			*
+			* @param [in] index The index of the feature to retrieve.
+			* @param [out] pFeatureId The feature id.
+			* @param [out] pFeatureValue The feature value.
+			* @return Returns 0 if successful, otherwise returns a negative value.
+			*/
+			virtual int GetFeature(int index, int* pFeatureId, float* pFeatureValue) const = 0;
+		};
+
+		/**
+		* The CCharacterCluster class represents a character cluster generated from the buffered character items.
+		*
+		*/
+		class DLR_API CCharacterCluster
+		{
+		public:
+			/**
+			 * Destructor
+			 */
+			virtual ~CCharacterCluster() {};
+
+			/**
+			* Gets the character value of the cluster.
+			*
+			* @return Returns the character value of the cluster.
+			*/
+			virtual char GetCharacter() const = 0;
+
+			/**
+			* Gets the mean of the cluster.
+			*
+			* @return Returns the mean of the cluster.
+			*/
+			virtual const CBufferedCharacterItem* GetMean() const = 0;
+		};
+
+		/**
+		* The CBufferedCharacterItemSet class represents a set of buffered character item.
+		*
+		*/
+		class DLR_API CBufferedCharacterItemSet
+		{
+		protected:
+			/**
+			 * Destructor
+			 */
+			virtual ~CBufferedCharacterItemSet() {};
+
+		public:
+			/**
+			* Gets the number of items in the buffered item set.
+			*
+			* @return Returns the number of items in the buffered item set.
+			*
+			*/
+			virtual int GetItemsCount() const = 0;
+
+			/**
+			* Gets a pointer to the CBufferedCharacterItem object at the specified index.
+			*
+			* @param [in] index The index of the item to retrieve.
+			*
+			* @return Returns a pointer to the CBufferedCharacterItem object at the specified index.
+			*
+			*/
+			virtual const CBufferedCharacterItem* GetItem(int index) const = 0;
+
+			/**
+			* Gets a pointer to the CBufferedCharacterItem object at the specified index.
+			*
+			* @param [in] index The index of the item to retrieve.
+			*
+			* @return Returns a pointer to the CBufferedCharacterItem object at the specified index.
+			*
+			*/
+			virtual const CBufferedCharacterItem* operator[](int index) const = 0;
+
+			/**
+			* Increases the reference count of the CBufferedCharacterItemSet object.
+			*
+			* @return An object of CBufferedCharacterItemSet.
+			*/
+			virtual CBufferedCharacterItemSet* Retain() = 0;
+
+			/**
+			* Decreases the reference count of the CBufferedCharacterItemSet object.
+			*
+			*/
+			virtual void Release() = 0;
+
+			/**
+			* Gets the number of character clusters in the buffered item set.
+			*
+			* @return Returns the number of character clusters in the buffered item set.
+			*
+			*/
+			virtual int GetCharacterClustersCount() const = 0;
+
+			/**
+			* Gets the character cluster at the specified index.
+			*
+			* @param [in] index The index of the character cluster to retrieve.
+			*
+			* @return Returns the character cluster at the specified index.
+			*
+			*/
+			virtual const CCharacterCluster* GetCharacterCluster(int index) const = 0;
 		};
 
 	}

@@ -1,5 +1,5 @@
 #pragma once
-#define DYNAMSOFT_CORE_VERSION "3.2.10.0220"
+#define DYNAMSOFT_CORE_VERSION "3.2.40.1677"
 
 /**Enumeration section*/
 
@@ -176,12 +176,15 @@ typedef enum ErrorCode {
 
 	/**The section level result is irreplaceable.*/
 	EC_SECTION_LEVEL_RESULT_IRREPLACEABLE = -10072,
-	
+
 	/**The axis definition is incorrect.*/
 	EC_AXIS_DEFINITION_INCORRECT = -10073,
 
 	/**The result is not replaceable due to type mismatch.*/
 	EC_RESULT_TYPE_MISMATCH_IRREPLACEABLE = -10074,
+
+	/**Failed to load the PDF library.*/
+	EC_PDF_LIBRARY_LOAD_FAILED = -10075,
 
 	/** -20000~-29999: DLS license error code. */
 	/**No license.*/
@@ -709,8 +712,11 @@ enum IntermediateResultUnitType : unsigned long long
 	/**The type of the IntermediateResult is "short lines".*/
 	IRUT_SHORT_LINES = 1 << 27,
 
+	/**The type of the IntermediateResult is "text line groups".*/
+	IRUT_RAW_TEXT_LINES = 1LL << 28,
+
 	/**The type of the IntermediateResult is "all".*/
-	IRUT_ALL = 0xFFFFFFF
+	IRUT_ALL = 0xFFFFFFFFFFFFFFFF
 };
 
 /**
@@ -1064,6 +1070,7 @@ namespace dynamsoft
 		/**
 		 * The CPoint class represents a point in 2D space. It contains an array of two integers, which represent the coordinates of the point.
 		 */
+		//template class DS_API DMPoint_<int>;
 		typedef DMPoint_<int> CPoint;
 
 		/**
@@ -1828,6 +1835,13 @@ namespace dynamsoft
 			*
 			*/
 			virtual void Release() = 0;
+
+			/**
+			 * Clone the captured result item.
+			 *
+			 * @return Returns a pointer to a copy of the captured result item.
+			 */
+			virtual CCapturedResultItem* Clone() const = 0;
 		};
 
 		/**
@@ -1859,10 +1873,6 @@ namespace dynamsoft
 		*/
 		class DS_API CImageSourceErrorListener {
 		public:
-			/**
-			* Destructor
-			*/
-			virtual ~CImageSourceErrorListener() {};
 
 			/**
 			* Called when an error is received from the image source.
@@ -3134,6 +3144,16 @@ namespace dynamsoft
 			*
 			*/
 			virtual void OnUnitResultReceived(CIntermediateResultUnit *pUnit, const IntermediateResultExtraInfo* info) = 0;
+
+			/**
+			* Called by function modules when a task result has been received.
+			*
+			* @param [in] pResult A pointer to the CIntermediateResult object that contains several result units.
+			* @param [in] info A pointer to the IntermediateResultExtraInfo object that contains the extra info of intermediate result.
+			*
+			* @remark It is for internal calls of function modules such as DynamsoftBarcodeReader, DynamsoftLabelRecognizer and DynamsoftDocumentNormalizer.
+			*/
+			virtual void OnTaskResultsReceivedInner(CIntermediateResult *pResult, const IntermediateResultExtraInfo* info) = 0;
 		};
 	}
 }

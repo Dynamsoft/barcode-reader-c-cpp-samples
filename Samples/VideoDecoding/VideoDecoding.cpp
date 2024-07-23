@@ -30,10 +30,10 @@ using namespace cv;
 #endif
 #endif
 
+class MyCapturedResultReceiver : public CCapturedResultReceiver
+{
 
-class MyCapturedResultReceiver : public CCapturedResultReceiver {
-
-	virtual void OnDecodedBarcodesReceived(CDecodedBarcodesResult* pResult)override
+	virtual void OnDecodedBarcodesReceived(CDecodedBarcodesResult *pResult) override
 	{
 		if (pResult->GetErrorCode() != EC_OK)
 		{
@@ -46,8 +46,9 @@ class MyCapturedResultReceiver : public CCapturedResultReceiver {
 				cout << "ImageID:" << tag->GetImageId() << endl;
 			int count = pResult->GetItemsCount();
 			cout << "Decoded " << count << " barcodes" << endl;
-			for (int i = 0; i < count; i++) {
-				const CBarcodeResultItem* barcodeResultItem = pResult->GetItem(i);
+			for (int i = 0; i < count; i++)
+			{
+				const CBarcodeResultItem *barcodeResultItem = pResult->GetItem(i);
 				if (barcodeResultItem != NULL)
 				{
 					cout << "Result " << i + 1 << endl;
@@ -66,11 +67,11 @@ class MyVideoFetcher : public CImageSourceAdapter
 public:
 	MyVideoFetcher(){};
 	~MyVideoFetcher(){};
-	bool HasNextImageToFetch()const override
+	bool HasNextImageToFetch() const override
 	{
 		return true;
 	}
-	void MyAddImageToBuffer(const CImageData* img, bool bClone = true)
+	void MyAddImageToBuffer(const CImageData *img, bool bClone = true)
 	{
 		AddImageToBuffer(img, bClone);
 	}
@@ -90,84 +91,85 @@ int main()
 	int iRet = -1;
 	char szErrorMsg[256];
 	// Initialize license.
-  	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
-  	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp 
-   	iRet = CLicenseManager::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
-	if (iRet != EC_OK)
+	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
+	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
+	iRet = CLicenseManager::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
+	if (iRet != ErrorCode::EC_OK && iRet != ErrorCode::EC_LICENSE_CACHE_USED)
 	{
-		cout << szErrorMsg << endl;
-	}
-	int errorCode = 1;
-	char errorMsg[512] = { 0 };
-
-	CCaptureVisionRouter *cvr = new CCaptureVisionRouter;
-
-	MyVideoFetcher *fetcher = new MyVideoFetcher();
-	fetcher->SetMaxImageCount(100);
-	fetcher->SetBufferOverflowProtectionMode(BOPM_UPDATE);
-	fetcher->SetColourChannelUsageType(CCUT_AUTO);
-	cvr->SetInput(fetcher);
-
-	CMultiFrameResultCrossFilter* filter = new CMultiFrameResultCrossFilter;
-	filter->EnableResultCrossVerification(CRIT_BARCODE, true);
-	filter->EnableResultDeduplication(CRIT_BARCODE, true);
-	filter->SetDuplicateForgetTime(CRIT_BARCODE, 5000);
-	cvr->AddResultFilter(filter);
-
-	CCapturedResultReceiver *capturedReceiver = new MyCapturedResultReceiver;
-	cvr->AddResultReceiver(capturedReceiver);
-
-	errorCode = cvr->StartCapturing(CPresetTemplate::PT_READ_BARCODES, false, errorMsg, 512);
-	if (errorCode != EC_OK)
-	{
-		cout << "error:" << errorMsg << endl;
+		cout << "License initialization failed: ErrorCode: " << iRet << ", ErrorString: " << szErrorMsg << endl;
 	}
 	else
 	{
-		for (int i = 1;; ++i)
+		int errorCode = 1;
+		char errorMsg[512] = {0};
+
+		CCaptureVisionRouter *cvr = new CCaptureVisionRouter;
+
+		MyVideoFetcher *fetcher = new MyVideoFetcher();
+		fetcher->SetMaxImageCount(100);
+		fetcher->SetBufferOverflowProtectionMode(BOPM_UPDATE);
+		fetcher->SetColourChannelUsageType(CCUT_AUTO);
+		cvr->SetInput(fetcher);
+
+		CMultiFrameResultCrossFilter *filter = new CMultiFrameResultCrossFilter;
+		filter->EnableResultCrossVerification(CRIT_BARCODE, true);
+		filter->EnableResultDeduplication(CRIT_BARCODE, true);
+		filter->SetDuplicateForgetTime(CRIT_BARCODE, 5000);
+		cvr->AddResultFilter(filter);
+
+		CCapturedResultReceiver *capturedReceiver = new MyCapturedResultReceiver;
+		cvr->AddResultReceiver(capturedReceiver);
+
+		errorCode = cvr->StartCapturing(CPresetTemplate::PT_READ_BARCODES, false, errorMsg, 512);
+		if (errorCode != EC_OK)
 		{
-			auto start = std::chrono::high_resolution_clock::now();
-			Mat frame;
-			capture.read(frame);
-			if (frame.empty())
-			{
-				cerr << "ERROR: Can't grab camera frame." << endl;
-				break;
-			}
-			CFileImageTag tag(nullptr, 0, 0);
-			tag.SetImageId(i);
-			CImageData data(frame.rows * frame.step.p[0],
-				frame.data,
-				capture.get(CAP_PROP_FRAME_WIDTH),
-				capture.get(CAP_PROP_FRAME_HEIGHT),
-				frame.step.p[0],
-				IPF_RGB_888,
-				0,
-				&tag);
-			fetcher->MyAddImageToBuffer(&data);
-			imshow("Frame", frame);
-			auto finish = std::chrono::high_resolution_clock::now();
-			auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
-			int usingTime = elapsed.count();
-			int key = 1;
-			if (usingTime < 40)
-				key = 40 - usingTime;
-			key = waitKey(key);
-			if (key == 27/*ESC*/)
-				break;
+			cout << "error:" << errorMsg << endl;
 		}
-		cvr->StopCapturing();
+		else
+		{
+			for (int i = 1;; ++i)
+			{
+				auto start = std::chrono::high_resolution_clock::now();
+				Mat frame;
+				capture.read(frame);
+				if (frame.empty())
+				{
+					cerr << "ERROR: Can't grab camera frame." << endl;
+					break;
+				}
+				CFileImageTag tag(nullptr, 0, 0);
+				tag.SetImageId(i);
+				CImageData data(frame.rows * frame.step.p[0],
+								frame.data,
+								capture.get(CAP_PROP_FRAME_WIDTH),
+								capture.get(CAP_PROP_FRAME_HEIGHT),
+								frame.step.p[0],
+								IPF_RGB_888,
+								0,
+								&tag);
+				fetcher->MyAddImageToBuffer(&data);
+				imshow("Frame", frame);
+				auto finish = std::chrono::high_resolution_clock::now();
+				auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+				int usingTime = elapsed.count();
+				int key = 1;
+				if (usingTime < 40)
+					key = 40 - usingTime;
+				key = waitKey(key);
+				if (key == 27 /*ESC*/)
+					break;
+			}
+			cvr->StopCapturing(false, true);
+		}
+
+		capture.release();
+
+		delete cvr, cvr = NULL;
+		delete fetcher, fetcher = NULL;
+		delete filter, filter = NULL;
+		delete capturedReceiver, capturedReceiver = NULL;
 	}
-
-	capture.release();
-
-	delete cvr, cvr = NULL;
-	delete fetcher, fetcher = NULL;
-	delete filter, filter = NULL;
-	delete capturedReceiver, capturedReceiver = NULL;
-
 	cout << "Press any key to quit..." << endl;
 	cin.ignore();
 	return 0;
-
 }

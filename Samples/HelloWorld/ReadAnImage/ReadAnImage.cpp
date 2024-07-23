@@ -18,53 +18,56 @@ using namespace dynamsoft::basic_structures;
 #endif
 #endif
 
-
-
 int main()
 {
 	int errorCode = 1;
 	char errorMsg[512];
 
 	// Initialize license.
-	// You can request and extend a trial license from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp 
+	// You can request and extend a trial license from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
 	// The string 'DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9' here is a free public trial license. Note that network connection is required for this license to work.
 	errorCode = CLicenseManager::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", errorMsg, 512);
 
-	if (errorCode != EC_OK)
-		cout << "License initialization error: " << errorMsg << endl;
-
-	CCaptureVisionRouter* cvr = new CCaptureVisionRouter;
-
-	string imageFile = "../../../Images/AllSupportedBarcodeTypes.png";
-	CCapturedResult* result = cvr->Capture(imageFile.c_str(), CPresetTemplate::PT_READ_BARCODES);
-
-	if (result->GetErrorCode() != 0) {
-		cout << "Error: " << result->GetErrorCode() << "," << result->GetErrorString() << endl;
-	}
-
-	int capturedResultItemCount = result->GetItemsCount();
-	cout << "Decoded " << capturedResultItemCount << " barcodes" << endl;
-
-	for (int j = 0; j < capturedResultItemCount; j++) 
+	if (errorCode != ErrorCode::EC_OK && errorCode != ErrorCode::EC_LICENSE_CACHE_USED)
 	{
-		const CCapturedResultItem* capturedResultItem = result->GetItem(j);
-		CapturedResultItemType type = capturedResultItem->GetType();
-		if (type == CapturedResultItemType::CRIT_BARCODE) 
-		{
-			const CBarcodeResultItem* barcodeResultItem = dynamic_cast<const CBarcodeResultItem*> (capturedResultItem);
-			cout << "Result " << j + 1 << endl;
-			cout << "Barcode Format: " << barcodeResultItem->GetFormatString() << endl;
-			cout << "Barcode Text: " << barcodeResultItem->GetText() << endl;
-		}
+		cout << "License initialization failed: ErrorCode: " << errorCode << ", ErrorString: " << errorMsg << endl;
 	}
+	else
+	{
+		CCaptureVisionRouter *cvr = new CCaptureVisionRouter;
 
-	if (result)
-		result->Release();
-	delete cvr, cvr = NULL;
+		string imageFile = "../../../Images/GeneralBarcodes.png";
+		CCapturedResult *result = cvr->Capture(imageFile.c_str(), CPresetTemplate::PT_READ_BARCODES);
 
+		if (result->GetErrorCode() != 0)
+		{
+			cout << "Error: " << result->GetErrorCode() << "," << result->GetErrorString() << endl;
+		}
+		CDecodedBarcodesResult *barcodeResult = result->GetDecodedBarcodesResult();
+		if (barcodeResult == nullptr || barcodeResult->GetItemsCount() == 0)
+		{
+			cout << "No barcode found." << endl;
+		}
+		else
+		{
+			int barcodeResultItemCount = barcodeResult->GetItemsCount();
+			cout << "Decoded " << barcodeResultItemCount << " barcodes" << endl;
 
+			for (int j = 0; j < barcodeResultItemCount; j++)
+			{
+				const CBarcodeResultItem *barcodeResultItem = barcodeResult->GetItem(j);
+				cout << "Result " << j + 1 << endl;
+				cout << "Barcode Format: " << barcodeResultItem->GetFormatString() << endl;
+				cout << "Barcode Text: " << barcodeResultItem->GetText() << endl;
+			}
+		}
+		if (barcodeResult)
+			barcodeResult->Release();
+		if (result)
+			result->Release();
+		delete cvr, cvr = NULL;
+	}
 	cout << "Press any key to quit..." << endl;
 	cin.ignore();
 	return 0;
 }
-
