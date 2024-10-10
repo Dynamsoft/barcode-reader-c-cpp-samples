@@ -13,4 +13,4 @@ MultiThreadDecoding.cpp
 add_executable(MultiThreadDecoding ${FILE_SRCS})
 set_target_properties(MultiThreadDecoding PROPERTIES SKIP_BUILD_RPATH TRUE)
 target_link_libraries(MultiThreadDecoding DynamsoftCaptureVisionRouter DynamsoftLicense DynamsoftCore pthread)
-File(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../../Distributables/DBR-PresetTemplates.json DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../Distributables/Lib/Linux/x64)
+File(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../../Distributables/Templates/DBR-PresetTemplates.json DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../Distributables/Lib/Linux/x64/Templates)

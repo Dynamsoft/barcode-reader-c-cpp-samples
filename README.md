@@ -6,6 +6,7 @@ This repository contains multiple samples that demonstrates how to use the <a hr
 - Operating systems:
   - Windows: 7, 8, 10, 2003, 2008, 2008 R2, 2012 and above.
   - Linux x64: Ubuntu 14.04.4+ LTS, Debian 8+, etc
+  - Linux ARM 64-bit
 - Developing Tool
   - Visual Studio 2012 or above
   - G++ 5.4+  

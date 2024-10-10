@@ -98,7 +98,7 @@
     </Link>
     <PostBuildEvent>
       <Command>xcopy /ys "$(SolutionDir)..\..\Distributables\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
-xcopy /ys "$(SolutionDir)..\..\Distributables\DBR-PresetTemplates.json" "$(OutputPath)"</Command>
+xcopy /ys "$(SolutionDir)..\..\Distributables\Templates\DBR-PresetTemplates.json" "$(OutputPath)Templates\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -115,7 +115,7 @@ xcopy /ys "$(SolutionDir)..\..\Distributables\DBR-PresetTemplates.json" "$(Outpu
     </Link>
     <PostBuildEvent>
       <Command>xcopy /ys "$(SolutionDir)..\..\Distributables\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
-xcopy /ys "$(SolutionDir)..\..\Distributables\DBR-PresetTemplates.json" "$(OutputPath)"</Command>
+xcopy /ys "$(SolutionDir)..\..\Distributables\Templates\DBR-PresetTemplates.json" "$(OutputPath)Templates\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -136,7 +136,7 @@ xcopy /ys "$(SolutionDir)..\..\Distributables\DBR-PresetTemplates.json" "$(Outpu
     </Link>
     <PostBuildEvent>
       <Command>xcopy /ys "$(SolutionDir)..\..\Distributables\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
-xcopy /ys "$(SolutionDir)..\..\Distributables\DBR-PresetTemplates.json" "$(OutputPath)"</Command>
+xcopy /ys "$(SolutionDir)..\..\Distributables\Templates\DBR-PresetTemplates.json" "$(OutputPath)Templates\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,7 +157,7 @@ xcopy /ys "$(SolutionDir)..\..\Distributables\DBR-PresetTemplates.json" "$(Outpu
     </Link>
     <PostBuildEvent>
       <Command>xcopy /ys "$(SolutionDir)..\..\Distributables\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
-xcopy /ys "$(SolutionDir)..\..\Distributables\DBR-PresetTemplates.json" "$(OutputPath)"</Command>
+xcopy /ys "$(SolutionDir)..\..\Distributables\Templates\DBR-PresetTemplates.json" "$(OutputPath)Templates\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
