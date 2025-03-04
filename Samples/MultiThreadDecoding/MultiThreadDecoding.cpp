@@ -16,11 +16,11 @@ using namespace dynamsoft::license;
 #include <io.h>
 
 #ifdef _WIN64
-#pragma comment(lib, "../../Distributables/Lib/Windows/x64/DynamsoftCaptureVisionRouterx64.lib")
-#pragma comment(lib, "../../Distributables/Lib/Windows/x64/DynamsoftLicensex64.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x64/DynamsoftCaptureVisionRouterx64.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x64/DynamsoftLicensex64.lib")
 #else
-#pragma comment(lib, "../../Distributables/Lib/Windows/x86/DynamsoftCaptureVisionRouterx86.lib")
-#pragma comment(lib, "../../Distributables/Lib/Windows/x86/DynamsoftLicensex86.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x86/DynamsoftCaptureVisionRouterx86.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x86/DynamsoftLicensex86.lib")
 #endif
 
 #else
@@ -157,8 +157,8 @@ int main(int argc, const char *argv[])
 	cout << "Hints: Please input 'Q' or 'q' to quit the application." << endl;
 
 	// 1.Initialize license.
-	// You can request and extend a trial license from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
 	// The string 'DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9' here is a free public trial license. Note that network connection is required for this license to work.
+	// You can also request a 30-day trial license in the customer portal: https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
 	errorCode = CLicenseManager::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
 	if (errorCode != ErrorCode::EC_OK && errorCode != ErrorCode::EC_LICENSE_CACHE_USED)
 	{
@@ -173,11 +173,23 @@ int main(int argc, const char *argv[])
 			string imagePath;
 			getline(cin, imagePath);
 
+			if (imagePath.empty())
+			{
+				cout << "Empty input, please try again." << endl;
+				continue;
+			}
+
 			if (imagePath == "q" || imagePath == "Q")
 				break;
 
 			vector<string> vecFiles;
 			GetFiles(imagePath, vecFiles);
+
+			if (vecFiles.empty())
+			{
+				cout << "No image files found, please try again." << endl;
+				continue;
+			}
 
 			MultiThreadDecoding(vecFiles);
 

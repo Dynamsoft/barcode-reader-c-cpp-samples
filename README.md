@@ -4,8 +4,8 @@ This repository contains multiple samples that demonstrates how to use the <a hr
 
 ## Requirements
 - Operating systems:
-  - Windows: 7, 8, 10, 2003, 2008, 2008 R2, 2012 and above.
-  - Linux x64: Ubuntu 14.04.4+ LTS, Debian 8+, etc
+  - Windows: Windows 8 and higher, or Windows Server 2012 and higher.
+  - Linux x64: Ubuntu 14.04.4+ LTS, Debian 8+, CentOS 7+, etc
   - Linux ARM 64-bit
 - Developing Tool
   - Visual Studio 2012 or above
@@ -20,6 +20,9 @@ This repository contains multiple samples that demonstrates how to use the <a hr
 | [`ReadMultipleImages`](Samples/HelloWorld/ReadMultipleImages) | This sample demonstrates the simplest way to read barcodes from directory with image files and output barcode format and text. |
 | [`VideoDecoding`](Samples/VideoDecoding) | This sample demonstrates how to read barcodes from video frames. |
 | [`MultiThreadDecoding`](Samples/MultiThreadDecoding) | This sample demonstrates how to read barcodes and get barcode results in self-managed thread. |
+| [`BarcodePerformanceEvaluator`](Samples/BarcodePerformanceEvaluator) | This sample demonstrates how to read barcodes from files in the specified directory and return results plus performance metrics. |
+| [`GeneralSettings`](Samples/GeneralSettings) | This sample demonstrates how to configure general used settings and read barcodes from an image file. |
+| [`ReadDPMBarcode`](Samples/ReadDPMBarcode) | This sample demonstrates how to read DPM (Direct Part Marking) barcodes and get barcode results. |
 
 ## License
 

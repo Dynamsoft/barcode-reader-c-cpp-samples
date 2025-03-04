@@ -57,8 +57,8 @@
     <PostBuildEvent>
       <Command>copy "thirdLib\bin\$(Configuration)\*.*"  "$(OutputPath)"
 
-xcopy /ys "$(SolutionDir)..\..\Distributables\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
-xcopy /ys "$(SolutionDir)..\..\Distributables\Templates\*.json" "$(OutputPath)Templates\"</Command>
+xcopy /ys "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
+xcopy /ys "$(SolutionDir)..\..\Dist\Templates\*.json" "$(OutputPath)Templates\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -10,11 +10,11 @@ using namespace dynamsoft::dbr;
 using namespace dynamsoft::basic_structures;
 #if defined(_WIN64) || defined(_WIN32)
 #ifdef _WIN64
-#pragma comment(lib, "../../../Distributables/Lib/Windows/x64/DynamsoftLicensex64.lib")
-#pragma comment(lib, "../../../Distributables/Lib/Windows/x64/DynamsoftCaptureVisionRouterx64.lib")
+#pragma comment(lib, "../../../Dist/Lib/Windows/x64/DynamsoftLicensex64.lib")
+#pragma comment(lib, "../../../Dist/Lib/Windows/x64/DynamsoftCaptureVisionRouterx64.lib")
 #else
-#pragma comment(lib, "../../../Distributables/Lib/Windows/x86/DynamsoftLicensex86.lib")
-#pragma comment(lib, "../../../Distributables/Lib/Windows/x86/DynamsoftCaptureVisionRouterx86.lib")
+#pragma comment(lib, "../../../Dist/Lib/Windows/x86/DynamsoftLicensex86.lib")
+#pragma comment(lib, "../../../Dist/Lib/Windows/x86/DynamsoftCaptureVisionRouterx86.lib")
 #endif
 #endif
 
@@ -24,8 +24,8 @@ int main()
 	char errorMsg[512];
 
 	// Initialize license.
-	// You can request and extend a trial license from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
 	// The string 'DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9' here is a free public trial license. Note that network connection is required for this license to work.
+	// You can also request a 30-day trial license in the customer portal: https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
 	errorCode = CLicenseManager::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", errorMsg, 512);
 
 	if (errorCode != ErrorCode::EC_OK && errorCode != ErrorCode::EC_LICENSE_CACHE_USED)
@@ -39,7 +39,11 @@ int main()
 		string imageFile = "../../../Images/GeneralBarcodes.png";
 		CCapturedResult *result = cvr->Capture(imageFile.c_str(), CPresetTemplate::PT_READ_BARCODES);
 
-		if (result->GetErrorCode() != 0)
+		if (result->GetErrorCode() == ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING)
+		{
+			cout << "Warning: " << result->GetErrorCode() << ", " << result->GetErrorString() << endl;
+		}
+		else if (result->GetErrorCode() != ErrorCode::EC_OK)
 		{
 			cout << "Error: " << result->GetErrorCode() << "," << result->GetErrorString() << endl;
 		}

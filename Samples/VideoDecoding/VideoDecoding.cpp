@@ -4,10 +4,9 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
-// Include headers of DynamsoftCaptureVisionRouter SDK
-#include <iostream>
 #include <string>
 
+// Include headers of DynamsoftCaptureVisionRouter SDK
 #include "../../Include/DynamsoftCaptureVisionRouter.h"
 #include "../../Include/DynamsoftUtility.h"
 using namespace std;
@@ -18,15 +17,15 @@ using namespace dynamsoft::utility;
 using namespace cv;
 #if defined(_WIN64) || defined(_WIN32)
 #ifdef _WIN64
-#pragma comment(lib, "../../Distributables/Lib/Windows/x64/DynamsoftCorex64.lib")
-#pragma comment(lib, "../../Distributables/Lib/Windows/x64/DynamsoftLicensex64.lib")
-#pragma comment(lib, "../../Distributables/Lib/Windows/x64/DynamsoftCaptureVisionRouterx64.lib")
-#pragma comment(lib, "../../Distributables/Lib/Windows/x64/DynamsoftUtilityx64.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x64/DynamsoftCorex64.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x64/DynamsoftLicensex64.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x64/DynamsoftCaptureVisionRouterx64.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x64/DynamsoftUtilityx64.lib")
 #else
-#pragma comment(lib, "../../Distributables/Lib/Windows/x86/DynamsoftCorex86.lib")
-#pragma comment(lib, "../../Distributables/Lib/Windows/x86/DynamsoftLicensex86.lib")
-#pragma comment(lib, "../../Distributables/Lib/Windows/x86/DynamsoftCaptureVisionRouterx86.lib")
-#pragma comment(lib, "../../Distributables/Lib/Windows/x86/DynamsoftUtilityx86.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x86/DynamsoftCorex86.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x86/DynamsoftLicensex86.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x86/DynamsoftCaptureVisionRouterx86.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x86/DynamsoftUtilityx86.lib")
 #endif
 #endif
 
@@ -35,26 +34,27 @@ class MyCapturedResultReceiver : public CCapturedResultReceiver
 
 	virtual void OnDecodedBarcodesReceived(CDecodedBarcodesResult *pResult) override
 	{
-		if (pResult->GetErrorCode() != EC_OK)
+		if (pResult->GetErrorCode() == ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING)
+		{
+			cout << "Warning: " << pResult->GetErrorCode() << ", " << pResult->GetErrorString() << endl;
+		}
+		else if (pResult->GetErrorCode() != EC_OK)
 		{
 			cout << "Error: " << pResult->GetErrorString() << endl;
 		}
-		else
+		auto tag = pResult->GetOriginalImageTag();
+		if (tag)
+			cout << "ImageID:" << tag->GetImageId() << endl;
+		int count = pResult->GetItemsCount();
+		cout << "Decoded " << count << " barcodes" << endl;
+		for (int i = 0; i < count; i++)
 		{
-			auto tag = pResult->GetOriginalImageTag();
-			if (tag)
-				cout << "ImageID:" << tag->GetImageId() << endl;
-			int count = pResult->GetItemsCount();
-			cout << "Decoded " << count << " barcodes" << endl;
-			for (int i = 0; i < count; i++)
+			const CBarcodeResultItem *barcodeResultItem = pResult->GetItem(i);
+			if (barcodeResultItem != NULL)
 			{
-				const CBarcodeResultItem *barcodeResultItem = pResult->GetItem(i);
-				if (barcodeResultItem != NULL)
-				{
-					cout << "Result " << i + 1 << endl;
-					cout << "Barcode Format: " << barcodeResultItem->GetFormatString() << endl;
-					cout << "Barcode Text: " << barcodeResultItem->GetText() << endl;
-				}
+				cout << "Result " << i + 1 << endl;
+				cout << "Barcode Format: " << barcodeResultItem->GetFormatString() << endl;
+				cout << "Barcode Text: " << barcodeResultItem->GetText() << endl;
 			}
 		}
 
@@ -92,7 +92,7 @@ int main()
 	char szErrorMsg[256];
 	// Initialize license.
 	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
-	// If you don't have a license yet, you can request a trial from https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
+	// You can also request a 30-day trial license in the customer portal: https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
 	iRet = CLicenseManager::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
 	if (iRet != ErrorCode::EC_OK && iRet != ErrorCode::EC_LICENSE_CACHE_USED)
 	{
