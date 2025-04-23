@@ -36,12 +36,12 @@ int main()
 	else
 	{
         // 2. Create an instance of CaptureVisionRouter.
-		CCaptureVisionRouter *cvr = new CCaptureVisionRouter;
+		CCaptureVisionRouter *cvRouter = new CCaptureVisionRouter;
 
 		// 3. General settings (including barcode format, barcode count and scan region) through SimplifiedCaptureVisionSettings
         // 3.1 Obtain current runtime settings of instance.
 		SimplifiedCaptureVisionSettings settings;
-		errorCode = cvr->GetSimplifiedSettings(CPresetTemplate::PT_READ_BARCODES, &settings);
+		errorCode = cvRouter->GetSimplifiedSettings(CPresetTemplate::PT_READ_BARCODES, &settings);
 		if (errorCode != ErrorCode::EC_OK)
 		{
 			cout << "Get simplified settings failed, Error: " << errorCode << endl;
@@ -51,13 +51,13 @@ int main()
 			// 3.2 Set the expected barcode format you want to read.
 			settings.barcodeSettings.barcodeFormatIds = BarcodeFormat::BF_QR_CODE | BarcodeFormat::BF_CODE_128;
 
-			// 3.3 Set the expected barcode count you want to read. 
+			// 3.3 Set the expected barcode count you want to read.
 			settings.barcodeSettings.expectedBarcodesCount = 10;
 
 			// 3.4 Set the grayscale transformation modes.
 			settings.barcodeSettings.grayscaleTransformationModes[0] = GrayscaleTransformationMode::GTM_AUTO;
-			
-			// 3.5 Set the ROI(region of interest) to speed up the barcode reading process. 
+
+			// 3.5 Set the ROI(region of interest) to speed up the barcode reading process.
             // Note: DBR supports setting coordinates by pixels or percentages. The origin of the coordinate system is the upper left corner point.
 			settings.roiMeasuredInPercentage = 1;
 			settings.roi.points[0] = CPoint(0, 0);
@@ -66,15 +66,15 @@ int main()
 			settings.roi.points[3] = CPoint(0, 100);
 
 			// 3.6 Apply the new settings to the instance.
-			errorCode = cvr->UpdateSettings(CPresetTemplate::PT_READ_BARCODES, &settings, errorMsg, 512);
+			errorCode = cvRouter->UpdateSettings(CPresetTemplate::PT_READ_BARCODES, &settings, errorMsg, 512);
 			if (errorCode != ErrorCode::EC_OK)
 				cout << "Update settings failed: ErrorCode: " << errorCode << ", ErrorString : " << errorMsg << endl;
-			
+
 			// 4. Replace by your own image path
 			string imageFile = "../../Images/GeneralBarcodes.png";
 
 			// 5. Decode barcodes from the image file.
-			CCapturedResult *result = cvr->Capture(imageFile.c_str(), CPresetTemplate::PT_READ_BARCODES);
+			CCapturedResult *result = cvRouter->Capture(imageFile.c_str(), CPresetTemplate::PT_READ_BARCODES);
 
 			if (result->GetErrorCode() == ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING)
 			{
@@ -112,9 +112,9 @@ int main()
 			// 8. Release the capture result.
 			if (result)
 				result->Release();
-			
+
 			// 9. Release the allocated memory.
-			delete cvr, cvr = NULL;
+			delete cvRouter, cvRouter = NULL;
 		}
 	}
 	cout << "Press any key to quit..." << endl;

@@ -36,14 +36,14 @@ int main()
 	else
 	{
 		// 2. Create an instance of CCaptureVisionRouter.
-		CCaptureVisionRouter* cvr = new CCaptureVisionRouter;
-		errorCode = cvr->InitSettingsFromFile("../../Dist/Templates/ReadDPM.json",errorMsg, 512);
+		CCaptureVisionRouter* cvRouter = new CCaptureVisionRouter;
+		errorCode = cvRouter->InitSettingsFromFile("../../Dist/Templates/ReadDPM.json",errorMsg, 512);
 
         // 3. Replace with your own dpm barcode image path.
 		string imageFile = "../../Images/DPM.png";
 
 		// 4. Decode barcodes from the image file.
-		CCapturedResult* result = cvr->Capture(imageFile.c_str(), "");
+		CCapturedResult* result = cvRouter->Capture(imageFile.c_str(), "");
 
 		if (result->GetErrorCode() == ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING)
 		{
@@ -83,7 +83,7 @@ int main()
 			result->Release();
 
 		// 8. Release the allocated memory.
-		delete cvr, cvr = NULL;
+		delete cvRouter, cvRouter = NULL;
 	}
 	cout << "Press any key to quit..." << endl;
 	cin.ignore();

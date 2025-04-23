@@ -103,24 +103,24 @@ int main()
 		int errorCode = 1;
 		char errorMsg[512] = {0};
 
-		CCaptureVisionRouter *cvr = new CCaptureVisionRouter;
+		CCaptureVisionRouter *cvRouter = new CCaptureVisionRouter;
 
 		MyVideoFetcher *fetcher = new MyVideoFetcher();
 		fetcher->SetMaxImageCount(100);
 		fetcher->SetBufferOverflowProtectionMode(BOPM_UPDATE);
 		fetcher->SetColourChannelUsageType(CCUT_AUTO);
-		cvr->SetInput(fetcher);
+		cvRouter->SetInput(fetcher);
 
 		CMultiFrameResultCrossFilter *filter = new CMultiFrameResultCrossFilter;
 		filter->EnableResultCrossVerification(CRIT_BARCODE, true);
 		filter->EnableResultDeduplication(CRIT_BARCODE, true);
 		filter->SetDuplicateForgetTime(CRIT_BARCODE, 5000);
-		cvr->AddResultFilter(filter);
+		cvRouter->AddResultFilter(filter);
 
 		CCapturedResultReceiver *capturedReceiver = new MyCapturedResultReceiver;
-		cvr->AddResultReceiver(capturedReceiver);
+		cvRouter->AddResultReceiver(capturedReceiver);
 
-		errorCode = cvr->StartCapturing(CPresetTemplate::PT_READ_BARCODES, false, errorMsg, 512);
+		errorCode = cvRouter->StartCapturing(CPresetTemplate::PT_READ_BARCODES, false, errorMsg, 512);
 		if (errorCode != EC_OK)
 		{
 			cout << "error:" << errorMsg << endl;
@@ -159,12 +159,12 @@ int main()
 				if (key == 27 /*ESC*/)
 					break;
 			}
-			cvr->StopCapturing(false, true);
+			cvRouter->StopCapturing(false, true);
 		}
 
 		capture.release();
 
-		delete cvr, cvr = NULL;
+		delete cvRouter, cvRouter = NULL;
 		delete fetcher, fetcher = NULL;
 		delete filter, filter = NULL;
 		delete capturedReceiver, capturedReceiver = NULL;

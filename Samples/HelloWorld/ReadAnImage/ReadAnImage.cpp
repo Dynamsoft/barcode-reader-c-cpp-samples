@@ -34,10 +34,10 @@ int main()
 	}
 	else
 	{
-		CCaptureVisionRouter *cvr = new CCaptureVisionRouter;
+		CCaptureVisionRouter *cvRouter = new CCaptureVisionRouter;
 
 		string imageFile = "../../../Images/GeneralBarcodes.png";
-		CCapturedResult *result = cvr->Capture(imageFile.c_str(), CPresetTemplate::PT_READ_BARCODES);
+		CCapturedResult *result = cvRouter->Capture(imageFile.c_str(), CPresetTemplate::PT_READ_BARCODES);
 
 		if (result->GetErrorCode() == ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING)
 		{
@@ -69,7 +69,7 @@ int main()
 			barcodeResult->Release();
 		if (result)
 			result->Release();
-		delete cvr, cvr = NULL;
+		delete cvRouter, cvRouter = NULL;
 	}
 	cout << "Press any key to quit..." << endl;
 	cin.ignore();

@@ -18,20 +18,20 @@
 
 CDbrBarcodeFileReader::CDbrBarcodeFileReader()
 {
-	m_pCVR = new CCaptureVisionRouter;
+	cvRouter = new CCaptureVisionRouter;
 }
 
 CDbrBarcodeFileReader::~CDbrBarcodeFileReader()
 {
-	if (m_pCVR)
+	if (cvRouter)
 	{
-		delete m_pCVR, m_pCVR = NULL;
+		delete cvRouter, cvRouter = NULL;
 	}
 }
 
 void CDbrBarcodeFileReader::Run()
 {
-	if (!m_pCVR)
+	if (!cvRouter)
 	{
 		cout << "Get instance failed." << endl;
 		return;
@@ -119,7 +119,7 @@ void CDbrBarcodeFileReader::RunWithRuntimeSettings()
 		string filePath = m_listSettingsFile.at(i);
 		char szErrorMsgBuffer[1024] = { 0 };
 		int nErrorCode = -1;
-		nErrorCode = m_pCVR->InitSettingsFromFile(filePath.c_str(), szErrorMsgBuffer, sizeof(szErrorMsgBuffer));
+		nErrorCode = cvRouter->InitSettingsFromFile(filePath.c_str(), szErrorMsgBuffer, sizeof(szErrorMsgBuffer));
 		if (nErrorCode != 0)
 		{
 			cout <<"Init runtime settings file("+ filePath+") failed:"<<string(szErrorMsgBuffer) << endl;
@@ -142,7 +142,7 @@ bool CDbrBarcodeFileReader::ReadFileBarcodes(const string strFilePath, CBarcodeS
 	///////////////////////////////////////////////////
 	start = clock();
 	int nErrorCode = -1;
-	CCapturedResult* result = m_pCVR->Capture(strFilePath.c_str());
+	CCapturedResult* result = cvRouter->Capture(strFilePath.c_str());
 	end = clock();
 	decodeResultInfo.dDecodeTime = ((double)(end - start) / CLOCKS_PER_SEC * 1000);
 

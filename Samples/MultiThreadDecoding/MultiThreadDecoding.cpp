@@ -33,9 +33,9 @@ std::mutex coutMutex;
 
 void ThreadDecodeFile(const char *filePath)
 {
-	CCaptureVisionRouter router;
+	CCaptureVisionRouter cvRouter;
 
-	CCapturedResult *result = router.Capture(filePath, CPresetTemplate::PT_READ_BARCODES);
+	CCapturedResult *result = cvRouter.Capture(filePath, CPresetTemplate::PT_READ_BARCODES);
 
 	std::lock_guard<std::mutex> lock(coutMutex);
 

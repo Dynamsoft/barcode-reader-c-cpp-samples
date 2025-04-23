@@ -63,9 +63,9 @@ private:
 	CCaptureVisionRouter *m_router;
 
 public:
-	MyImageSourceStateListener(CCaptureVisionRouter *router)
+	MyImageSourceStateListener(CCaptureVisionRouter *cvRouter)
 	{
-		m_router = router;
+		m_router = cvRouter;
 	}
 
 	virtual void OnImageSourceStateReceived(ImageSourceState state)
@@ -91,23 +91,23 @@ int main()
 	}
 	else
 	{
-		CCaptureVisionRouter *cvr = new CCaptureVisionRouter;
+		CCaptureVisionRouter *cvRouter = new CCaptureVisionRouter;
 
 		CDirectoryFetcher *fetcher = new CDirectoryFetcher;
 		fetcher->SetDirectory("../../../Images");
-		cvr->SetInput(fetcher);
+		cvRouter->SetInput(fetcher);
 
 		CCapturedResultReceiver *capturedReceiver = new MyCapturedResultReceiver;
-		cvr->AddResultReceiver(capturedReceiver);
+		cvRouter->AddResultReceiver(capturedReceiver);
 
-		CImageSourceStateListener *listener = new MyImageSourceStateListener(cvr);
-		cvr->AddImageSourceStateListener(listener);
+		CImageSourceStateListener *listener = new MyImageSourceStateListener(cvRouter);
+		cvRouter->AddImageSourceStateListener(listener);
 
-		errorCode = cvr->StartCapturing(CPresetTemplate::PT_READ_BARCODES, true, errorMsg, 512);
+		errorCode = cvRouter->StartCapturing(CPresetTemplate::PT_READ_BARCODES, true, errorMsg, 512);
 		if (errorCode != EC_OK)
 			cout << "error:" << errorMsg << endl;
 
-		delete cvr, cvr = NULL;
+		delete cvRouter, cvRouter = NULL;
 		delete fetcher, fetcher = NULL;
 		delete listener, listener = NULL;
 		delete capturedReceiver, capturedReceiver = NULL;

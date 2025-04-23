@@ -41,6 +41,6 @@ private:
 private:
 	
 	vector<string>  m_listSettingsFile;
-	CCaptureVisionRouter* m_pCVR;
+	CCaptureVisionRouter* cvRouter;
 };
 
