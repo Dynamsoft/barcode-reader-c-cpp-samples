@@ -1,21 +1,17 @@
 #pragma once
 
 #if !defined(_WIN32) && !defined(_WIN64)
-#ifdef __EMSCRIPTEN__
-#define DCP_API __attribute__((used))
-#else
 #define DCP_API __attribute__((visibility("default")))
-#endif
-#else
-#ifdef DCP_EXPORTS
+#else //windows
+#if defined(DCP_EXPORTS)
 #define DCP_API __declspec(dllexport)
 #else
-#define DCP_API
+#define DCP_API __declspec(dllimport)
 #endif
 #endif
 #include "DynamsoftCore.h"
 
-#define DCP_VERSION "3.0.10.3895"
+#define DCP_VERSION "3.0.30.4532"
 /**
  * @enum MappingStatus 
  *

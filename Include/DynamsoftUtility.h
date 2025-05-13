@@ -1,9 +1,10 @@
 #pragma once
+
 #if !defined(_WIN32) && !defined(_WIN64)
 #define UTIL_API __attribute__((visibility("default")))
 #include <stddef.h>
-#else
-#ifdef UTIL_EXPORTS
+#else //windows
+#if defined(UTIL_EXPORTS)
 #define UTIL_API __declspec(dllexport)
 #else
 #define UTIL_API __declspec(dllimport)
@@ -11,9 +12,8 @@
 #include <windows.h>
 #endif
 
-
 #include"DynamsoftCaptureVisionRouter.h"
-#define DISA_VERSION "2.0.10.3895"
+#define DISA_VERSION "2.0.30.4532"
 
 #ifdef __cplusplus
 

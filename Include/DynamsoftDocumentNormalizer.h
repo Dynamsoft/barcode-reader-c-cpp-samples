@@ -1,25 +1,21 @@
 #pragma once
 
-#if !defined(_WIN32) && !defined(_WIN64)
 
-#ifdef __EMSCRIPTEN__
-#define DDN_API __attribute__((used))
-#else
+#if !defined(_WIN32) && !defined(_WIN64)
 #define DDN_API __attribute__((visibility("default")))
 #include <stddef.h>
-#endif
-
-#else
-#ifdef DDN_EXPORTS
+#else //windows
+#if defined(DDN_EXPORTS)
 #define DDN_API __declspec(dllexport)
 #else
-#define DDN_API 
+#define DDN_API __declspec(dllimport)
 #endif
 #include <windows.h>
 #endif
+
 #include "DynamsoftCore.h"
 
-#define DDN_VERSION                  "3.0.10.3895"
+#define DDN_VERSION                  "3.0.30.4532"
 
 /**Enums section*/
 

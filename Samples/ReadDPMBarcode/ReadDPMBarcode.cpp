@@ -37,7 +37,7 @@ int main()
 	{
 		// 2. Create an instance of CCaptureVisionRouter.
 		CCaptureVisionRouter* cvRouter = new CCaptureVisionRouter;
-		errorCode = cvRouter->InitSettingsFromFile("../../Dist/Templates/ReadDPM.json",errorMsg, 512);
+		errorCode = cvRouter->InitSettingsFromFile("../../CustomTemplates/ReadDPM.json", errorMsg, 512);
 
         // 3. Replace with your own dpm barcode image path.
 		string imageFile = "../../Images/DPM.png";

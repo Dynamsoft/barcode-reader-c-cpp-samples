@@ -19,13 +19,15 @@
 #endif
 
 #include "DynamsoftCore.h"
-#include "DynamsoftLabelRecognizer.h"
+#include "DynamsoftLicense.h"
 #include "DynamsoftBarcodeReader.h"
+//#if !defined(ONLY_DBR)
+#include "DynamsoftLabelRecognizer.h"
 #include "DynamsoftDocumentNormalizer.h"
 #include "DynamsoftCodeParser.h"
-#include "DynamsoftLicense.h"
+//#endif
 
-#define DCV_VERSION                  "3.0.10.3895"
+#define DCV_VERSION                  "3.0.30.4532"
 
 /**Enumeration section*/
 

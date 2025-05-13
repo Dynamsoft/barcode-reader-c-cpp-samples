@@ -1,5 +1,5 @@
 #pragma once
-#define DYNAMSOFT_CORE_VERSION "4.0.10.3895"
+#define DYNAMSOFT_CORE_VERSION "4.0.30.4532"
 
 /**Enumeration section*/
 
@@ -941,14 +941,10 @@ typedef struct IntermediateResultExtraInfo
 #define DS_API __attribute__((visibility("default")))
 #include <stddef.h> 
 #else
-#if defined(ANDROID) || defined(__APPLE__) || defined(__linux__) || ((defined(RELEASE_LIB) || defined(DEBUG_LIB)) && !defined(MULTI_MODULE_FLAG))
-#define DS_API
-#else
-#ifdef DS_EXPORTS
+#if defined(DS_EXPORTS)
 #define DS_API __declspec(dllexport)
 #else
 #define DS_API __declspec(dllimport)
-#endif
 #endif
 #include <windows.h>
 #endif

@@ -1,30 +1,24 @@
 #pragma once
 
 #if !defined(_WIN32) && !defined(_WIN64)
-
-#ifdef __EMSCRIPTEN__
-#define DBR_API __attribute__((used))
-#else
 #define DBR_API __attribute__((visibility("default")))
-#endif
-
-#ifdef __APPLE__
-#else
+#if !defined(__APPLE__)
 typedef signed char BOOL;
 #endif
 typedef void* HANDLE;
 #include <stddef.h>
-#else
-#ifdef DBR_EXPORTS
+#else //windows
+#if defined(DBR_EXPORTS)
 #define DBR_API __declspec(dllexport)
 #else
 #define DBR_API __declspec(dllimport)
 #endif
 #include <windows.h>
 #endif
+
 #include "DynamsoftCore.h"
 
-#define DBR_VERSION "11.0.10.3895"
+#define DBR_VERSION "11.0.30.4532"
 
 /**Enumeration section*/
 
