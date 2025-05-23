@@ -14,6 +14,8 @@ This repository contains multiple samples that demonstrates how to use the <a hr
 
 ## Samples
 
+### Basic Barcode Reader Samples
+
 | Sample | Description |
 |---|---|
 | [`ReadAnImage`](Samples/HelloWorld/ReadAnImage) | This sample demonstrates the simplest way to read barcodes from an image file and output barcode format and text. |
@@ -23,6 +25,18 @@ This repository contains multiple samples that demonstrates how to use the <a hr
 | [`BarcodePerformanceEvaluator`](Samples/BarcodePerformanceEvaluator) | This sample demonstrates how to read barcodes from files in the specified directory and return results plus performance metrics. |
 | [`GeneralSettings`](Samples/GeneralSettings) | This sample demonstrates how to configure general used settings and read barcodes from an image file. |
 | [`ReadDPMBarcode`](Samples/ReadDPMBarcode) | This sample demonstrates how to read DPM (Direct Part Marking) barcodes and get barcode results. |
+
+### Additional Samples using Capture Vision SDK
+
+In addition to the classic barcode decoding samples listed above, the following samples go a step further by parsing the decoded results and showcasing more structured workflows.
+
+> [!IMPORTANT]
+> These samples use the `dynamsoft-capture-vision` package instead of `dynamsoft-barcode-reader`. If you're switching to these samples, make sure to [download](https://www.dynamsoft.com/capture-vision/confirmation/#desktop) and use the correct package.
+
+| Sample | Description |
+| --- | --- |
+| [`DriverLicenseScanner`](https://github.com/Dynamsoft/capture-vision-cpp-samples/blob/main/Samples/DriverLicenseScanner) | Shows how to capture and extract user's information from driver license/ID. |
+| [`VINScanner`](https://github.com/Dynamsoft/capture-vision-cpp-samples/blob/main/Samples/VINScanner) | Shows how to capture and extract vehicle's information from Vehicle Identification Number (VIN). |
 
 ## License
 
