@@ -94,7 +94,7 @@ int main()
 	// The string "DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9" here is a free public trial license. Note that network connection is required for this license to work.
 	// You can also request a 30-day trial license in the customer portal: https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
 	iRet = CLicenseManager::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
-	if (iRet != ErrorCode::EC_OK && iRet != ErrorCode::EC_LICENSE_CACHE_USED)
+	if (iRet != ErrorCode::EC_OK && iRet != ErrorCode::EC_LICENSE_WARNING)
 	{
 		cout << "License initialization failed: ErrorCode: " << iRet << ", ErrorString: " << szErrorMsg << endl;
 	}

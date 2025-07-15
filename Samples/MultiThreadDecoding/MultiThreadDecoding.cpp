@@ -18,9 +18,11 @@ using namespace dynamsoft::license;
 #ifdef _WIN64
 #pragma comment(lib, "../../Dist/Lib/Windows/x64/DynamsoftCaptureVisionRouterx64.lib")
 #pragma comment(lib, "../../Dist/Lib/Windows/x64/DynamsoftLicensex64.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x64/DynamsoftCorex64.lib")
 #else
 #pragma comment(lib, "../../Dist/Lib/Windows/x86/DynamsoftCaptureVisionRouterx86.lib")
 #pragma comment(lib, "../../Dist/Lib/Windows/x86/DynamsoftLicensex86.lib")
+#pragma comment(lib, "../../Dist/Lib/Windows/x86/DynamsoftCorex86.lib")
 #endif
 
 #else
@@ -35,33 +37,41 @@ void ThreadDecodeFile(const char *filePath)
 {
 	CCaptureVisionRouter cvRouter;
 
-	CCapturedResult *result = cvRouter.Capture(filePath, CPresetTemplate::PT_READ_BARCODES);
+	CCapturedResultArray* resultArray = cvRouter.CaptureMultiPages(filePath, CPresetTemplate::PT_READ_BARCODES);
 
 	std::lock_guard<std::mutex> lock(coutMutex);
 
 	cout << "Thread: " << this_thread::get_id() << endl;
 	cout << "File Name: " << filePath << endl;
-	cout << "Error: " << result->GetErrorCode() << ", " << result->GetErrorString() << endl;
-
-	CDecodedBarcodesResult *barcodeResult = result->GetDecodedBarcodesResult();
-
-	if (barcodeResult == nullptr || barcodeResult->GetItemsCount() == 0)
+	int count = resultArray->GetResultsCount();
+	bool noResultPrint = true;
+	for (int i = 0; i < count; ++i)
 	{
-		cout << "No barcode found." << endl;
-	}
-	else
-	{
-		cout << "Total barcode(s) found: " << barcodeResult->GetItemsCount() << endl;
-		for (int index = 0; index < barcodeResult->GetItemsCount(); ++index)
+		const CCapturedResult* result = resultArray->GetResult(i);
+		cout << "Page " << i + 1 << ":" << endl;
+		cout << "Error: " << result->GetErrorCode() << ", " << result->GetErrorString() << endl;
+
+		CDecodedBarcodesResult* barcodeResult = result->GetDecodedBarcodesResult();
+
+		if (barcodeResult == nullptr || barcodeResult->GetItemsCount() == 0)
 		{
-			const CBarcodeResultItem *barcode = barcodeResult->GetItem(index);
-			cout << index + 1 << ": " << barcode->GetFormatString() << ", " << barcode->GetText() << endl;
+			cout << "No barcode found in page " << i + 1 << endl;
 		}
+		else
+		{
+			cout << "Total barcode(s) found in page " << i + 1 << ": " << barcodeResult->GetItemsCount() << endl;
+			for (int index = 0; index < barcodeResult->GetItemsCount(); ++index)
+			{
+				const CBarcodeResultItem* barcode = barcodeResult->GetItem(index);
+				cout << index + 1 << ": " << barcode->GetFormatString() << ", " << barcode->GetText() << endl;
+			}
 
-		barcodeResult->Release();
+			barcodeResult->Release();
+		}
+		cout << endl;
 	}
-	if (result != nullptr)
-		result->Release();
+	if (resultArray != nullptr)
+		resultArray->Release();
 
 	cout << endl;
 }
@@ -160,7 +170,7 @@ int main(int argc, const char *argv[])
 	// The string 'DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9' here is a free public trial license. Note that network connection is required for this license to work.
 	// You can also request a 30-day trial license in the customer portal: https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
 	errorCode = CLicenseManager::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", szErrorMsg, 256);
-	if (errorCode != ErrorCode::EC_OK && errorCode != ErrorCode::EC_LICENSE_CACHE_USED)
+	if (errorCode != ErrorCode::EC_OK && errorCode != ErrorCode::EC_LICENSE_WARNING)
 	{
 		cout << "License initialization failed: ErrorCode: " << errorCode << ", ErrorString: " << szErrorMsg << endl;
 	}

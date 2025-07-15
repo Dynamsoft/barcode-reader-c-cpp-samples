@@ -29,7 +29,7 @@ int main()
 	// You can also request a 30-day trial license in the customer portal: https://www.dynamsoft.com/customer/license/trialLicense?product=dbr&utm_source=samples&package=c_cpp
 	errorCode = CLicenseManager::InitLicense("DLS2eyJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSJ9", errorMsg, 512);
 
-	if (errorCode != ErrorCode::EC_OK && errorCode != ErrorCode::EC_LICENSE_CACHE_USED)
+	if (errorCode != ErrorCode::EC_OK && errorCode != ErrorCode::EC_LICENSE_WARNING)
 	{
 		cout << "License initialization failed: ErrorCode: " << errorCode << ", ErrorString: " << errorMsg << endl;
 	}
@@ -43,44 +43,49 @@ int main()
 		string imageFile = "../../Images/DPM.png";
 
 		// 4. Decode barcodes from the image file.
-		CCapturedResult* result = cvRouter->Capture(imageFile.c_str(), "");
+		CCapturedResultArray* resultArray = cvRouter->CaptureMultiPages(imageFile.c_str(), "");
+		int count = resultArray->GetResultsCount();
+		bool noResultPrint = true;
+		for (int i = 0; i < count; ++i)
+		{
+			const CCapturedResult* result = resultArray->GetResult(i);
 
-		if (result->GetErrorCode() == ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING)
-		{
-			cout << "Warning: " << result->GetErrorCode() << ", " << result->GetErrorString() << endl;
-		}
-		else if (result->GetErrorCode() != ErrorCode::EC_OK)
-		{
-			cout << "Error: " << result->GetErrorCode() << "," << result->GetErrorString() << endl;
-		}
-
-		// 5. Output the barcode format and barcode text.
-		CDecodedBarcodesResult* barcodeResult = result->GetDecodedBarcodesResult();
-		if (barcodeResult == nullptr || barcodeResult->GetItemsCount() == 0)
-		{
-			cout << "No barcode found." << endl;
-		}
-		else
-		{
-			int barcodeResultItemCount = barcodeResult->GetItemsCount();
-			cout << "Decoded " << barcodeResultItemCount << " barcodes" << endl;
-
-			for (int j = 0; j < barcodeResultItemCount; j++)
+			if (result->GetErrorCode() == ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING)
 			{
-				const CBarcodeResultItem* barcodeResultItem = barcodeResult->GetItem(j);
-				cout << "Barcode " << j + 1 << endl;
-				cout << "Barcode Format: " << barcodeResultItem->GetFormatString() << endl;
-				cout << "Barcode Text: " << barcodeResultItem->GetText() << endl;
+				cout << "Warning: " << result->GetErrorCode() << ", " << result->GetErrorString() << endl;
 			}
+			else if (result->GetErrorCode() != ErrorCode::EC_OK)
+			{
+				cout << "Error: " << result->GetErrorCode() << "," << result->GetErrorString() << endl;
+			}
+
+			// 5. Output the barcode format and barcode text.
+			CDecodedBarcodesResult* barcodeResult = result->GetDecodedBarcodesResult();
+			if (barcodeResult == nullptr || barcodeResult->GetItemsCount() == 0)
+			{
+				cout << "No barcode found in page " << i + 1 << endl;
+			}
+			else
+			{
+				int barcodeResultItemCount = barcodeResult->GetItemsCount();
+				cout << "Page " << i + 1 << " decoded " << barcodeResultItemCount << " barcodes" << endl;
+
+				for (int j = 0; j < barcodeResultItemCount; j++)
+				{
+					const CBarcodeResultItem* barcodeResultItem = barcodeResult->GetItem(j);
+					cout << "Barcode " << i + 1 << "-" << j + 1 << endl;
+					cout << "Barcode Format: " << barcodeResultItem->GetFormatString() << endl;
+					cout << "Barcode Text: " << barcodeResultItem->GetText() << endl;
+				}
+			}
+
+			// 6. Release the barcode result.
+			if (barcodeResult)
+				barcodeResult->Release();
 		}
-
-		// 6. Release the barcode result.
-		if (barcodeResult)
-			barcodeResult->Release();
-
 		// 7. Release the capture result.
-		if (result)
-			result->Release();
+		if (resultArray)
+			resultArray->Release();
 
 		// 8. Release the allocated memory.
 		delete cvRouter, cvRouter = NULL;

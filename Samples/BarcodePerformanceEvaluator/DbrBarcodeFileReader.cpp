@@ -142,34 +142,39 @@ bool CDbrBarcodeFileReader::ReadFileBarcodes(const string strFilePath, CBarcodeS
 	///////////////////////////////////////////////////
 	start = clock();
 	int nErrorCode = -1;
-	CCapturedResult* result = cvRouter->Capture(strFilePath.c_str());
+	CCapturedResultArray* resultArray = cvRouter->CaptureMultiPages(strFilePath.c_str());
 	end = clock();
 	decodeResultInfo.dDecodeTime = ((double)(end - start) / CLOCKS_PER_SEC * 1000);
+	int count = resultArray->GetResultsCount();
+	for (int i = 0; i < count; ++i)
+	{
+		const CCapturedResult* result = resultArray->GetResult(i);
 
-	if (result->GetErrorCode() != ErrorCode::EC_OK)
-	{
-		decodeResultInfo.strErrorMessage = result->GetErrorString();
-		if (result->GetErrorCode() != ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING)
-			bret = false;
-	}
+		if (result->GetErrorCode() != ErrorCode::EC_OK)
+		{
+			decodeResultInfo.strErrorMessage = result->GetErrorString();
+			if (result->GetErrorCode() != ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING)
+				bret = false;
+		}
 
-	CDecodedBarcodesResult* barcodeResult = result->GetDecodedBarcodesResult();
-	for (int i = 0; barcodeResult != NULL && i < barcodeResult->GetItemsCount(); i++)
-	{
-		CBarcodeStatisticsRecorder::BCODE_VALUE bcodeValue;
-		const CBarcodeResultItem* barcodeResultItem = barcodeResult->GetItem(i);
-		bcodeValue.strTextMessage = barcodeResultItem->GetText();
-		bcodeValue.strCodeFormat = barcodeResultItem->GetFormatString();
-		unsigned char* tempByte = barcodeResultItem->GetBytes();
-		int byteLength = barcodeResultItem->GetBytesLength();
-		bcodeValue.strHexMessage = ToHexString(tempByte, byteLength);
-		decodeResultInfo.listCodes.push_back(bcodeValue);
+		CDecodedBarcodesResult* barcodeResult = result->GetDecodedBarcodesResult();
+		for (int i = 0; barcodeResult != NULL && i < barcodeResult->GetItemsCount(); i++)
+		{
+			CBarcodeStatisticsRecorder::BCODE_VALUE bcodeValue;
+			const CBarcodeResultItem* barcodeResultItem = barcodeResult->GetItem(i);
+			bcodeValue.strTextMessage = barcodeResultItem->GetText();
+			bcodeValue.strCodeFormat = barcodeResultItem->GetFormatString();
+			unsigned char* tempByte = barcodeResultItem->GetBytes();
+			int byteLength = barcodeResultItem->GetBytesLength();
+			bcodeValue.strHexMessage = ToHexString(tempByte, byteLength);
+			decodeResultInfo.listCodes.push_back(bcodeValue);
+		}
+		if (barcodeResult)
+			barcodeResult->Release();
 	}
-	if (barcodeResult)
-		barcodeResult->Release();
-	if (result)
+	if (resultArray)
 	{
-		result->Release();
+		resultArray->Release();
 	}
 
 	return bret;
