@@ -14,6 +14,7 @@ set(DS_LIB_PATH ../../Dist/Lib/Linux/x64)
 set(DS_LIBS DynamsoftCaptureVisionRouter DynamsoftCore DynamsoftUtility DynamsoftLicense)
 
 set(DS_JSON_PATH ../../Dist/Templates)
+set(DS_MODELS_PATH ../../Dist/Models)
 
 add_executable(${TARGET_NAME} ${SOURCE_FILE})
 
@@ -29,7 +30,14 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${DS_JSON_PATH} ${DS_LIB_PATH}/Templates
 )
 
+add_custom_command(
+    TARGET ${TARGET_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${DS_MODELS_PATH} ${DS_LIB_PATH}/Models
+)
+
 add_custom_target(my_clean
     COMMAND ${CMAKE_COMMAND} -E remove -f ${TARGET_NAME} ParameterTuner.o
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${DS_LIB_PATH}/Templates
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${DS_LIB_PATH}/Models
 )
