@@ -20,3 +20,5 @@ target_link_libraries(GeneralSettings DynamsoftCaptureVisionRouter DynamsoftLice
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Templates/DBR-PresetTemplates.json
      DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Lib/Linux/x64/Templates)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist//Models/
+     DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Lib/Linux/x64/Models)

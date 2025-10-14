@@ -97,7 +97,9 @@
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(ProjectDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
-xcopy /y "$(ProjectDir)..\..\Dist\Templates\DBR-PresetTemplates.json" "$(OutputPath)Templates\"</Command>
+xcopy /y "$(ProjectDir)..\..\Dist\Templates\DBR-PresetTemplates.json" "$(OutputPath)Templates\"
+xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(OutputPath)Models\"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -117,7 +119,9 @@ xcopy /y "$(ProjectDir)..\..\Dist\Templates\DBR-PresetTemplates.json" "$(OutputP
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(ProjectDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
-xcopy /y "$(ProjectDir)..\..\Dist\Templates\DBR-PresetTemplates.json" "$(OutputPath)Templates\"</Command>
+xcopy /y "$(ProjectDir)..\..\Dist\Templates\DBR-PresetTemplates.json" "$(OutputPath)Templates\"
+xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(OutputPath)Models\"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -138,7 +142,9 @@ xcopy /y "$(ProjectDir)..\..\Dist\Templates\DBR-PresetTemplates.json" "$(OutputP
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(ProjectDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
-xcopy /y "$(ProjectDir)..\..\Dist\Templates\DBR-PresetTemplates.json" "$(OutputPath)Templates\"</Command>
+xcopy /y "$(ProjectDir)..\..\Dist\Templates\DBR-PresetTemplates.json" "$(OutputPath)Templates\"
+xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(OutputPath)Models\"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,7 +164,9 @@ xcopy /y "$(ProjectDir)..\..\Dist\Templates\DBR-PresetTemplates.json" "$(OutputP
     </Link>
     <PostBuildEvent>
       <Command>xcopy /y "$(ProjectDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
-xcopy /y "$(ProjectDir)..\..\Dist\Templates\DBR-PresetTemplates.json" "$(OutputPath)Templates\"</Command>
+xcopy /y "$(ProjectDir)..\..\Dist\Templates\DBR-PresetTemplates.json" "$(OutputPath)Templates\"
+xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(OutputPath)Models\"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

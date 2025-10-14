@@ -37,18 +37,22 @@ public:
 
 std::tuple<std::string, std::string, std::string> selectImage() {
 	std::map<std::string, std::tuple<std::string, std::string, std::string>> sampleImages = {
-		{"1", {"images/blurry.png", "ReadBlurryBarcode.json", "Suitable for blurred images"}},
+		{"1", {"images/blurry.png", "ReadBlurry1DBarcode.json", "Suitable for blurred 1D barcode"}},
 		{"2", {"images/GeneralBarcodes.png", "ReadMultipleBarcode.json", "Suitable for multiple barcodes"}},
 		{"3", {"images/inverted-barcode.png", "ReadInvertedBarcode.json", "Suitable for colour inverted barcode"}},
-		{"4", {"images/DPM.png", "ReadDPM.json", "Suitable for Direct Part Marking barcode"}}
+		{"4", {"images/DPM.png", "ReadDPM.json", "Suitable for Direct Part Marking barcode"}},
+		{"5", {"images/EAN-13.jpg", "ReadOneDRetail.json", "Suitable for retail 1D barcode such as EAN13, UPC-A"}},
+		{"6", {"images/OneDIndustrial.jpg", "ReadOneDIndustrial.json", "Suitable for industrial 1D barcode such as Code128, Code39"}}
 	};
 
 	std::cout << "Available Sample Scenarios:" << std::endl;
-	std::cout << "[1] Blurry barcode" << std::endl;
+	std::cout << "[1] Blurry 1D barcode" << std::endl;
 	std::cout << "[2] Multiple Barcodes" << std::endl;
 	std::cout << "[3] Colour Inverted Barcode" << std::endl;
 	std::cout << "[4] Direct Part Marking (DPM)" << std::endl;
-	std::cout << "[5] Custom Image" << std::endl;
+	std::cout << "[5] Retail 1D barcode" << std::endl;
+	std::cout << "[6] Industrial 1D barcode" << std::endl;
+	std::cout << "[7] Custom Image" << std::endl;
 
 	while (true) {
 		std::cout << "\nEnter the number of the image to test, or provide a full path to your own image:" << std::endl;
@@ -65,7 +69,7 @@ std::tuple<std::string, std::string, std::string> selectImage() {
 			imagePath.insert(0, "../../");
 			return std::make_tuple(imagePath, matchedTemplate, description);
 		}
-		else if (choice == "5") {
+		else if (choice == "7") {
 			std::cout << "Enter full path to your own image:\n> ";
 			std::string customPath;
 			std::getline(std::cin, customPath);
@@ -159,7 +163,7 @@ void run(CCaptureVisionRouter* cvrInstance, const std::string& imagePath, const 
 	int count = resultArray->GetResultsCount();
 	for (int i = 0; i < count; ++i)
 	{
-		std::cout << "Result" << (count > 1 ? " " + std::to_string(count) : "") << ":" << std::endl;
+		std::cout << "Result" << (count > 1 ? " Page-" + std::to_string(i + 1) : "") << ":" << std::endl;
 		const CCapturedResult* result = resultArray->GetResult(i);
 		if (!result)
 			continue;
@@ -173,9 +177,9 @@ void run(CCaptureVisionRouter* cvrInstance, const std::string& imagePath, const 
 		CDecodedBarcodesResult* barcodeResult = result->GetDecodedBarcodesResult();
 		if (barcodeResult) {
 			int count = barcodeResult->GetItemsCount();
-			for (int i = 0; i < count; ++i) {
-				const CBarcodeResultItem* item = barcodeResult->GetItem(i);
-				std::cout << "Barcode result [" << i << "]: " << item->GetText()
+			for (int j = 0; j < count; ++j) {
+				const CBarcodeResultItem* item = barcodeResult->GetItem(j);
+				std::cout << "Barcode result [" << j << "]: " << item->GetText()
 					<< " (Format: " << item->GetFormatString() << ")" << std::endl;
 			}
 		}

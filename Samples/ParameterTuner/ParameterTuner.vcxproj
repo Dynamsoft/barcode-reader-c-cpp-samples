@@ -84,7 +84,7 @@
     <PostBuildEvent>
       <Command>xcopy /y "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
 if not exist "$(TargetDir)Models" mkdir "$(TargetDir)Models"
-xcopy /y "$(SolutionDir)..\..\Dist\Models\OneDDeblur*" "$(TargetDir)Models"
+xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(TargetDir)Models"
 xcopy /y "$(SolutionDir)..\..\Dist\Templates\*.json" "$(TargetDir)\Templates\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -104,7 +104,7 @@ xcopy /y "$(SolutionDir)..\..\Dist\Templates\*.json" "$(TargetDir)\Templates\"</
     <PostBuildEvent>
       <Command>xcopy /y "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
 if not exist "$(TargetDir)Models" mkdir "$(TargetDir)Models"
-xcopy /y "$(SolutionDir)..\..\Dist\Models\OneDDeblur*" "$(TargetDir)Models"
+xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(TargetDir)Models"
 xcopy /y "$(SolutionDir)..\..\Dist\Templates\*.json" "$(TargetDir)\Templates\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -122,7 +122,7 @@ xcopy /y "$(SolutionDir)..\..\Dist\Templates\*.json" "$(TargetDir)\Templates\"</
     <PostBuildEvent>
       <Command>xcopy /y "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
 if not exist "$(TargetDir)Models" mkdir "$(TargetDir)Models"
-xcopy /y "$(SolutionDir)..\..\Dist\Models\OneDDeblur*" "$(TargetDir)Models"
+xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(TargetDir)Models"
 xcopy /y "$(SolutionDir)..\..\Dist\Templates\*.json" "$(TargetDir)\Templates\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -142,7 +142,7 @@ xcopy /y "$(SolutionDir)..\..\Dist\Templates\*.json" "$(TargetDir)\Templates\"</
     <PostBuildEvent>
       <Command>xcopy /y "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
 if not exist "$(TargetDir)Models" mkdir "$(TargetDir)Models"
-xcopy /y "$(SolutionDir)..\..\Dist\Models\OneDDeblur*" "$(TargetDir)Models"
+xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(TargetDir)Models"
 xcopy /y "$(SolutionDir)..\..\Dist\Templates\*.json" "$(TargetDir)\Templates\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

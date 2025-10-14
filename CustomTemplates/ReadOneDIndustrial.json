@@ -1,0 +1,133 @@
+{
+    "CaptureVisionTemplates": [
+        {
+            "Name": "ReadOneDIndustrial",
+            "ImageROIProcessingNameArray": [
+                "roi-oned-industrial"
+            ]
+        }
+    ],
+    "TargetROIDefOptions": [
+        {
+            "Name": "roi-oned-industrial",
+            "TaskSettingNameArray": [
+                "task-oned-industrial"
+            ]
+        }
+    ],
+    "BarcodeReaderTaskSettingOptions": [
+        {
+            "Name": "task-oned-industrial",
+            "ExpectedBarcodesCount": 0,
+            "BarcodeFormatIds": [
+                "BF_CODE_128", "BF_CODE_39", "BF_ITF", "BF_CODABAR", "BF_MSI_CODE"
+            ],
+            "SectionArray": [
+                {
+                    "Section": "ST_REGION_PREDETECTION",
+                    "ImageParameterName": "ip-oned-industrial",
+                    "StageArray": [
+                        {
+                            "Stage": "SST_PREDETECT_REGIONS"
+                        }
+                    ]
+                },
+                {
+                    "Section": "ST_BARCODE_LOCALIZATION",
+                    "ImageParameterName": "ip-oned-industrial",
+                    "StageArray": [
+                        {
+                            "Stage": "SST_LOCALIZE_CANDIDATE_BARCODES",
+                            "LocalizationModes": [
+                                {
+                                    "Mode": "LM_CONNECTED_BLOCKS"
+                                },
+                                {
+                                    "Mode": "LM_NEURAL_NETWORK",
+                                    "ModelNameArray": [ "OneDLocalization" ]
+                                }
+                            ]
+                        },
+                        {
+                            "Stage": "SST_LOCALIZE_BARCODES"
+                        }
+                    ]
+                },
+                {
+                    "Section": "ST_BARCODE_DECODING",
+                    "ImageParameterName": "ip-oned-industrial",
+                    "StageArray": [
+                        {
+                            "Stage": "SST_RESIST_DEFORMATION"
+                        },
+                        {
+                            "Stage": "SST_COMPLEMENT_BARCODE"
+                        },
+                        {
+                            "Stage": "SST_SCALE_BARCODE_IMAGE"
+                        },
+                        {
+                            "Stage": "SST_DECODE_BARCODES",
+                            "DeblurModes": [
+                                {
+                                    "Mode": "DM_THRESHOLD_BINARIZATION"
+                                },
+                                {
+                                    "Mode": "DM_DIRECT_BINARIZATION"
+                                },
+                                {
+                                    "Mode": "DM_NEURAL_NETWORK",
+                                    "ModelNameArray": [ "Code128Decoder", "OneDDeblur" ]
+                                },
+                                {
+                                    "Mode": "DM_DEEP_ANALYSIS"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "ImageParameterOptions": [
+        {
+            "Name": "ip-oned-industrial",
+            "ApplicableStages": [
+                {
+                    "Stage": "SST_DETECT_TEXT_ZONES",
+                    "TextDetectionMode": {
+                        "Mode": "TTDM_LINE",
+                        "Direction": "UNKNOWN",
+                        "Sensitivity": 3
+                    }
+                },
+                {
+                    "Stage": "SST_REMOVE_TEXT_ZONES_FROM_BINARY",
+                    "IfEraseTextZone": 1
+                },
+                {
+                    "Stage": "SST_BINARIZE_IMAGE",
+                    "BinarizationModes": [
+                        {
+                            "Mode": "BM_LOCAL_BLOCK",
+                            "BlockSizeX": 0,
+                            "BlockSizeY": 0,
+                            "EnableFillBinaryVacancy": 0
+                        }
+                    ]
+                },
+                {
+                    "Stage": "SST_BINARIZE_TEXTURE_REMOVED_GRAYSCALE",
+                    "BinarizationModes": [
+                        {
+                            "Mode": "BM_LOCAL_BLOCK",
+                            "BlockSizeX": 0,
+                            "BlockSizeY": 0,
+                            "EnableFillBinaryVacancy": 0
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

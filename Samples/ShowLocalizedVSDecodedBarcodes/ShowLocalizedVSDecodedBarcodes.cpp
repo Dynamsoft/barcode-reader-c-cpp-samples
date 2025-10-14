@@ -134,7 +134,12 @@ int main() {
     std::string imagePath = "../../Images/GeneralBarcodes.png";
     std::string resultImagePath = "../../Images/GeneralBarcodes_result.png";
 
-    CCapturedResult* result = cvRouter->Capture(imagePath.c_str(), CPresetTemplate::PT_READ_BARCODES);
+    SimplifiedCaptureVisionSettings settings;
+    cvRouter->GetSimplifiedSettings(CPresetTemplate::PT_READ_BARCODES, &settings);
+    settings.outputOriginalImage = 1;
+    cvRouter->UpdateSettings(CPresetTemplate::PT_READ_BARCODES, &settings, errorMessage, 1024);
+    
+	CCapturedResult* result = cvRouter->Capture(imagePath.c_str(), CPresetTemplate::PT_READ_BARCODES);
 
     if (result->GetErrorCode() == ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING)
     {
@@ -143,6 +148,17 @@ int main() {
     else if (result->GetErrorCode() != ErrorCode::EC_OK)
     {
         std::cout << "Error: " << result->GetErrorCode() << ", " << result->GetErrorString() << std::endl;
+    }
+    const CImageData* originalImage = nullptr;
+    for (int i = 0; i < result->GetItemsCount(); ++i)
+    {
+        const CCapturedResultItem* item = result->GetItem(i);
+        if (item && item->GetType() == CRIT_ORIGINAL_IMAGE)
+        {
+            const COriginalImageResultItem* originalResultItem = dynamic_cast<const COriginalImageResultItem*>(item);
+            originalImage = originalResultItem->GetImageData();
+			break;
+        }
     }
     CDecodedBarcodesResult* barcodeResult = result->GetDecodedBarcodesResult();
 
@@ -164,8 +180,18 @@ int main() {
             }
         }
         CImageIO io;
-        CImageData* image = io.ReadFromFile(imagePath.c_str());
-        CImageData* drawedImage = drawOnImage(image, irr->locations, resultLocs);
+        CImageData* drawedImage = nullptr;
+        if (originalImage)
+        {
+            drawedImage = drawOnImage(originalImage, irr->locations, resultLocs);
+        }
+        else
+        {
+            CImageData* image = io.ReadFromFile(imagePath.c_str());
+            drawedImage = drawOnImage(image, irr->locations, resultLocs);
+            if (image)
+                delete image, image = nullptr;
+        }
         if (drawedImage)
         {
             io.SaveToFile(drawedImage, resultImagePath.c_str());

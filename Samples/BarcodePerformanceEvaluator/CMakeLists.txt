@@ -35,5 +35,4 @@ add_executable(BarcodePerformanceEvaluator ${FILE_SRCS})
 set_target_properties(BarcodePerformanceEvaluator PROPERTIES SKIP_BUILD_RPATH TRUE)
 target_link_libraries(BarcodePerformanceEvaluator DynamsoftCaptureVisionRouter DynamsoftLicense DynamsoftUtility DynamsoftCore)
 File(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Templates/DBR-PresetTemplates.json DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Lib/Linux/x64/Templates)
-
-
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Models DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Lib/Linux/x64)

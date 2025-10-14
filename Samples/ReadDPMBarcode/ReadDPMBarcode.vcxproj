@@ -82,7 +82,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /ys "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"</Command>
+      <Command>xcopy /ys "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
+xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(OutputPath)Models\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -101,7 +102,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /ys "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"</Command>
+      <Command>xcopy /ys "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
+xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(OutputPath)Models\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -116,7 +118,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /ys "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"</Command>
+      <Command>xcopy /ys "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
+xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(OutputPath)Models\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,7 +138,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /ys "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"</Command>
+      <Command>xcopy /ys "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
+xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(OutputPath)Models\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

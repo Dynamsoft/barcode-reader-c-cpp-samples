@@ -17,3 +17,5 @@ add_executable(ReadDPMBarcode ${FILE_SRCS})
 set_target_properties(ReadDPMBarcode PROPERTIES SKIP_BUILD_RPATH TRUE)
 
 target_link_libraries(ReadDPMBarcode DynamsoftCaptureVisionRouter DynamsoftLicense DynamsoftCore)
+
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Models DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Lib/Linux/x64)

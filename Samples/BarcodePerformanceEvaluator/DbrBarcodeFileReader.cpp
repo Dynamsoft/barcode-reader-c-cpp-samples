@@ -14,6 +14,7 @@
 
 #include <time.h>
 #include <iostream>
+#include <chrono>
 #include "DbrBarcodeFileReader.h"
 
 CDbrBarcodeFileReader::CDbrBarcodeFileReader()
@@ -137,14 +138,14 @@ void CDbrBarcodeFileReader::RunWithRuntimeSettings()
 bool CDbrBarcodeFileReader::ReadFileBarcodes(const string strFilePath, CBarcodeStatisticsRecorder::DecodeResultInfo& decodeResultInfo)
 {
 	bool bret = true;
-	clock_t start, end;
+	std::chrono::high_resolution_clock::time_point start, end;
 
 	///////////////////////////////////////////////////
-	start = clock();
+	start = std::chrono::high_resolution_clock::now();
 	int nErrorCode = -1;
 	CCapturedResultArray* resultArray = cvRouter->CaptureMultiPages(strFilePath.c_str());
-	end = clock();
-	decodeResultInfo.dDecodeTime = ((double)(end - start) / CLOCKS_PER_SEC * 1000);
+	end = std::chrono::high_resolution_clock::now();
+	decodeResultInfo.dDecodeTime = std::chrono::duration<double, std::milli>(end - start).count();
 	int count = resultArray->GetResultsCount();
 	for (int i = 0; i < count; ++i)
 	{
