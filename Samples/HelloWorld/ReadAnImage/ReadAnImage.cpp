@@ -44,8 +44,6 @@ int main()
 		for (int i = 0; i < count; ++i)
 		{
 			const CCapturedResult* result = resultArray->GetResult(i);
-
-
 			if (result->GetErrorCode() == ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING)
 			{
 				cout << "Warning: " << result->GetErrorCode() << ", " << result->GetErrorString() << endl;
@@ -54,20 +52,31 @@ int main()
 			{
 				cout << "Error: " << result->GetErrorCode() << "," << result->GetErrorString() << endl;
 			}
+
+			int pageNumber = i + 1;
+
+			// It is usually necessary to determine 'ImageTagType' based on the original image tag.
+			// Since imageFile is used, it is directly converted to 'const dynamsoft::basic_structures::CFileImageTag *'.
+			const CFileImageTag *tag = dynamic_cast<const CFileImageTag *>(result->GetOriginalImageTag());
+			if(tag != nullptr)
+			{
+				pageNumber = tag->GetPageNumber() + 1;
+			}
+
 			CDecodedBarcodesResult* barcodeResult = result->GetDecodedBarcodesResult();
 			if (barcodeResult == nullptr || barcodeResult->GetItemsCount() == 0)
 			{
-				cout << "No barcode found in page " << i + 1 << endl;
+				cout << "No barcode found in page " << pageNumber << endl;
 			}
 			else
 			{
 				int barcodeResultItemCount = barcodeResult->GetItemsCount();
-				cout << "Page " << i + 1 << " decoded " << barcodeResultItemCount << " barcodes" << endl;
+				cout << "Page " << pageNumber << " decoded " << barcodeResultItemCount << " barcodes" << endl;
 
 				for (int j = 0; j < barcodeResultItemCount; j++)
 				{
 					const CBarcodeResultItem* barcodeResultItem = barcodeResult->GetItem(j);
-					cout << "Result " << i + 1 << "-" << j + 1 << endl;
+					cout << "Result " << pageNumber << "-" << j + 1 << endl;
 					cout << "Barcode Format: " << barcodeResultItem->GetFormatString() << endl;
 					cout << "Barcode Text: " << barcodeResultItem->GetText() << endl;
 				}

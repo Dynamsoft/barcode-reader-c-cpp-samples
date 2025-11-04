@@ -31,6 +31,7 @@ class MyCapturedResultReceiver : public CCapturedResultReceiver
 		const CFileImageTag *tag = dynamic_cast<const CFileImageTag *>(pResult->GetOriginalImageTag());
 
 		cout << "File: " << tag->GetFilePath() << endl;
+		cout << "Page: " << tag->GetPageNumber() << endl;
 
 		if (pResult->GetErrorCode() == ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING)
 		{

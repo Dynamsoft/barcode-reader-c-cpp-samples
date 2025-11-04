@@ -48,18 +48,26 @@ void ThreadDecodeFile(const char *filePath)
 	for (int i = 0; i < count; ++i)
 	{
 		const CCapturedResult* result = resultArray->GetResult(i);
-		cout << "Page " << i + 1 << ":" << endl;
+		int pageNumber = i + 1;
+		// It is usually necessary to determine 'ImageTagType' based on the original image tag.
+		// Since imageFile is used, it is directly converted to 'const dynamsoft::basic_structures::CFileImageTag *'.
+		const CFileImageTag *tag = dynamic_cast<const CFileImageTag *>(result->GetOriginalImageTag());
+		if(tag != nullptr)
+		{
+			pageNumber = tag->GetPageNumber() + 1;
+		}
+		cout << "Page " << pageNumber << ":" << endl;
 		cout << "Error: " << result->GetErrorCode() << ", " << result->GetErrorString() << endl;
 
 		CDecodedBarcodesResult* barcodeResult = result->GetDecodedBarcodesResult();
 
 		if (barcodeResult == nullptr || barcodeResult->GetItemsCount() == 0)
 		{
-			cout << "No barcode found in page " << i + 1 << endl;
+			cout << "No barcode found in page " << pageNumber << endl;
 		}
 		else
 		{
-			cout << "Total barcode(s) found in page " << i + 1 << ": " << barcodeResult->GetItemsCount() << endl;
+			cout << "Total barcode(s) found in page " << pageNumber << ": " << barcodeResult->GetItemsCount() << endl;
 			for (int index = 0; index < barcodeResult->GetItemsCount(); ++index)
 			{
 				const CBarcodeResultItem* barcode = barcodeResult->GetItem(index);
@@ -191,6 +199,9 @@ int main(int argc, const char *argv[])
 
 			if (imagePath == "q" || imagePath == "Q")
 				break;
+
+			if (imagePath.length() >= 2 && imagePath.front() == '"' && imagePath.back() == '"')
+				imagePath = imagePath.substr(1, imagePath.length() - 2);
 
 			vector<string> vecFiles;
 			GetFiles(imagePath, vecFiles);

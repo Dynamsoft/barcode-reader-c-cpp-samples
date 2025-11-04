@@ -163,10 +163,20 @@ void run(CCaptureVisionRouter* cvrInstance, const std::string& imagePath, const 
 	int count = resultArray->GetResultsCount();
 	for (int i = 0; i < count; ++i)
 	{
-		std::cout << "Result" << (count > 1 ? " Page-" + std::to_string(i + 1) : "") << ":" << std::endl;
+
 		const CCapturedResult* result = resultArray->GetResult(i);
 		if (!result)
 			continue;
+
+		int pageNumber = i + 1;
+		// It is usually necessary to determine 'ImageTagType' based on the original image tag.
+		// Since imageFile is used, it is directly converted to 'const dynamsoft::basic_structures::CFileImageTag *'.
+		const CFileImageTag *tag = dynamic_cast<const CFileImageTag *>(result->GetOriginalImageTag());
+		if(tag != nullptr)
+		{
+			pageNumber = tag->GetPageNumber() + 1;
+		}
+		std::cout << "Result" << (count > 1 ? " Page-" + std::to_string(pageNumber) : "") << ":" << std::endl;
 
 		int errorCode = result->GetErrorCode();
 		if (errorCode != ErrorCode::EC_OK && errorCode != ErrorCode::EC_UNSUPPORTED_JSON_KEY_WARNING) {
