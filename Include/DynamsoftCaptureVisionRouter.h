@@ -27,7 +27,7 @@
 #include "DynamsoftCodeParser.h"
 //#endif
 
-#define DCV_VERSION                  "3.2.50.6558"
+#define DCV_VERSION                  "3.4.10.6925"
 
 /**Enumeration section*/
 
@@ -1406,8 +1406,8 @@ namespace dynamsoft
 			static void SetGlobalIntraOpNumThreads(int intraOpNumThreads = 0);
 
 		private:
-			CCaptureVisionRouter(const CCaptureVisionRouter& r);
-			CCaptureVisionRouter& operator=(const CCaptureVisionRouter& r);
+			CCaptureVisionRouter(const CCaptureVisionRouter& r) = delete;
+			CCaptureVisionRouter& operator=(const CCaptureVisionRouter& r) = delete;
 		};
 
 		/**
