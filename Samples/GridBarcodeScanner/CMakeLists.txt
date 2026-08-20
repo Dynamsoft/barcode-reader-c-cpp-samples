@@ -5,17 +5,19 @@ project(GridBarcodeScanner LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O2 -fvisibility=hidden -fvisibility-inlines-hidden -L ${DBRLIB} -Wl,-rpath,${DBRLIB} -Wl,-rpath,'$ORIGIN' -static-libgcc -static-libstdc++ -s")
-
-set(SOURCE_FILE GridBarcodeScanner.cpp)
+set(SOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/GridBarcodeScanner.cpp)
 set(TARGET_NAME GridBarcodeScanner)
 
 set(OPENCV_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../thirdLib/opencv)
 set(OPENCV_INCLUDE_DIR ${OPENCV_ROOT}/include)
 set(OPENCV_LIB_DIR ${OPENCV_ROOT}/lib)
 
-set(DS_LIB_PATH ../../Dist/Lib/Linux/x64)
+set(DS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../..)
+set(DS_INCLUDE_PATH ${DS_ROOT}/Include)
+set(DS_LIB_PATH ${DS_ROOT}/Dist/Lib/Linux/x64)
 set(DS_LIBS DynamsoftCaptureVisionRouter DynamsoftCore DynamsoftUtility DynamsoftLicense DynamsoftImageProcessing)
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O2 -fvisibility=hidden -fvisibility-inlines-hidden -L${DS_LIB_PATH} -Wl,-rpath,${DS_LIB_PATH} -Wl,-rpath,'$ORIGIN' -static-libgcc -static-libstdc++ -s")
 set(OPENCV_LIBS
 	${OPENCV_LIB_DIR}/libopencv_core.so
 	${OPENCV_LIB_DIR}/libopencv_highgui.so
@@ -24,8 +26,8 @@ set(OPENCV_LIBS
 )
 set(OPENCV_SYSTEM_LIBS pthread dl m z)
 
-set(DS_MODELS_PATH ../../Dist/Models)
-set(CUSTOM_TEMPLATE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../CustomTemplates)
+set(DS_MODELS_PATH ${DS_ROOT}/Dist/Models)
+set(CUSTOM_TEMPLATE_SOURCE_DIR ${DS_ROOT}/CustomTemplates)
 set(CUSTOM_TEMPLATE_FILES
 	${CUSTOM_TEMPLATE_SOURCE_DIR}/GridFastScan.json
 	${CUSTOM_TEMPLATE_SOURCE_DIR}/GridDeepDecode.json
@@ -33,7 +35,7 @@ set(CUSTOM_TEMPLATE_FILES
 
 add_executable(${TARGET_NAME} ${SOURCE_FILE})
 
-target_include_directories(${TARGET_NAME} PRIVATE ../../Include ${OPENCV_INCLUDE_DIR})
+target_include_directories(${TARGET_NAME} PRIVATE ${DS_INCLUDE_PATH} ${OPENCV_INCLUDE_DIR})
 
 target_link_libraries(${TARGET_NAME} stdc++ ${DS_LIBS} ${OPENCV_LIBS} ${OPENCV_SYSTEM_LIBS})
 
