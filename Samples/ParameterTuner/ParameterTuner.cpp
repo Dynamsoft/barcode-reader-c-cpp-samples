@@ -37,12 +37,12 @@ public:
 
 std::tuple<std::string, std::string, std::string> selectImage() {
 	std::map<std::string, std::tuple<std::string, std::string, std::string>> sampleImages = {
-		{"1", {"images/blurry.png", "ReadBlurry1DBarcode.json", "Suitable for blurred 1D barcode"}},
-		{"2", {"images/GeneralBarcodes.png", "ReadMultipleBarcode.json", "Suitable for multiple barcodes"}},
-		{"3", {"images/inverted-barcode.png", "ReadInvertedBarcode.json", "Suitable for colour inverted barcode"}},
-		{"4", {"images/DPM.png", "ReadDPM.json", "Suitable for Direct Part Marking barcode"}},
-		{"5", {"images/EAN-13.jpg", "ReadOneDRetail.json", "Suitable for retail 1D barcode such as EAN13, UPC-A"}},
-		{"6", {"images/OneDIndustrial.jpg", "ReadOneDIndustrial.json", "Suitable for industrial 1D barcode such as Code128, Code39"}}
+		{"1", {"Images/blurry.png", "ReadBlurry1DBarcode.json", "Suitable for blurred 1D barcode"}},
+		{"2", {"Images/GeneralBarcodes.png", "ReadMultipleBarcode.json", "Suitable for multiple barcodes"}},
+		{"3", {"Images/inverted-barcode.png", "ReadInvertedBarcode.json", "Suitable for colour inverted barcode"}},
+		{"4", {"Images/DPM.png", "ReadDPM.json", "Suitable for Direct Part Marking barcode"}},
+		{"5", {"Images/EAN-13.jpg", "ReadOneDRetail.json", "Suitable for retail 1D barcode such as EAN13, UPC-A"}},
+		{"6", {"Images/OneDIndustrial.jpg", "ReadOneDIndustrial.json", "Suitable for industrial 1D barcode such as Code128, Code39"}}
 	};
 
 	std::cout << "Available Sample Scenarios:" << std::endl;

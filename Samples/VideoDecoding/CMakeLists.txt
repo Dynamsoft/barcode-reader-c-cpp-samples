@@ -1,20 +1,46 @@
 cmake_minimum_required(VERSION 3.6)
-project(VideoDecoding)
 
-set(DBRLIB ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Lib/Linux/x64)
+project(VideoDecoding LANGUAGES CXX)
 
-set (CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(SOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/VideoDecoding.cpp)
+set(TARGET_NAME VideoDecoding)
+
+# Use the OpenCV shipped with this repository instead of the one installed on the machine.
+set(OPENCV_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../thirdLib/opencv)
+set(OPENCV_INCLUDE_DIR ${OPENCV_ROOT}/include)
+set(OPENCV_LIB_DIR ${OPENCV_ROOT}/lib)
+
+set(DS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../..)
+set(DS_INCLUDE_PATH ${DS_ROOT}/Include)
+set(DS_LIB_PATH ${DS_ROOT}/Dist/Lib/Linux/x64)
+
 add_compile_options(-O2 -fPIC)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O2 -fvisibility=hidden -fvisibility-inlines-hidden -L ${DBRLIB} -Wl,-rpath,${DBRLIB} -Wl,-rpath,'$ORIGIN' -static-libgcc -static-libstdc++ -s")
-find_package(OpenCV 3.4.5 REQUIRED)
+# --disable-new-dtags emits DT_RPATH instead of DT_RUNPATH, so the rpath below also
+# applies to transitive dependencies (e.g. libopencv_imgproc.so pulled in by highgui).
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -O2 -fvisibility=hidden -fvisibility-inlines-hidden -L${DS_LIB_PATH} -Wl,--disable-new-dtags -Wl,-rpath,${DS_LIB_PATH} -Wl,-rpath,${OPENCV_LIB_DIR} -Wl,-rpath,'$ORIGIN' -static-libgcc -static-libstdc++ -s")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdLib/Include)
+set(DS_LIBS DynamsoftCaptureVisionRouter DynamsoftLicense DynamsoftUtility DynamsoftCore)
 
-file(GLOB FILE_SRCS
-VideoDecoding.cpp
+set(OPENCV_LIBS
+	${OPENCV_LIB_DIR}/libopencv_core.so
+	${OPENCV_LIB_DIR}/libopencv_videoio.so
+	${OPENCV_LIB_DIR}/libopencv_highgui.so
 )
-add_executable(VideoDecoding ${FILE_SRCS})
-set_target_properties(VideoDecoding PROPERTIES SKIP_BUILD_RPATH TRUE)
-target_link_libraries(VideoDecoding DynamsoftCaptureVisionRouter DynamsoftLicense DynamsoftUtility DynamsoftCore opencv_core opencv_videoio opencv_highgui)
-File(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Templates/DBR-PresetTemplates.json DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Lib/Linux/x64/Templates)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Models DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../Dist/Lib/Linux/x64)
+
+set(OPENCV_SYSTEM_LIBS pthread dl m z)
+
+add_executable(${TARGET_NAME} ${SOURCE_FILE})
+
+target_include_directories(${TARGET_NAME} PRIVATE ${DS_INCLUDE_PATH} ${OPENCV_INCLUDE_DIR})
+
+target_link_directories(${TARGET_NAME} PRIVATE ${DS_LIB_PATH})
+
+target_link_libraries(${TARGET_NAME} ${DS_LIBS} ${OPENCV_LIBS} ${OPENCV_SYSTEM_LIBS})
+
+set_target_properties(${TARGET_NAME} PROPERTIES INSTALL_RPATH "${DS_LIB_PATH};${OPENCV_LIB_DIR};$ORIGIN")
+
+file(COPY ${DS_ROOT}/Dist/Templates/DBR-PresetTemplates.json DESTINATION ${DS_LIB_PATH}/Templates)
+file(COPY ${DS_ROOT}/Dist/Models DESTINATION ${DS_LIB_PATH})
