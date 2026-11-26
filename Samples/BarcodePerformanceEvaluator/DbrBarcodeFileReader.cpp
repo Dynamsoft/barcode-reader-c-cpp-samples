@@ -1,15 +1,11 @@
 #if defined(_WIN64) || defined(_WIN32)
 #include <io.h>
+#include <direct.h>
 #else
-#ifdef DM_ARM
-#include <sys/uio.h>
-#else
-#include <sys/io.h>
-#endif
-#include <unistd.h> 
+#include <dirent.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <dirent.h>
 #endif
 
 #include <time.h>

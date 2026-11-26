@@ -15,11 +15,11 @@ using namespace dynamsoft::license;
 #include <windows.h>
 #include <io.h>
 
-#ifdef _WIN64
+#if defined(_WIN64) && !defined(DBR_NO_PRAGMA_LINK)
 #pragma comment(lib, "../../Dist/Lib/Windows/x64/DynamsoftCaptureVisionRouterx64.lib")
 #pragma comment(lib, "../../Dist/Lib/Windows/x64/DynamsoftLicensex64.lib")
 #pragma comment(lib, "../../Dist/Lib/Windows/x64/DynamsoftCorex64.lib")
-#else
+#elif !defined(DBR_NO_PRAGMA_LINK)
 #pragma comment(lib, "../../Dist/Lib/Windows/x86/DynamsoftCaptureVisionRouterx86.lib")
 #pragma comment(lib, "../../Dist/Lib/Windows/x86/DynamsoftLicensex86.lib")
 #pragma comment(lib, "../../Dist/Lib/Windows/x86/DynamsoftCorex86.lib")

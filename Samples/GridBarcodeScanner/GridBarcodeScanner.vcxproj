@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -56,11 +56,11 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\thirdLib\opencv\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\thirdLib\opencv\lib\Windows\$(PlatformTarget)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_core452.lib;opencv_highgui452.lib;opencv_imgcodecs452.lib;opencv_imgproc452.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "..\thirdLib\opencv\bin\$(Configuration)\*.*"  "$(OutputPath)"
+      <Command>copy "..\thirdLib\opencv\lib\Windows\$(PlatformTarget)\*.*"  "$(OutputPath)"
 
 xcopy /y "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
 xcopy /y "$(SolutionDir)..\..\Dist\Templates\*.json" "$(TargetDir)\Templates\"
@@ -81,11 +81,11 @@ xcopy /ys "$(SolutionDir)..\..\Dist\Models" "$(OutputPath)Models\"</Command>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\thirdLib\opencv\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\thirdLib\opencv\lib\Windows\$(PlatformTarget)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>opencv_core452.lib;opencv_highgui452.lib;opencv_imgcodecs452.lib;opencv_imgproc452.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "..\thirdLib\opencv\bin\$(Configuration)\*.*"  "$(OutputPath)"
+      <Command>copy "..\thirdLib\opencv\lib\Windows\$(PlatformTarget)\*.*"  "$(OutputPath)"
 
 xcopy /y "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*" "$(TargetDir)"
 xcopy /y "$(SolutionDir)..\..\Dist\Templates\*.json" "$(TargetDir)\Templates\"

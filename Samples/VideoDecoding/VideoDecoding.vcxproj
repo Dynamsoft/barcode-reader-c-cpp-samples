@@ -52,10 +52,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>opencv_core452.lib;opencv_videoio452.lib;opencv_highgui452.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\thirdLib\opencv\lib\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\thirdLib\opencv\lib\Windows\$(PlatformTarget)\</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>copy "..\thirdLib\opencv\bin\$(Configuration)\*.*"  "$(OutputPath)"
+      <Command>copy "..\thirdLib\opencv\lib\Windows\$(PlatformTarget)\*.*"  "$(OutputPath)"
 
 xcopy /ys "$(SolutionDir)..\..\Dist\Lib\Windows\$(PlatformTarget)\*.dll" "$(OutputPath)"
 xcopy /ys "$(SolutionDir)..\..\Dist\Templates\*.json" "$(OutputPath)Templates\"

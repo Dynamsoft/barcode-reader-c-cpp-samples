@@ -11,11 +11,6 @@
 #include <direct.h>
 #define sleep _sleep
 #else
-#ifdef DM_ARM
-#include <sys/uio.h>
-#else
-#include <sys/io.h>
-#endif
 #include <dirent.h>
 #include <unistd.h> 
 #include <sys/stat.h>
